@@ -14,6 +14,9 @@
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTTrackContainer.h"
 #include "DataFormats/L1GlobalMuonTrigger/interface/L1MuRegionalCand.h"
 
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/DtSuperStation.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/DtSuperStationFwd.h"
+
 namespace {
   using namespace L1ITMu;
   struct dictionary {
@@ -46,6 +49,16 @@ namespace {
 
     InternalTrackRef rtk;
     InternalTrackPtr ptk;
+
+    // subdetector tracks
+    DtSuperStation dss;
+    edm::Wrapper<DtSuperStation> wdss;
+
+    DtSuperStationPair pdss;
+    edm::Wrapper<DtSuperStationPair> wpdss;
+
+    DtSuperStationMap mdss;
+    edm::Wrapper<DtSuperStationMap> wmdss;
 
     // Candidate tracks
     CandidateTrack cctk;

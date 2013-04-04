@@ -40,6 +40,15 @@
   <class name="L1ITMu::InternalTrackRef"/>
   <class name="L1ITMu::InternalTrackPtr"/>
 
+  <class name="L1ITMu::DtSuperStation" ClassVersion="10">
+   <version ClassVersion="10" checksum="3937991841"/>
+  </class>
+  <class name="edm::Wrapper<L1ITMu::DtSuperStation>"/>
+  <class name="L1ITMu::DtSuperStationPair"/>
+  <class name="edm::Wrapper<L1ITMu::DtSuperStationPair>"/>
+  <class name="L1ITMu::DtSuperStationMap"/>
+  <class name="edm::Wrapper<L1ITMu::DtSuperStationMap>"/>
+
   <class name="L1ITMu::CandidateTrack" ClassVersion="10">
    <version ClassVersion="10" checksum="4284624899"/>
   </class>
@@ -75,6 +84,6 @@
   <class name="edm::reftobase::RefHolder<L1ITMu::DTTrackRef>"/>
   <class name="edm::reftobase::RefHolder<L1ITMu::CSCTrackRef>"/>
   <class name="edm::reftobase::RefHolder<L1ITMu::InternalTrackRef>"/>
-  
+
  </selection>
 </lcgdict>
