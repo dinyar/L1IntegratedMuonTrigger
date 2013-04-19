@@ -27,6 +27,12 @@ namespace L1ITMu {
 
     /// internal enum for subdetector stub identification
     enum subsystem_offset{ kDT, kRPCb, kCSC, kRPCf };
+
+    /// structure for internal indexing
+    struct primitiveAssociation {
+      std::vector< size_t > rpcIn;
+      std::vector< size_t > rpcOut;
+    };
     
     /// default constructor
     DtSuperStation() :_wheel(0),_sector(0),_station(0) {};
@@ -64,7 +70,17 @@ namespace L1ITMu {
     /// returns station
     inline int station() const { return _station; }
 
+    /// rpc inner layer hits associated to a given dt station
+    TriggerPrimitiveList getRpcInAssociatedStubs( size_t dtIndex ) const;
+
+    /// rpc outer layer hits associated to a given dt station
+    TriggerPrimitiveList getRpcOutAssociatedStubs( size_t dtIndex ) const;
+
+    // build association map among dt and rpc primitives
+    void associate( double );
+
   private :
+
     /// dt segments
     TriggerPrimitiveList _dtAssociatedStubs;
 
@@ -76,6 +92,9 @@ namespace L1ITMu {
 
     /// space coordinates
     int _wheel, _sector, _station;
+
+    // association map among dt and rpc primitives
+    std::vector< primitiveAssociation > _dtMapAss;
 
   };
 }

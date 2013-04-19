@@ -25,11 +25,13 @@ public:
   void produce(edm::Event&, const edm::EventSetup&);  
 private:
   edm::InputTag _trigPrimSrc;
+  double _maxDeltaPhi;
 };
 
 
 L1ITMuDtSuperStationProducer::L1ITMuDtSuperStationProducer( const edm::ParameterSet& iConfig )
-  : _trigPrimSrc(iConfig.getParameter<edm::InputTag>("TriggerPrimitiveSrc"))
+  : _trigPrimSrc(iConfig.getParameter<edm::InputTag>("TriggerPrimitiveSrc")),
+    _maxDeltaPhi(iConfig.getParameter<double>("MaxDeltaPhi"))
 {
   produces<L1ITMu::DtSuperStationMap>().setBranchAlias("DtSuperStationMap");
 }
@@ -79,6 +81,11 @@ L1ITMuDtSuperStationProducer::produce( edm::Event& iEvent,
     L1ITMu::TriggerPrimitiveRef tpref(tps, tp - tpbeg);
     tracksMap[key].addStub( tpref );
   }
+
+
+  L1ITMu::DtSuperStationMap::iterator st = out->begin();
+  L1ITMu::DtSuperStationMap::iterator stend = out->end();
+  for ( ; st != stend; ++st ) st->second.associate( _maxDeltaPhi );
 
   iEvent.put(out);
 

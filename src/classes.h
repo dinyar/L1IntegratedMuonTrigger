@@ -60,6 +60,12 @@ namespace {
     DtSuperStationMap mdss;
     edm::Wrapper<DtSuperStationMap> wmdss;
 
+    DtSuperStation::primitiveAssociation sspa;
+    edm::Wrapper<DtSuperStation::primitiveAssociation> wsspa;
+
+    std::vector<DtSuperStation::primitiveAssociation> vsspa;
+    edm::Wrapper<std::vector<DtSuperStation::primitiveAssociation> > wvsspa;
+
     // Candidate tracks
     CandidateTrack cctk;
     edm::Wrapper<CandidateTrack> wcctk;
