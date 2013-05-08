@@ -1,18 +1,22 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process('TEXTDUMP')
+process = cms.Process('PLOTMAKER')
+
+process.load('FWCore.MessageService.MessageLogger_cfi')
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string('L1ITMuDtSuperStation.root')
+    fileName=cms.string('L1ITMuonBarrelPlots.root')
     )
 
 process.L1ITMuPlotter = cms.EDAnalyzer(
-    'L1ITMuDtSuperStationPlots',
-    L1ITMuDtSuperStation = cms.InputTag('L1ITMuDtSuperStationProducer')
+    'L1ITMuonBarrelPlots',
+    MBLTCollection = cms.InputTag('MBLTProducer'),
+    L1ITDTChambPhContainer = cms.InputTag('L1ITMuonBarrelPrimitiveProducer', '', 'L1ITMU')
 )
 
-infile = 'file:L1ITMU.root'
+infile = 'file:L1ITMBLT.root'
 
 process.source = cms.Source(
     'PoolSource',

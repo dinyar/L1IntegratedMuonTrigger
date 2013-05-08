@@ -185,7 +185,7 @@ bool TriggerPrimitive::operator==(const TriggerPrimitive& tp) const {
 const int TriggerPrimitive::getBX() const {
   switch(_subsystem) {
   case kDT:
-    return _dt.bx;
+    return _dt.bx - ( _dt.Ts2TagCode ? 1 : 0 );
   case kCSC:
     return _csc.bx;
   case kRPC:

@@ -1,17 +1,17 @@
-#include "L1Trigger/L1IntegratedMuonTrigger/interface/DtSuperStation.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
 
 #include "DataFormats/MuonDetId/interface/RPCDetId.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
 
-L1ITMu::DtSuperStation::DtSuperStation( const DTChamberId & dtId )
+L1ITMu::MBLTCollection::MBLTCollection( const DTChamberId & dtId )
 {
   _wheel = dtId.wheel();
   _sector = dtId.sector();
   _station = dtId.station();
 }
 
-void L1ITMu::DtSuperStation::addStub(const TriggerPrimitiveRef& stub)
+void L1ITMu::MBLTCollection::addStub(const TriggerPrimitiveRef& stub)
 {
 
   TriggerPrimitive::subsystem_type type = stub->subsystem();
@@ -43,13 +43,19 @@ void L1ITMu::DtSuperStation::addStub(const TriggerPrimitiveRef& stub)
 
 
 
-void L1ITMu::DtSuperStation::associate( double minRpcPhi )
+void L1ITMu::MBLTCollection::associate( double minRpcPhi )
 {
 
   size_t dtSize = _dtAssociatedStubs.size();
   size_t rpcInSize = _rpcInAssociatedStubs.size();
   size_t rpcOutSize = _rpcOutAssociatedStubs.size();
   _dtMapAss.resize( dtSize );
+
+
+//   std::vector< std::map<double, size_t> > dtIdxIn;
+//   dtIdxIn.resize(rpcInSize);
+//   std::vector< std::map<double, size_t> > dtIdxOut;
+//   dtIdxOut.resize(rpcOutSize);
 
   for ( size_t iDt = 0; iDt < dtSize; ++iDt ) {
 
@@ -60,17 +66,23 @@ void L1ITMu::DtSuperStation::associate( double minRpcPhi )
     for ( size_t iIn = 0; iIn < rpcInSize; ++iIn ) {
       double phiIn = _rpcInAssociatedStubs.at( iIn )->getCMSGlobalPhi();
       double deltaPhiIn = fabs( reco::deltaPhi( phi, phiIn ) );
-      if ( deltaPhiIn < minRpcPhi ) rpcInIdx[ deltaPhiIn ] = iIn;
+      if ( deltaPhiIn < minRpcPhi ) {
+	rpcInIdx[ deltaPhiIn ] = iIn;
+// 	dtIdxIn[iIn][ deltaPhiIn ] = iDt;
+      }
     }
 
     for ( size_t iOut = 0; iOut < rpcOutSize; ++iOut ) {
       double phiOut = _rpcOutAssociatedStubs.at( iOut )->getCMSGlobalPhi();
       double deltaPhiOut = fabs( reco::deltaPhi( phi, phiOut ) );
-      if ( deltaPhiOut < minRpcPhi ) rpcOutIdx[ deltaPhiOut ] = iOut;
+      if ( deltaPhiOut < minRpcPhi ) {
+	rpcOutIdx[ deltaPhiOut ] = iOut;
+// 	dtIdxOut[iOut][ deltaPhiOut ] = iDt;
+      }
     }
 
 
-    DtSuperStation::primitiveAssociation & dtAss = _dtMapAss.at(iDt);
+    MBLTCollection::primitiveAssociation & dtAss = _dtMapAss.at(iDt);
 
     /// fill up index for In associations
     std::map< double, size_t >::const_iterator it = rpcInIdx.begin();
@@ -89,7 +101,7 @@ void L1ITMu::DtSuperStation::associate( double minRpcPhi )
 }
 
 
-L1ITMu::TriggerPrimitiveList L1ITMu::DtSuperStation::getRpcInAssociatedStubs( size_t dtIndex ) const
+L1ITMu::TriggerPrimitiveList L1ITMu::MBLTCollection::getRpcInAssociatedStubs( size_t dtIndex ) const
 {
 
   L1ITMu::TriggerPrimitiveList returnList;
@@ -112,7 +124,7 @@ L1ITMu::TriggerPrimitiveList L1ITMu::DtSuperStation::getRpcInAssociatedStubs( si
 }
 
 
-L1ITMu::TriggerPrimitiveList L1ITMu::DtSuperStation::getRpcOutAssociatedStubs( size_t dtIndex ) const
+L1ITMu::TriggerPrimitiveList L1ITMu::MBLTCollection::getRpcOutAssociatedStubs( size_t dtIndex ) const
 {
 
   L1ITMu::TriggerPrimitiveList returnList;
@@ -132,6 +144,77 @@ L1ITMu::TriggerPrimitiveList L1ITMu::DtSuperStation::getRpcOutAssociatedStubs( s
 
   return returnList;
 
+
+}
+
+
+
+
+
+
+L1ITMu::MBLTCollection::bxMatch L1ITMu::MBLTCollection::haveCommonRpc( size_t dt1, size_t dt2 ) const
+{
+  
+  L1ITMu::MBLTCollection::bxMatch ret_val = NOMATCH;
+
+  if ( dt1 == dt2 ) {
+    throw cms::Exception("DT primitive compared to itself") 
+      << "The two id passed refer to the same primitive"
+      << std::endl;
+  }
+
+  try {
+    const primitiveAssociation & prim1 = _dtMapAss.at(dt1);
+    const primitiveAssociation & prim2 = _dtMapAss.at(dt2);
+
+//     bool in_match = false;
+//     bool out_match = false;
+
+//     size_t rpcInSize1 = prim1.rpcIn.size();
+//     size_t rpcInSize2 = prim2.rpcIn.size();
+//     for ( size_t i = 0; i < rpcInSize1; ++i ) 
+//       for ( size_t j = 0; j < rpcInSize2; ++j )
+// 	if ( prim1.rpcIn[i] == prim1.rpcIn[j] ) {
+// 	  in_match = true;
+// 	  i = rpcInSize1;
+// 	  break;
+// 	}
+
+//     size_t rpcOutSize1 = prim1.rpcOut.size();
+//     size_t rpcOutSize2 = prim2.rpcOut.size();
+//     for ( size_t i = 0; i < rpcOutSize1; ++i ) 
+//       for ( size_t j = 0; j < rpcOutSize2; ++j )
+// 	if ( prim1.rpcOut[i] == prim1.rpcOut[j] ) {
+// 	  out_match = true;
+// 	  i = rpcOutSize1;
+// 	  break;
+// 	}
+//     if ( in_match && out_match ) return FULLMATCH;
+//     else if ( in_match ) return INMATCH;
+//     else if ( out_match ) return OUTMATCH;
+//     return NOMATCH;
+
+
+    if ( !prim1.rpcIn.empty() && !prim2.rpcIn.empty() ) {
+      if ( prim1.rpcIn.front() == prim2.rpcIn.front() ) {
+    	ret_val = INMATCH;
+      }
+    }
+
+    if ( !prim1.rpcOut.empty() && !prim2.rpcOut.empty() ) {
+      if ( prim1.rpcOut.front() == prim2.rpcOut.front() ) {
+    	ret_val = ( ret_val == INMATCH ) ? FULLMATCH : OUTMATCH;
+      }
+    }
+    return ret_val;
+
+  } catch ( const std::out_of_range & e ) {
+    throw cms::Exception("DT Chamber Out of Range") 
+      << "The number of dt primitives in sector are " << _dtMapAss.size()
+      << std::endl;
+  }
+
+  return ret_val;
 
 }
 

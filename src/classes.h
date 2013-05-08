@@ -14,8 +14,8 @@
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTTrackContainer.h"
 #include "DataFormats/L1GlobalMuonTrigger/interface/L1MuRegionalCand.h"
 
-#include "L1Trigger/L1IntegratedMuonTrigger/interface/DtSuperStation.h"
-#include "L1Trigger/L1IntegratedMuonTrigger/interface/DtSuperStationFwd.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollectionFwd.h"
 
 namespace {
   using namespace L1ITMu;
@@ -51,20 +51,20 @@ namespace {
     InternalTrackPtr ptk;
 
     // subdetector tracks
-    DtSuperStation dss;
-    edm::Wrapper<DtSuperStation> wdss;
+    MBLTCollection dss;
+    edm::Wrapper<MBLTCollection> wdss;
 
-    DtSuperStationPair pdss;
-    edm::Wrapper<DtSuperStationPair> wpdss;
+    MBLTContainerPair pdss;
+    edm::Wrapper<MBLTContainerPair> wpdss;
 
-    DtSuperStationMap mdss;
-    edm::Wrapper<DtSuperStationMap> wmdss;
+    MBLTContainer mdss;
+    edm::Wrapper<MBLTContainer> wmdss;
 
-    DtSuperStation::primitiveAssociation sspa;
-    edm::Wrapper<DtSuperStation::primitiveAssociation> wsspa;
+    MBLTCollection::primitiveAssociation sspa;
+    edm::Wrapper<MBLTCollection::primitiveAssociation> wsspa;
 
-    std::vector<DtSuperStation::primitiveAssociation> vsspa;
-    edm::Wrapper<std::vector<DtSuperStation::primitiveAssociation> > wvsspa;
+    std::vector<MBLTCollection::primitiveAssociation> vsspa;
+    edm::Wrapper<std::vector<MBLTCollection::primitiveAssociation> > wvsspa;
 
     // Candidate tracks
     CandidateTrack cctk;

@@ -1,5 +1,5 @@
-#ifndef L1Trigger_L1IntegratedMuonTrigger_DtSuperStation_h_
-#define L1Trigger_L1IntegratedMuonTrigger_DtSuperStation_h_
+#ifndef L1Trigger_L1IntegratedMuonTrigger_MBLTCollection_h_
+#define L1Trigger_L1IntegratedMuonTrigger_MBLTCollection_h_
 // 
 // Class: L1ITMu:: 
 //
@@ -21,7 +21,7 @@
 
 namespace L1ITMu {
   
-  class DtSuperStation {
+  class MBLTCollection {
 
   public:
 
@@ -33,15 +33,17 @@ namespace L1ITMu {
       std::vector< size_t > rpcIn;
       std::vector< size_t > rpcOut;
     };
+
+    enum bxMatch { NOMATCH, INMATCH, OUTMATCH, FULLMATCH };
     
     /// default constructor
-    DtSuperStation() :_wheel(0),_sector(0),_station(0) {};
+    MBLTCollection() :_wheel(0),_sector(0),_station(0) {};
 
     /// construction out of DTChamberId: automatically extracts info
-    DtSuperStation( const DTChamberId & dtId );
-    ~DtSuperStation() {};
+    MBLTCollection( const DTChamberId & dtId );
+    ~MBLTCollection() {};
 
-    /// selectively add Trigger Primitives to the SuperSegment
+    /// selectively add Trigger Primitives to the MBLTCollection
     /// dt, rpc up layer and rpc down layer are stored in separated collections
     void addStub( const TriggerPrimitiveRef& stub );
 
@@ -78,6 +80,9 @@ namespace L1ITMu {
 
     // build association map among dt and rpc primitives
     void associate( double );
+
+    // look for common rpc hists among 2 dt primitives
+    bxMatch haveCommonRpc( size_t dt1, size_t dt2 ) const;
 
   private :
 

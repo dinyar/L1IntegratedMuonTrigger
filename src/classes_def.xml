@@ -40,22 +40,20 @@
   <class name="L1ITMu::InternalTrackRef"/>
   <class name="L1ITMu::InternalTrackPtr"/>
 
-  <class name="L1ITMu::DtSuperStation" ClassVersion="11">
-   <version ClassVersion="10" checksum="3937991841"/>
-   <version ClassVersion="11" checksum="1647444613"/>
+  <class name="L1ITMu::MBLTCollection" ClassVersion="10">
+   <version ClassVersion="10" checksum="752113217"/>
   </class>
-  <class name="edm::Wrapper<L1ITMu::DtSuperStation>"/>
-  <class name="L1ITMu::DtSuperStationPair"/>
-  <class name="edm::Wrapper<L1ITMu::DtSuperStationPair>"/>
-  <class name="L1ITMu::DtSuperStationMap"/>
-  <class name="edm::Wrapper<L1ITMu::DtSuperStationMap>"/>
-  <class name="L1ITMu::DtSuperStation::primitiveAssociation"/>
-  <class name="edm::Wrapper<L1ITMu::DtSuperStation::primitiveAssociation>"  ClassVersion="10">
-   <version ClassVersion="10" checksum="4275688957"/>
+  <class name="edm::Wrapper<L1ITMu::MBLTCollection>"/>
+  <class name="L1ITMu::MBLTContainerPair"/>
+  <class name="edm::Wrapper<L1ITMu::MBLTContainerPair>"/>
+  <class name="L1ITMu::MBLTContainer"/>
+  <class name="edm::Wrapper<L1ITMu::MBLTContainer>"/>
+  <class name="L1ITMu::MBLTCollection::primitiveAssociation"/>
+  <class name="edm::Wrapper<L1ITMu::MBLTCollection::primitiveAssociation>"  ClassVersion="10">
+   <version ClassVersion="10" checksum="2108283157"/>
   </class>
-  <class name="std::vector<L1ITMu::DtSuperStation::primitiveAssociation>"/>
-  <class name="edm::Wrapper<std::vector<L1ITMu::DtSuperStation::primitiveAssociation> >"/>
-
+  <class name="std::vector<L1ITMu::MBLTCollection::primitiveAssociation>"/>
+  <class name="edm::Wrapper<std::vector<L1ITMu::MBLTCollection::primitiveAssociation> >"/>
 
   <class name="L1ITMu::CandidateTrack" ClassVersion="10">
    <version ClassVersion="10" checksum="4284624899"/>
