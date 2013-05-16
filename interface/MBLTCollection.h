@@ -72,6 +72,9 @@ namespace L1ITMu {
     /// returns station
     inline int station() const { return _station; }
 
+    /// returns detId
+    inline DTChamberId detId() const { return DTChamberId( _wheel, _station, _sector ); }
+
     /// rpc inner layer hits associated to a given dt station
     TriggerPrimitiveList getRpcInAssociatedStubs( size_t dtIndex ) const;
 

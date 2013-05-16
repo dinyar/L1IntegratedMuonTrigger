@@ -1,0 +1,85 @@
+#ifndef __L1ITMU_MBTRACK_H__
+#define __L1ITMU_MBTRACK_H__
+// 
+// Class: L1ITMu::MBTrack
+//
+// Info: This class represents (one of the) internal tracks processed
+//       by L1ITMu before sending off to the GT or whatever comes after.
+//       As such, they are similar to the L1MuRegionalCands in terms of
+//       their meaning.
+//       To exploit that we also allow these tracks to be built out of
+//       old style regional cands so we can perform studies using them
+//       in the new framework. So that debugging is easier in the case
+//       of the new track not matching it's parent, a reference to the
+//       parent track is stored.
+//
+// Author: 
+//
+
+#include <iostream>
+
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/TriggerPrimitiveFwd.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/TriggerPrimitive.h"
+
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollectionFwd.h"
+
+#include "DataFormats/L1GlobalMuonTrigger/interface/L1MuRegionalCand.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/RegionalTracksFwd.h"
+#include "DataFormats/Common/interface/RefToBase.h"
+
+#include "DataFormats/L1DTTrackFinder/interface/L1MuDTTrackCand.h"
+#include "DataFormats/L1CSCTrackFinder/interface/L1Track.h"
+
+#include "DataFormats/MuonDetId/interface/DTChamberId.h"
+
+// Muons & Tracks Data Formats
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+
+namespace L1ITMu{
+  class MBTrack : public L1MuRegionalCand {   
+  public:
+
+    // default constructor
+    MBTrack():_wheel(0),_sector(0),_type(5) {}
+    ~MBTrack() {}
+
+    ///  construct starting froma DTTF candidate
+    MBTrack(const L1MuDTTrackCand&);
+
+    // return the persistent pointer to the parent of this internal track
+    // may be null if this has no parent
+    RegionalCandBaseRef parent() const { return _parent; }
+
+    /// set set parent in case you are starting from primitives
+    void setParent(const RegionalCandBaseRef& parent)
+       { _parent = parent; }
+
+    /// add primitives in case you are starting from tracks
+    void addStub(const MBLTCollection& stub);
+    void addStub(const std::pair<const DTChamberId, L1ITMu::MBLTCollection>& stub);
+
+    /// return list of associated MBLT primitives
+    const MBLTContainer& getStubs() const 
+      { return _associatedStubs; }
+
+    /// associate a reco muon
+    void associateMuon( reco::MuonRef & muon )
+    { _recomuon = muon; }
+
+    /// return associated recomuon, if any
+    reco::MuonRef getAssociatedMuon()
+    { return _recomuon; }
+
+  private:
+    int _wheel, _sector;
+    unsigned _type;
+    //pointer to parent, if this was created from a CSC/DT/RPC track
+    MBLTContainer _associatedStubs;
+    RegionalCandBaseRef _parent;
+    reco::MuonRef _recomuon;
+  };
+}
+
+#endif

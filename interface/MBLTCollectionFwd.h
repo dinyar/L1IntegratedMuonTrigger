@@ -9,9 +9,10 @@ class DTChamberId;
 
 namespace L1ITMu {
   class MBLTCollection;
-
   typedef std::pair<DTChamberId, MBLTCollection> MBLTContainerPair;
   typedef std::map<DTChamberId, MBLTCollection> MBLTContainer;
+  typedef edm::Ref<MBLTContainer> MBLTContainerRef;
+
 }
 
 #endif

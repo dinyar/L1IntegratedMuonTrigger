@@ -16,6 +16,8 @@
 
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollectionFwd.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrack.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrackFwd.h"
 
 namespace {
   using namespace L1ITMu;
@@ -65,6 +67,12 @@ namespace {
 
     std::vector<MBLTCollection::primitiveAssociation> vsspa;
     edm::Wrapper<std::vector<MBLTCollection::primitiveAssociation> > wvsspa;
+
+    MBTrack mtss;
+    edm::Wrapper<MBTrack> wmtss;
+
+    MBTrackCollection mtcss;
+    edm::Wrapper<MBTrackCollection> wmtcss;
 
     // Candidate tracks
     CandidateTrack cctk;
