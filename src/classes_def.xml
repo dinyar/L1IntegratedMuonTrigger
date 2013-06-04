@@ -56,8 +56,9 @@
   <class name="edm::Wrapper<std::vector<L1ITMu::MBLTCollection::primitiveAssociation> >"/>
 
 
-  <class name="L1ITMu::MBTrack" ClassVersion="10">
+  <class name="L1ITMu::MBTrack" ClassVersion="11">
    <version ClassVersion="10" checksum="3650627706"/>
+   <version ClassVersion="11" checksum="3784341217"/>
   </class>
   <class name="edm::Wrapper<L1ITMu::MBTrack>"/>
   <class name="L1ITMu::MBTrackCollection"/>

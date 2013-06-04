@@ -37,15 +37,21 @@
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 
+// GMT Data Formats
+#include "DataFormats/L1GlobalMuonTrigger/interface/L1MuGMTCand.h"
+#include "DataFormats/L1GlobalMuonTrigger/interface/L1MuGMTExtendedCand.h"
+#include "DataFormats/L1GlobalMuonTrigger/interface/L1MuGMTReadoutRecord.h"
+
+
 namespace L1ITMu{
   class MBTrack : public L1MuRegionalCand {   
   public:
 
     // default constructor
     MBTrack():_wheel(0),_sector(0),_type(5) {}
-    ~MBTrack() {}
+    ~MBTrack() { _gmtout.clear(); _gmtin.clear(); }
 
-    ///  construct starting froma DTTF candidate
+    ///  construct starting from a DTTF candidate
     MBTrack(const L1MuDTTrackCand&);
 
     // return the persistent pointer to the parent of this internal track
@@ -64,13 +70,19 @@ namespace L1ITMu{
     const MBLTContainer& getStubs() const 
       { return _associatedStubs; }
 
-    /// associate a reco muon
-    void associateMuon( reco::MuonRef & muon )
-    { _recomuon = muon; }
-
-    /// return associated recomuon, if any
-    reco::MuonRef getAssociatedMuon()
-    { return _recomuon; }
+    /// associate a GMTout 
+    void associateGMTout(const L1MuGMTExtendedCand& gmtout);
+   
+    /// associate a GMTin 
+    void associateGMTin(const L1MuRegionalCand& gmtin);
+      
+    /// return associated GMTout, if any
+    std::vector<L1MuGMTExtendedCand> getAssociatedGMTout() 
+      { return _gmtout; }
+    
+    /// return associated GMTin, if any
+    std::vector<L1MuRegionalCand> getAssociatedGMTin() 
+      { return _gmtin; }
 
   private:
     int _wheel, _sector;
@@ -78,7 +90,8 @@ namespace L1ITMu{
     //pointer to parent, if this was created from a CSC/DT/RPC track
     MBLTContainer _associatedStubs;
     RegionalCandBaseRef _parent;
-    reco::MuonRef _recomuon;
+    std::vector<L1MuGMTExtendedCand> _gmtout;
+    std::vector<L1MuRegionalCand> _gmtin;    
   };
 }
 
