@@ -77,11 +77,11 @@ namespace L1ITMu{
     void associateGMTin(const L1MuRegionalCand& gmtin);
       
     /// return associated GMTout, if any
-    std::vector<L1MuGMTExtendedCand> getAssociatedGMTout() 
+    const std::vector<L1MuGMTExtendedCand> getAssociatedGMTout() const 
       { return _gmtout; }
     
     /// return associated GMTin, if any
-    std::vector<L1MuRegionalCand> getAssociatedGMTin() 
+    const std::vector<L1MuRegionalCand> getAssociatedGMTin() const 
       { return _gmtin; }
 
   private:

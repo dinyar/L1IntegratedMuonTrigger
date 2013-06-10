@@ -16,6 +16,7 @@ process.load('L1Trigger.L1IntegratedMuonTrigger.L1CSCTFTrackConverter_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.L1DTTFTrackConverter_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.L1RPCTFTrackConverter_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.MBLTProducer_cfi')
+process.load('L1Trigger.L1IntegratedMuonTrigger.MBTracksProducer_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.L1ITMuonBarrelPrimitiveProducer_cfi')
 
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -40,6 +41,7 @@ process.L1ITMUSequence = cms.Sequence( process.L1ITMuTriggerPrimitives +
                                        process.L1DTTFTrackConverter    +
                                        process.L1RPCTFTrackConverters  +
                                        process.MBLTProducer +
+                                       process.MBTracksProducer +
                                        process.L1ITMuonBarrelPrimitiveProducer )
 
 process.L1ITMUPath = cms.Path(process.L1ITMUSequence)
@@ -48,12 +50,14 @@ outCommands = cms.untracked.vstring('drop *')
 outCommands.append('keep *_genParticles_*_*')
 outCommands.append('keep *_simCsctfDigis_*_*')
 outCommands.append('keep *_simDttfDigis_*_*')
+outCommands.append('keep *_simGmtDigis_*_*')
 outCommands.append('keep *_simRpcTriggerDigis_*_*')
 outCommands.append('keep *_simMuonRPCDigis_*_*')
 outCommands.append('keep *_simDtTriggerPrimitiveDigis_*_*')
 outCommands.append('keep *_simCscTriggerPrimitiveDigis_*_*')
 outCommands.append('keep *_L1ITMuTriggerPrimitives_*_*')
 outCommands.append('keep *_MBLTProducer_*_*')
+outCommands.append('keep *_MBTracksProducer_*_*')
 outCommands.append('keep *_L1ITMuonBarrelPrimitiveProducer_*_*')
 outCommands.append('keep *_*Converter_*_*')
 outCommands.append('keep *_*Matcher_*_*')

@@ -25,6 +25,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBhelpers.h"
 
@@ -34,6 +35,10 @@
 // GMT
 #include "DataFormats/L1GlobalMuonTrigger/interface/L1MuGMTReadoutCollection.h"
 
+#include "CondFormats/L1TObjects/interface/L1MuTriggerScales.h"
+#include "CondFormats/DataRecord/interface/L1MuTriggerScalesRcd.h"
+
+#define pig 3.141592653589793238462
 
 // using namespace L1ITMu;
 
@@ -46,14 +51,17 @@ public:
 
   void produce(edm::Event&, const edm::EventSetup&);  
 private:
-  edm::InputTag _dtTrackSrc, _gmtSrc, _trigPrimSrc;
+  edm::InputTag _dtTrackSrc, _gmtSrc, _mbCollSrc;
   const int min_bx, max_bx;
+  double _maxDeltaPhi, _maxDeltaR;
 };
 
 MBTracksProducer::MBTracksProducer(const PSet& ps):
   _dtTrackSrc(ps.getParameter<edm::InputTag>("DTTrackSrc")),
-  _gmtSrc(ps.getParameter<edm::InputTag>("gtDigis")),
-  _trigPrimSrc(ps.getParameter<edm::InputTag>("TriggerPrimitiveSrc")),
+  _gmtSrc(ps.getParameter<edm::InputTag>("gmtDigis")),  
+  _mbCollSrc(ps.getParameter<edm::InputTag>("MBLTCollectionSrc")),
+  _maxDeltaPhi(ps.getParameter<double>("MaxDeltaPhi")),
+  _maxDeltaR(ps.getParameter<double>("MaxDeltaR")),
   min_bx(ps.getParameter<int>("BX_min")),
   max_bx(ps.getParameter<int>("BX_max")) {
   produces<L1ITMu::DTTrackCollection>("input");
@@ -74,8 +82,8 @@ void MBTracksProducer::produce(edm::Event& ev,
   edm::Handle<L1MuDTTrackContainer> dtTracks;
   ev.getByLabel(_dtTrackSrc,dtTracks);
   
-  edm::Handle<L1ITMu::MBLTContainer> trigPrims;
-  ev.getByLabel(_trigPrimSrc,trigPrims);
+  edm::Handle<L1ITMu::MBLTContainer> MBCont;
+  ev.getByLabel(_mbCollSrc,MBCont);
 
   // get GMT readout collection
   edm::Handle<L1MuGMTReadoutCollection> pCollection;
@@ -86,6 +94,10 @@ void MBTracksProducer::produce(edm::Event& ev,
   std::vector<L1MuGMTReadoutRecord> gmt_records = gmtrc->getRecords();
   std::vector<L1MuGMTReadoutRecord>::const_iterator RRItr = gmt_records.begin();
   std::vector<L1MuGMTReadoutRecord>::const_iterator RREnd = gmt_records.end();
+  
+  // get L1MuTriggerScales
+  edm::ESHandle< L1MuTriggerScales > trigscales_h;
+  es.get< L1MuTriggerScalesRcd >().get( trigscales_h );
   
   int wheel;
   // DT sector processors have wheels [-3,-2,-1,1,2,3] since 
@@ -112,7 +124,16 @@ void MBTracksProducer::produce(edm::Event& ev,
 	    L1ITMu::RegionalCandBaseRef parentBaseRef(parentRef);
 	    trk.setParent(parentBaseRef);
             
+            int phi_local = dttrk->phi_packed();//range: 0 < phi_local < 31 
+            if(phi_local > 15) phi_local -= 32; //range: -16 < phi_local < 15
+            double dttrk_phi_global = (phi_local*(pig/72.))+((pig/6.)*dttrk->scNum());// + 12*i->scNum(); //range: -16 < phi_global < 147
+            if(dttrk_phi_global < 0) dttrk_phi_global+=2*pig; //range: 0 < phi_global < 147
+            if(dttrk_phi_global > 2*pig) dttrk_phi_global-=2*pig; //range: 0 < phi_global < 143
             
+            const L1MuTriggerScales* scales = trigscales_h.product();            
+            float dttrk_eta_global     = scales->getRegionalEtaScale(0)->getValue(dttrk->eta_packed());           
+// // //             float phi_global_new = 180. / acos(-1.) * scales->getPhiScale()->getValue(dttrk->phi_packed());
+                                   
             /// JP: GMT-DTTF matching            
             for ( ; RRItr != RREnd; ++RRItr ) {
               
@@ -123,9 +144,21 @@ void MBTracksProducer::produce(edm::Event& ev,
               
               for( ; dttfCand != dttfCandEnd; ++dttfCand ) {
                 
-                if(dttfCand->empty()) continue;                 
+                if(dttfCand->empty()) continue;        
+                                
+//                 std::cout << "### GMTin - DTTF matching" << std::endl; 
+//                 std::cout << "dttfCand->quality()    = " << dttfCand->quality() << std::endl; 
+//                 std::cout << "dttfCand->phi_packed() = " << dttfCand->phi_packed() << std::endl;
+//                 std::cout << "dttfCand->phiValue()   = " << dttfCand->phiValue() << std::endl;
+// 
+//                 std::cout << "dttrk->quality()       = " << dttrk->quality() << std::endl; 
+//                 std::cout << "dttrk->phi_packed()    = " << dttrk->phi_packed() << std::endl;
+// 
+//                 std::cout << "dttrk_phi_global       = " << dttrk_phi_global << std::endl;
+// // //                 std::cout << "dttrk_phi_global_new         = " << dttrk_phi_global_new << std::endl;
+                
                 if( (dttfCand->quality() == dttrk->quality()) &&
-                    (fabs(dttfCand->phiValue() - dttrk->phiValue()) < 1e-5) ) {
+                    (fabs(dttfCand->phiValue() - dttrk_phi_global) < _maxDeltaPhi) ) {                  
                 
                   trk.associateGMTin(*dttfCand);
                     
@@ -141,10 +174,21 @@ void MBTracksProducer::produce(edm::Event& ev,
                 
                 if(gmtCand->empty()) continue;        
                 
-                float dphi = gmtCand->phiValue() - dttrk->phiValue();
-                float deta = gmtCand->etaValue() - dttrk->etaValue();
+//                 std::cout << "### GMTout - DTTF matching" << std::endl; 
+//                 std::cout << "gmtCand->etaValue()   = " << gmtCand->etaValue() << std::endl;
+//                 std::cout << "gmtCand->phiValue()   = " << gmtCand->phiValue() << std::endl; 
+// 
+//                 std::cout << "dttrk->eta_packed()   = " << dttrk->eta_packed() << std::endl;
+//                 std::cout << "dttrk_eta_global      = " << dttrk_eta_global << std::endl;
+// 
+//                 std::cout << "dttrk->phi_packed()   = " << dttrk->phi_packed() << std::endl;
+//                 std::cout << "dttrk_phi_global      = " << dttrk_phi_global << std::endl;
+// // //                 std::cout << "dttrk_phi_global_new        = " << dttrk_phi_global_new << std::endl;
+                
+                float dphi = gmtCand->phiValue() - dttrk_phi_global;
+                float deta = gmtCand->etaValue() - dttrk_eta_global;
                 float dr   = sqrt(dphi*dphi + deta*deta);
-                if( dr < 0.3 ) {
+                if( dr < _maxDeltaR ) {
 
                   trk.associateGMTout(*gmtCand);               
                     
@@ -170,7 +214,7 @@ void MBTracksProducer::produce(edm::Event& ev,
             ///      to be more consistent
 	    L1ITMu::MBLTContainer tplist =  L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo(wheel,
 						    sp_wheel,sector+1,
-						    trigPrims,mode,
+						    MBCont,mode,
 						    addrs);
 	                            
 	    auto stub = tplist.cbegin();

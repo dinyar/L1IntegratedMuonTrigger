@@ -21,6 +21,9 @@
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollectionFwd.h"
 
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrack.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrackFwd.h"
+
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTChambPhDigi.h"
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTChambPhContainer.h"
 
@@ -45,7 +48,9 @@ public:
 private:
   void endJob();
 
+
   edm::InputTag _mbltCollectionInput;
+  edm::InputTag _mbTracksCollectionInput;
   edm::InputTag _l1itDtPhiChInput;
   edm::Service<TFileService> _fs;
   TH1F * confirmed[4];
@@ -69,12 +74,13 @@ private:
   TH1F * rpcInHitsPerDtseg;
   TH1F * rpcOutHitsPerDtseg;
   TH2F * dtQualityNew;
-
+  
 };
 
 
 L1ITMuonBarrelPlots::L1ITMuonBarrelPlots(const PSet& p)
   : _mbltCollectionInput( p.getParameter<edm::InputTag>("MBLTCollection") ),
+    _mbTracksCollectionInput( p.getParameter<edm::InputTag>("MBTracksCollection") ),
     _l1itDtPhiChInput( p.getParameter<edm::InputTag>("L1ITDTChambPhContainer") )
 {
 
@@ -375,7 +381,78 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 //     iph->phiB();
 //     iph->code();
 
+  /// JP : loop over MBtracks
+  edm::Handle<L1ITMu::MBTrackCollection> mbtrContainer;
+  iEvent.getByLabel( _mbTracksCollectionInput, mbtrContainer);
 
+  L1ITMu::MBTrackCollection::const_iterator tr = mbtrContainer->begin();
+  L1ITMu::MBTrackCollection::const_iterator trend = mbtrContainer->end();
+
+  std::cout << "Getting the MBTrackCollection (size " << mbtrContainer->size() << ")\n";
+  
+  for ( ; tr != trend; ++tr ) {
+    
+    const L1ITMu::MBTrack & mbtrack = *tr;
+    
+    std::cout << " - MBTrack :\n";
+    
+    /// loop over MBCollection
+    const L1ITMu::MBLTContainer & mbltContainer = mbtrack.getStubs();
+
+    L1ITMu::MBLTContainer::const_iterator st = mbltContainer.begin();
+    L1ITMu::MBLTContainer::const_iterator stend = mbltContainer.end();
+
+    std::cout << "  - Getting the MBLTCollection (size " << mbltContainer.size() << ") from the getStubs() method\n";
+    
+    for ( ; st != stend; ++st ) {
+      
+      const L1ITMu::MBLTCollection & mbltStation = st->second;
+    }
+    
+    /// loop over GMTout (L1MuGMTExtendedCand)
+    const std::vector<L1MuGMTExtendedCand> l1gmtextcand = mbtrack.getAssociatedGMTout(); 
+
+    std::vector<L1MuGMTExtendedCand>::const_iterator igmtout  = l1gmtextcand.begin();
+    std::vector<L1MuGMTExtendedCand>::const_iterator igmtoutend = l1gmtextcand.end();
+
+    std::cout << "  - Getting the vector<L1MuGMTExtendedCand> (size " << l1gmtextcand.size() << ") from the getAssociatedGMTout() method\n";
+    
+    for ( ; igmtout != igmtoutend; ++igmtout ) {
+      
+      const L1MuGMTExtendedCand & gmtout = *igmtout;
+
+      std::cout << "   - gmtOutput:\n";
+      
+      std::cout << "    - Quality = " << gmtout.quality() << std::endl;
+      std::cout << "    - Phi     = " << gmtout.phiValue() << std::endl;
+      std::cout << "    - Eta     = " << gmtout.etaValue() << std::endl;
+      std::cout << "    - Pt      = " << gmtout.ptValue() << std::endl;
+      std::cout << "    - Bx      = " << gmtout.bx() << std::endl;
+      
+    }
+
+    /// loop over GMTin (L1MuRegionalCand)
+    const std::vector<L1MuRegionalCand> l1muregcand = mbtrack.getAssociatedGMTin(); 
+    
+    std::vector<L1MuRegionalCand>::const_iterator igmtin  = l1muregcand.begin();
+    std::vector<L1MuRegionalCand>::const_iterator igmtinend = l1muregcand.end();
+
+    std::cout << "  - Getting the vector<L1MuRegionalCand> (size " << l1muregcand.size() << ") from the getAssociatedGMTin() method\n";
+
+    for ( ; igmtin != igmtinend; ++igmtin ) {
+      
+      const L1MuRegionalCand & gmtin = *igmtin;
+      
+      std::cout << "   - gmtInput:\n";
+      
+      std::cout << "    - Quality = " << gmtin.quality() << std::endl;
+      std::cout << "    - Phi     = " << gmtin.phiValue() << std::endl;
+      std::cout << "    - Bx      = " << gmtin.bx() << std::endl;
+      
+    }
+
+  }
+  
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"

@@ -12,6 +12,7 @@ process.TFileService = cms.Service(
 
 process.L1ITMuPlotter = cms.EDAnalyzer(
     'L1ITMuonBarrelPlots',
+    MBTracksCollection = cms.InputTag('MBTracksProducer'),
     MBLTCollection = cms.InputTag('MBLTProducer'),
     L1ITDTChambPhContainer = cms.InputTag('L1ITMuonBarrelPrimitiveProducer', '', 'L1ITMU')
 )
