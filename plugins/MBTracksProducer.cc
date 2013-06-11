@@ -1,12 +1,12 @@
 // 
 // Class: L1DTTFTrackConverter
 //
-// Info: This producer eats DTTF tracks (pre GMT) and matches them to 
+// Info: This producer eats DTTF tracks (pre GMT) and matches them to
 //       L1ITMu::TriggerPrimitives. In the process of doing so it
 //       converts the DTTF tracks into a collection L1ITMu::InternalTrack
 //       each of which contains the track stubs it was matched to.
 //
-// Author: 
+// Author:
 //
 
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrackFwd.h"
@@ -26,6 +26,7 @@
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBhelpers.h"
 
@@ -38,8 +39,6 @@
 #include "CondFormats/L1TObjects/interface/L1MuTriggerScales.h"
 #include "CondFormats/DataRecord/interface/L1MuTriggerScalesRcd.h"
 
-#define pig 3.141592653589793238462
-
 // using namespace L1ITMu;
 
 typedef edm::ParameterSet PSet;
@@ -49,72 +48,72 @@ public:
   MBTracksProducer(const PSet&);
   ~MBTracksProducer() {}
 
-  void produce(edm::Event&, const edm::EventSetup&);  
+  void produce(edm::Event&, const edm::EventSetup&);
 private:
   edm::InputTag _dtTrackSrc, _gmtSrc, _mbCollSrc;
-  const int min_bx, max_bx;
   double _maxDeltaPhi, _maxDeltaR;
+  const int _min_bx, _max_bx;
 };
 
 MBTracksProducer::MBTracksProducer(const PSet& ps):
   _dtTrackSrc(ps.getParameter<edm::InputTag>("DTTrackSrc")),
-  _gmtSrc(ps.getParameter<edm::InputTag>("gmtDigis")),  
+  _gmtSrc(ps.getParameter<edm::InputTag>("gmtDigis")),
   _mbCollSrc(ps.getParameter<edm::InputTag>("MBLTCollectionSrc")),
   _maxDeltaPhi(ps.getParameter<double>("MaxDeltaPhi")),
   _maxDeltaR(ps.getParameter<double>("MaxDeltaR")),
-  min_bx(ps.getParameter<int>("BX_min")),
-  max_bx(ps.getParameter<int>("BX_max")) {
+  _min_bx(ps.getParameter<int>("BX_min")),
+  _max_bx(ps.getParameter<int>("BX_max")) {
   produces<L1ITMu::DTTrackCollection>("input");
   produces<L1ITMu::MBTrackCollection>();
 }
 
-void MBTracksProducer::produce(edm::Event& ev, 
-				    const edm::EventSetup& es) {
-  std::auto_ptr<L1ITMu::MBTrackCollection> 
+void MBTracksProducer::produce( edm::Event& ev,
+				const edm::EventSetup& es) {
+  std::auto_ptr<L1ITMu::MBTrackCollection>
     convertedTracks (new L1ITMu::MBTrackCollection());
   std::auto_ptr<L1ITMu::DTTrackCollection> inputTracks(new L1ITMu::DTTrackCollection);
 
   // get the RefProd so we can make persistable references to
   // the track the converted track was made from
-  edm::RefProd<L1ITMu::DTTrackCollection> dttfProd = 
+  edm::RefProd<L1ITMu::DTTrackCollection> dttfProd =
     ev.getRefBeforePut<L1ITMu::DTTrackCollection>("input");
 
   edm::Handle<L1MuDTTrackContainer> dtTracks;
   ev.getByLabel(_dtTrackSrc,dtTracks);
-  
+
   edm::Handle<L1ITMu::MBLTContainer> MBCont;
   ev.getByLabel(_mbCollSrc,MBCont);
 
   // get GMT readout collection
   edm::Handle<L1MuGMTReadoutCollection> pCollection;
-  ev.getByLabel(_gmtSrc, pCollection);            
+  ev.getByLabel(_gmtSrc, pCollection);
   L1MuGMTReadoutCollection const* gmtrc = pCollection.product();
-  
+
   // get GMT readout record
   std::vector<L1MuGMTReadoutRecord> gmt_records = gmtrc->getRecords();
   std::vector<L1MuGMTReadoutRecord>::const_iterator RRItr = gmt_records.begin();
   std::vector<L1MuGMTReadoutRecord>::const_iterator RREnd = gmt_records.end();
-  
+
   // get L1MuTriggerScales
   edm::ESHandle< L1MuTriggerScales > trigscales_h;
   es.get< L1MuTriggerScalesRcd >().get( trigscales_h );
-  
+
   int wheel;
-  // DT sector processors have wheels [-3,-2,-1,1,2,3] since 
+  // DT sector processors have wheels [-3,-2,-1,1,2,3] since
   // wheel zero needs two SPs
   for( int sp_wheel = -3 ; sp_wheel <= 3; ++sp_wheel ) {
     if( sp_wheel == 0 ) continue;
-    wheel = std::abs(sp_wheel)-1;    
+    wheel = std::abs(sp_wheel)-1;
     wheel = sp_wheel < 0 ? -wheel : wheel;
     for( int sector = 0; sector <= 11; ++sector ) {
-      for( int bx = min_bx; bx <= max_bx; ++bx ) {
+      for( int bx = _min_bx; bx <= _max_bx; ++bx ) {
 	for( int itrk = 1; itrk <=2; ++itrk ) {
 	  std::unique_ptr<L1MuDTTrackCand> dttrk;
-	  if( itrk == 1 ) 
+	  if( itrk == 1 )
 	    dttrk.reset(dtTracks->dtTrackCand1(sp_wheel,sector,bx));
-	  else            
+	  else
 	    dttrk.reset(dtTracks->dtTrackCand2(sp_wheel,sector,bx));
-	  
+
 	  if( dttrk ) {
 	    inputTracks->push_back(*dttrk);
 
@@ -123,83 +122,74 @@ void MBTracksProducer::produce(edm::Event& ev,
 	    L1ITMu::DTTrackRef parentRef(dttfProd,inputTracks->size() - 1);
 	    L1ITMu::RegionalCandBaseRef parentBaseRef(parentRef);
 	    trk.setParent(parentBaseRef);
-            
-            int phi_local = dttrk->phi_packed();//range: 0 < phi_local < 31 
-            if(phi_local > 15) phi_local -= 32; //range: -16 < phi_local < 15
-            double dttrk_phi_global = (phi_local*(pig/72.))+((pig/6.)*dttrk->scNum());// + 12*i->scNum(); //range: -16 < phi_global < 147
-            if(dttrk_phi_global < 0) dttrk_phi_global+=2*pig; //range: 0 < phi_global < 147
-            if(dttrk_phi_global > 2*pig) dttrk_phi_global-=2*pig; //range: 0 < phi_global < 143
-            
-            const L1MuTriggerScales* scales = trigscales_h.product();            
-            float dttrk_eta_global     = scales->getRegionalEtaScale(0)->getValue(dttrk->eta_packed());           
-// // //             float phi_global_new = 180. / acos(-1.) * scales->getPhiScale()->getValue(dttrk->phi_packed());
-                                   
-            /// JP: GMT-DTTF matching            
+
+            int phi_local = dttrk->phi_packed();//range: 0 < phi_local < 31
+            if ( phi_local > 15 ) phi_local -= 32; //range: -16 < phi_local < 15
+            double dttrk_phi_global = (phi_local*(M_PI/72.))+((M_PI/6.)*dttrk->scNum());// + 12*i->scNum(); //range: -16 < phi_global < 147
+            if(dttrk_phi_global < 0) dttrk_phi_global+=2*M_PI; //range: 0 < phi_global < 147
+            if(dttrk_phi_global > 2*M_PI) dttrk_phi_global-=2*M_PI; //range: 0 < phi_global < 143
+
+            const L1MuTriggerScales* scales = trigscales_h.product();
+            float dttrk_eta_global = scales->getRegionalEtaScale(0)->getValue(dttrk->eta_packed());
+	    // float phi_global_new = 180. / acos(-1.) * scales->getPhiScale()->getValue(dttrk->phi_packed());
+            /// JP: GMT-DTTF matching
             for ( ; RRItr != RREnd; ++RRItr ) {
-              
+
               // loop over GMT input collection
               std::vector<L1MuRegionalCand> dttfCands = RRItr->getDTBXCands();
               std::vector<L1MuRegionalCand>::iterator dttfCand = dttfCands.begin();
               std::vector<L1MuRegionalCand>::iterator dttfCandEnd = dttfCands.end();
-              
+
               for( ; dttfCand != dttfCandEnd; ++dttfCand ) {
-                
-                if(dttfCand->empty()) continue;        
-                                
-//                 std::cout << "### GMTin - DTTF matching" << std::endl; 
-//                 std::cout << "dttfCand->quality()    = " << dttfCand->quality() << std::endl; 
-//                 std::cout << "dttfCand->phi_packed() = " << dttfCand->phi_packed() << std::endl;
-//                 std::cout << "dttfCand->phiValue()   = " << dttfCand->phiValue() << std::endl;
-// 
-//                 std::cout << "dttrk->quality()       = " << dttrk->quality() << std::endl; 
-//                 std::cout << "dttrk->phi_packed()    = " << dttrk->phi_packed() << std::endl;
-// 
-//                 std::cout << "dttrk_phi_global       = " << dttrk_phi_global << std::endl;
-// // //                 std::cout << "dttrk_phi_global_new         = " << dttrk_phi_global_new << std::endl;
-                
-                if( (dttfCand->quality() == dttrk->quality()) &&
-                    (fabs(dttfCand->phiValue() - dttrk_phi_global) < _maxDeltaPhi) ) {                  
-                
-                  trk.associateGMTin(*dttfCand);
-                    
-                }                                
+
+                if ( dttfCand->empty() ) continue;
+
+		edm::LogWarning( "GMTin - DTTF matching" )
+		  << "\n\tdttfCand->quality()    = " << dttfCand->quality()
+		  << "\n\tdttfCand->phi_packed() = " << dttfCand->phi_packed()
+		  << "\n\tdttfCand->phiValue()   = " << dttfCand->phiValue()
+		  << "\n\tdttrk->quality()       = " << dttrk->quality()
+		  << "\n\tdttrk->phi_packed()    = " << dttrk->phi_packed()
+		  << "\n\tdttrk_phi_global       = " << dttrk_phi_global
+		  << "\n\tdttfCand->phiValue()   = " << dttfCand->phiValue();
+
+		if ( (dttfCand->quality() == dttrk->quality() ) &&
+		    (fabs(dttfCand->phiValue() - dttrk_phi_global) < _maxDeltaPhi) ) {
+		  trk.associateGMTin(*dttfCand);
+		}
+
               }
 
-              // loop over GMT output collection              
+              // loop over GMT output collection
               std::vector<L1MuGMTExtendedCand> gmtCands = RRItr->getGMTBrlCands();
               std::vector<L1MuGMTExtendedCand>::iterator gmtCand = gmtCands.begin();
               std::vector<L1MuGMTExtendedCand>::iterator gmtCandEnd = gmtCands.end();
-              
+
               for( ; gmtCand != gmtCandEnd; ++gmtCand ) {
-                
-                if(gmtCand->empty()) continue;        
-                
-//                 std::cout << "### GMTout - DTTF matching" << std::endl; 
-//                 std::cout << "gmtCand->etaValue()   = " << gmtCand->etaValue() << std::endl;
-//                 std::cout << "gmtCand->phiValue()   = " << gmtCand->phiValue() << std::endl; 
-// 
-//                 std::cout << "dttrk->eta_packed()   = " << dttrk->eta_packed() << std::endl;
-//                 std::cout << "dttrk_eta_global      = " << dttrk_eta_global << std::endl;
-// 
-//                 std::cout << "dttrk->phi_packed()   = " << dttrk->phi_packed() << std::endl;
-//                 std::cout << "dttrk_phi_global      = " << dttrk_phi_global << std::endl;
-// // //                 std::cout << "dttrk_phi_global_new        = " << dttrk_phi_global_new << std::endl;
-                
+
+                if(gmtCand->empty()) continue;
+		edm::LogWarning( "GMTout - DTTF matching" )
+		  << "\n\tgmtCand->etaValue()   = " << gmtCand->etaValue()
+		  << "\n\tgmtCand->phiValue()   = " << gmtCand->phiValue()
+		  << "\n\tdttrk->eta_packed()   = " << dttrk->eta_packed()
+		  << "\n\tdttrk_eta_global      = " << dttrk_eta_global
+		  << "\n\tdttrk->phi_packed()   = " << dttrk->phi_packed()
+		  << "\n\tdttrk_phi_global      = " << dttrk_phi_global;
+
                 float dphi = gmtCand->phiValue() - dttrk_phi_global;
                 float deta = gmtCand->etaValue() - dttrk_eta_global;
                 float dr   = sqrt(dphi*dphi + deta*deta);
                 if( dr < _maxDeltaR ) {
 
-                  trk.associateGMTout(*gmtCand);               
-                    
+                  trk.associateGMTout(*gmtCand);
+
                 }
-              } 
-              
+              }
             }
 
-            /// JP: MB-DTTF matching                                  
+            /// JP: MB-DTTF matching
             std::vector<unsigned> addrs;
-            addrs.reserve(4);	     	   
+            addrs.reserve(4);
 	    for( int station = 1; station <= 4; ++ station ) {
 	      addrs.push_back(dttrk->stNum(station));
 	    }	
@@ -213,14 +203,14 @@ void MBTracksProducer::produce(edm::Event& ev,
             ///      the same code could be placed somewhere else
             ///      to be more consistent
 	    L1ITMu::MBLTContainer tplist =  L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo(wheel,
-						    sp_wheel,sector+1,
-						    MBCont,mode,
-						    addrs);
-	                            
+											    sp_wheel,sector+1,
+											    MBCont,mode,
+											    addrs);
+
 	    auto stub = tplist.cbegin();
 	    auto stend = tplist.cend();
 	    for( ; stub != stend; ++stub ) {
-	      trk.addStub(*stub);      
+	      trk.addStub(*stub);
 	    }
 
 	    convertedTracks->push_back(trk);

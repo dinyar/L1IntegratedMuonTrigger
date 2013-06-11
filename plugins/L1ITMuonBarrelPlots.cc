@@ -53,27 +53,27 @@ private:
   edm::InputTag _mbTracksCollectionInput;
   edm::InputTag _l1itDtPhiChInput;
   edm::Service<TFileService> _fs;
-  TH1F * confirmed[4];
-  TH1F * timingConf[4];
-  TH1F * timingConfIn[4];
-  TH1F * timingConfOut[4];
+  TH1F * _confirmed[4];
+  TH1F * _timingConf[4];
+  TH1F * _timingConfIn[4];
+  TH1F * _timingConfOut[4];
 
-  TH2F * dtDist[4];
-  TH2F * rpcInDist[4];
-  TH2F * rpcOutDist[4];
-  TH2F * dtQuality[4];
+  TH2F * _dtDist[4];
+  TH2F * _rpcInDist[4];
+  TH2F * _rpcOutDist[4];
+  TH2F * _dtQuality[4];
 
-  TH1F * deltaPhi;
-  TH1F * deltaEta;
-  TH1F * deltaR;
-  TH2F * deltaPhiR;
-  TH1F * deltaPhiBin;
+  TH1F * _deltaPhi;
+  TH1F * _deltaEta;
+  TH1F * _deltaR;
+  TH2F * _deltaPhiR;
+  TH1F * _deltaPhiBin;
 
-  TH1F * deltaPhiDt;
+  TH1F * _deltaPhiDt;
 
-  TH1F * rpcInHitsPerDtseg;
-  TH1F * rpcOutHitsPerDtseg;
-  TH2F * dtQualityNew;
+  TH1F * _rpcInHitsPerDtseg;
+  TH1F * _rpcOutHitsPerDtseg;
+  TH2F * _dtQualityNew;
   
 };
 
@@ -86,66 +86,64 @@ L1ITMuonBarrelPlots::L1ITMuonBarrelPlots(const PSet& p)
 
   for ( int i = 0; i < 4; ++i ) {
     TString stname = Form( "st%d", i+1 );
-    confirmed[i] = _fs->make<TH1F>( "confirmed_"+stname, "confirmed in "+stname, 5, -1, 4 );
+    _confirmed[i] = _fs->make<TH1F>( "confirmed_"+stname, "confirmed in "+stname, 5, -1, 4 );
 
-    confirmed[i]->GetXaxis()->SetBinLabel( 1, "RPC Only");
-    confirmed[i]->GetXaxis()->SetBinLabel( 2, "Unconfirmed");
-    confirmed[i]->GetXaxis()->SetBinLabel( 3, "In+Out");
-    confirmed[i]->GetXaxis()->SetBinLabel( 4, "In");
-    confirmed[i]->GetXaxis()->SetBinLabel( 5, "Out");
+    _confirmed[i]->GetXaxis()->SetBinLabel( 1, "RPC Only");
+    _confirmed[i]->GetXaxis()->SetBinLabel( 2, "Un_confirmed");
+    _confirmed[i]->GetXaxis()->SetBinLabel( 3, "In+Out");
+    _confirmed[i]->GetXaxis()->SetBinLabel( 4, "In");
+    _confirmed[i]->GetXaxis()->SetBinLabel( 5, "Out");
 
-    timingConf[i] = _fs->make<TH1F>( "timing_"+stname, "dt vs rpc timing in "+stname, 4, -2, 2 );
-    timingConfIn[i] = _fs->make<TH1F>( "timingIn_"+stname, "dt vs rpcIn timing in "+stname, 3, -1, 2 );
-    timingConfOut[i] = _fs->make<TH1F>( "timingOut_"+stname, "dt vs rpcOut timing in "+stname, 3, -1, 2 );
+    _timingConf[i] = _fs->make<TH1F>( "timing_"+stname, "dt vs rpc timing in "+stname, 4, -2, 2 );
+    _timingConfIn[i] = _fs->make<TH1F>( "timingIn_"+stname, "dt vs rpcIn timing in "+stname, 3, -1, 2 );
+    _timingConfOut[i] = _fs->make<TH1F>( "timingOut_"+stname, "dt vs rpcOut timing in "+stname, 3, -1, 2 );
 
-
-    dtDist[i] = _fs->make<TH2F>( "dtDist_"+stname, "dt primitives in "+stname, 5, -2, 3, 12, 1, 13 );
-    rpcInDist[i] = _fs->make<TH2F>( "rpcInDist_"+stname, "rpc inner primitives in "+stname, 5, -2, 3, 12, 1, 13 );
-    rpcOutDist[i] = _fs->make<TH2F>( "rpcOutDist_"+stname, "rpc outer primitives in "+stname, 5, -2, 3, 12, 1, 13 );
+    _dtDist[i] = _fs->make<TH2F>( "dtDist_"+stname, "dt primitives in "+stname, 5, -2, 3, 12, 1, 13 );
+    _rpcInDist[i] = _fs->make<TH2F>( "rpcInDist_"+stname, "rpc inner primitives in "+stname, 5, -2, 3, 12, 1, 13 );
+    _rpcOutDist[i] = _fs->make<TH2F>( "rpcOutDist_"+stname, "rpc outer primitives in "+stname, 5, -2, 3, 12, 1, 13 );
 
     /// DT quality stuff
-    dtQuality[i] = _fs->make<TH2F>( "dtQuality_"+stname, "dt quality vs rpc match in "+stname, 4, 0, 4, 7, 0, 7);
-    dtQuality[i]->GetXaxis()->SetBinLabel( 1, "Unconfirmed");
-    dtQuality[i]->GetXaxis()->SetBinLabel( 2, "In+Out");
-    dtQuality[i]->GetXaxis()->SetBinLabel( 3, "In");
-    dtQuality[i]->GetXaxis()->SetBinLabel( 4, "Out");
+    _dtQuality[i] = _fs->make<TH2F>( "dtQuality_"+stname, "dt quality vs rpc match in "+stname, 4, 0, 4, 7, 0, 7);
+    _dtQuality[i]->GetXaxis()->SetBinLabel( 1, "Un_confirmed");
+    _dtQuality[i]->GetXaxis()->SetBinLabel( 2, "In+Out");
+    _dtQuality[i]->GetXaxis()->SetBinLabel( 3, "In");
+    _dtQuality[i]->GetXaxis()->SetBinLabel( 4, "Out");
 
-    dtQuality[i]->GetYaxis()->SetBinLabel( 1, "LI" );
-    dtQuality[i]->GetYaxis()->SetBinLabel( 2, "LO" );
-    dtQuality[i]->GetYaxis()->SetBinLabel( 3, "HI" );
-    dtQuality[i]->GetYaxis()->SetBinLabel( 4, "HO" );
-    dtQuality[i]->GetYaxis()->SetBinLabel( 5, "LL" );
-    dtQuality[i]->GetYaxis()->SetBinLabel( 6, "HL" );
-    dtQuality[i]->GetYaxis()->SetBinLabel( 7, "HH" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 1, "LI" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 2, "LO" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 3, "HI" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 4, "HO" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 5, "LL" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 6, "HL" );
+    _dtQuality[i]->GetYaxis()->SetBinLabel( 7, "HH" );
 
   }
 
-  deltaPhiDt = _fs->make<TH1F>( "deltaPhiDt", "deltaPhiDt", 400, -0.2, 0.2 );
+  _deltaPhiDt = _fs->make<TH1F>( "deltaPhiDt", "deltaPhiDt", 400, -0.2, 0.2 );
 
-  deltaPhi = _fs->make<TH1F>( "deltaPhi", "deltaPhi", 400, -0.2, 0.2 );
-  deltaPhiBin = _fs->make<TH1F>( "deltaPhiBin", "deltaPhi bins", 3, -0.15, 0.15 );
+  _deltaPhi = _fs->make<TH1F>( "deltaPhi", "deltaPhi", 400, -0.2, 0.2 );
+  _deltaPhiBin = _fs->make<TH1F>( "deltaPhiBin", "deltaPhi bins", 3, -0.15, 0.15 );
 
-  deltaEta = _fs->make<TH1F>( "deltaEta", "deltaEta", 40, 0, 0.4 );
-  deltaR = _fs->make<TH1F>( "deltaR", "deltaR", 100, 0, 1 );
-  rpcInHitsPerDtseg = _fs->make<TH1F>( "rpcInHitsPerDtseg", "number of inner rpc hits matching a dt sector", 20, 0, 20 );
-  rpcOutHitsPerDtseg = _fs->make<TH1F>( "rpcOutHitsPerDtseg", "number of outer rpc hits matching a dt sector", 20, 0, 20 );
+  _deltaEta = _fs->make<TH1F>( "deltaEta", "deltaEta", 40, 0, 0.4 );
+  _deltaR = _fs->make<TH1F>( "deltaR", "deltaR", 100, 0, 1 );
+  _rpcInHitsPerDtseg = _fs->make<TH1F>( "rpcInHitsPerDtseg", "number of inner rpc hits matching a dt sector", 20, 0, 20 );
+  _rpcOutHitsPerDtseg = _fs->make<TH1F>( "rpcOutHitsPerDtseg", "number of outer rpc hits matching a dt sector", 20, 0, 20 );
 
-  deltaPhiR = _fs->make<TH2F>( "deltaPhiR", "deltaR vs deltaPhi", 400, 0, 0.4, 100, 0, 0.5 );
+  _deltaPhiR = _fs->make<TH2F>( "deltaPhiR", "deltaR vs deltaPhi", 400, 0, 0.4, 100, 0, 0.5 );
 
   /// DT quality stuff according to new definition
-  dtQualityNew = _fs->make<TH2F>( "dtQualityNew", "dt quality vs station", 4, 1, 5, 7, 0, 7);
-  dtQualityNew->GetXaxis()->SetBinLabel( 1, "MB1");
-  dtQualityNew->GetXaxis()->SetBinLabel( 2, "MB2");
-  dtQualityNew->GetXaxis()->SetBinLabel( 3, "MB3");
-  dtQualityNew->GetXaxis()->SetBinLabel( 4, "MB4");
-
-  dtQualityNew->GetYaxis()->SetBinLabel( 1, "HI" );
-  dtQualityNew->GetYaxis()->SetBinLabel( 2, "HO" );
-  dtQualityNew->GetYaxis()->SetBinLabel( 3, "HI+RPC" );
-  dtQualityNew->GetYaxis()->SetBinLabel( 4, "HO+RPC" );
-  dtQualityNew->GetYaxis()->SetBinLabel( 5, "#splitline{(HI+HO)}{+RPC@bx0}" );
-  dtQualityNew->GetYaxis()->SetBinLabel( 6, "(LL || HL)" );
-  dtQualityNew->GetYaxis()->SetBinLabel( 7, "HH" );
+  _dtQualityNew = _fs->make<TH2F>( "dtQualityNew", "dt quality vs station", 4, 1, 5, 7, 0, 7);
+  _dtQualityNew->GetXaxis()->SetBinLabel( 1, "MB1");
+  _dtQualityNew->GetXaxis()->SetBinLabel( 2, "MB2");
+  _dtQualityNew->GetXaxis()->SetBinLabel( 3, "MB3");
+  _dtQualityNew->GetXaxis()->SetBinLabel( 4, "MB4");
+  _dtQualityNew->GetYaxis()->SetBinLabel( 1, "HI" );
+  _dtQualityNew->GetYaxis()->SetBinLabel( 2, "HO" );
+  _dtQualityNew->GetYaxis()->SetBinLabel( 3, "HI+RPC" );
+  _dtQualityNew->GetYaxis()->SetBinLabel( 4, "HO+RPC" );
+  _dtQualityNew->GetYaxis()->SetBinLabel( 5, "#splitline{(HI+HO)}{+RPC@bx0}" );
+  _dtQualityNew->GetYaxis()->SetBinLabel( 6, "(LL || HL)" );
+  _dtQualityNew->GetYaxis()->SetBinLabel( 7, "HH" );
 
 }
   
@@ -165,13 +163,13 @@ void L1ITMuonBarrelPlots::endJob()
     for ( int q = 1; q < 8; ++q ) {
       double quality = 0;
       for ( int m = 1; m < 5; ++m ) {
-	quality += dtQuality[i]->GetBinContent( m, q );
+	quality += _dtQuality[i]->GetBinContent( m, q );
       }
       for ( int m = 1; m < 5; ++m ) {
 	if ( quality )
-	  dtQuality[i]->SetBinContent( m, q, dtQuality[i]->GetBinContent( m, q ) / quality );
+	  _dtQuality[i]->SetBinContent( m, q, _dtQuality[i]->GetBinContent( m, q ) / quality );
 	else
-	  dtQuality[i]->SetBinContent( m, q, 0 );
+	  _dtQuality[i]->SetBinContent( m, q, 0 );
       }
     }
 
@@ -179,13 +177,13 @@ void L1ITMuonBarrelPlots::endJob()
     int st = i + 1;
     double qualityNew = 0;
     for ( int q = 1; q < 8; ++q ) {
-      qualityNew += dtQualityNew->GetBinContent( st, q );
+      qualityNew += _dtQualityNew->GetBinContent( st, q );
     }
     for ( int q = 1; q < 8; ++q ) {
       if ( qualityNew )
-	dtQualityNew->SetBinContent( st, q, dtQualityNew->GetBinContent( st, q ) / qualityNew );
+	_dtQualityNew->SetBinContent( st, q, _dtQualityNew->GetBinContent( st, q ) / qualityNew );
       else
-	dtQualityNew->SetBinContent( st, q, 0 );
+	_dtQualityNew->SetBinContent( st, q, 0 );
     }
   }
 
@@ -230,9 +228,9 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
     size_t rpcOutListSize = mbltStation.getRpcOuter().size();
 
     /// fill general distribution plots
-    if ( dtListSize ) dtDist[index]->Fill( wheel, sector );
-    if ( rpcInListSize ) rpcInDist[index]->Fill( wheel, sector );
-    if ( rpcOutListSize ) rpcOutDist[index]->Fill( wheel, sector );
+    if ( dtListSize ) _dtDist[index]->Fill( wheel, sector );
+    if ( rpcInListSize ) _rpcInDist[index]->Fill( wheel, sector );
+    if ( rpcOutListSize ) _rpcOutDist[index]->Fill( wheel, sector );
 
     /// get dt to rpc associations
     size_t dtInTime = 0;
@@ -264,21 +262,21 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 	else if ( dtbx == rpcbxIn ) bx = 0;
 	else if ( dtbx > rpcbxIn ) bx = 1;
 	else if ( dtbx < rpcbxIn ) bx = -1;
-	timingConf[index]->Fill( bx );
+	_timingConf[index]->Fill( bx );
       } else if ( rpcInMatchSize ) {
 	int rpcbx = rpcInMatch.front()->getBX();
 	int bx = 0;
 	if ( dtbx == rpcbx ) bx = 0;
 	else if ( dtbx > rpcbx ) bx = 1;
 	else if ( dtbx < rpcbx ) bx = -1;
-	timingConfIn[index]->Fill( bx );
+	_timingConfIn[index]->Fill( bx );
       } else if ( rpcOutMatchSize ) {
 	int rpcbx = rpcOutMatch.front()->getBX();
 	int bx = 0;
 	if ( dtbx == rpcbx ) bx = 0;
 	else if ( dtbx > rpcbx ) bx = 1;
 	else if ( dtbx < rpcbx ) bx = -1;
-	timingConfOut[index]->Fill( bx );
+	_timingConfOut[index]->Fill( bx );
       }
 
       /// let's keep only bx=0
@@ -289,28 +287,28 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
       for ( size_t jDt = iDt+1; jDt < dtListSize; ++jDt ) {
 	double phi2 = mbltStation.getDtSegments().at(jDt)->getCMSGlobalPhi();
 	double deltaPhiSt = reco::deltaPhi( phi, phi2 );
-	deltaPhiDt->Fill( deltaPhiSt );
+	_deltaPhiDt->Fill( deltaPhiSt );
 // 	if ( deltaPhiSt < 0.05 ) {
 // 	}
       }
 
 
       /// count matching
-      rpcInHitsPerDtseg->Fill( rpcInMatchSize );
-      rpcOutHitsPerDtseg->Fill( rpcOutMatchSize );
+      _rpcInHitsPerDtseg->Fill( rpcInMatchSize );
+      _rpcOutHitsPerDtseg->Fill( rpcOutMatchSize );
 
       if ( rpcInMatchSize && rpcOutMatchSize ) {
-	confirmed[index]->Fill( 1 );
-	dtQuality[index]->Fill( 1, dtquality );
+	_confirmed[index]->Fill( 1 );
+	_dtQuality[index]->Fill( 1, dtquality );
       } else if ( rpcInMatchSize ) {
-	confirmed[index]->Fill( 2 );
-	dtQuality[index]->Fill( 2, dtquality );
+	_confirmed[index]->Fill( 2 );
+	_dtQuality[index]->Fill( 2, dtquality );
       } else if ( rpcOutMatchSize ) {
-	confirmed[index]->Fill( 3 );
-	dtQuality[index]->Fill( 3, dtquality );
+	_confirmed[index]->Fill( 3 );
+	_dtQuality[index]->Fill( 3, dtquality );
       } else {
-	confirmed[index]->Fill( 0 );
-	dtQuality[index]->Fill( 0., dtquality );
+	_confirmed[index]->Fill( 0 );
+	_dtQuality[index]->Fill( 0., dtquality );
       }
 
       /// angular differences
@@ -323,10 +321,10 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 	double rpcEta = (*rpcInIt)->getCMSGlobalEta();
 	double dR = reco::deltaR( eta, phi, rpcEta, rpcPhi);
 	double rpcDeltaPhi = reco::deltaPhi( phi, rpcPhi );
-	deltaEta->Fill( fabs( eta - rpcEta ) );
-	deltaPhi->Fill( rpcDeltaPhi );
-	deltaR->Fill( dR );
-	deltaPhiR->Fill( fabs( rpcDeltaPhi ), dR );
+	_deltaEta->Fill( fabs( eta - rpcEta ) );
+	_deltaPhi->Fill( rpcDeltaPhi );
+	_deltaR->Fill( dR );
+	_deltaPhiR->Fill( fabs( rpcDeltaPhi ), dR );
       }
 
       TriggerPrimitiveList::const_iterator rpcOutIt = rpcOutMatch.begin();
@@ -335,31 +333,31 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 	double rpcEta = (*rpcOutIt)->getCMSGlobalEta();
 	double dR = reco::deltaR( eta, phi, rpcEta, rpcPhi);
 	double rpcDeltaPhi = reco::deltaPhi( phi, rpcPhi );
-	deltaEta->Fill( fabs( eta - rpcEta ) );
-	deltaPhi->Fill( rpcDeltaPhi );
-	deltaR->Fill( dR );
-	deltaPhiR->Fill( fabs( rpcDeltaPhi ), dR );
+	_deltaEta->Fill( fabs( eta - rpcEta ) );
+	_deltaPhi->Fill( rpcDeltaPhi );
+	_deltaR->Fill( dR );
+	_deltaPhiR->Fill( fabs( rpcDeltaPhi ), dR );
       }
 
       if ( rpcInMatchSize ) {
 	double rpcDeltaPhi = reco::deltaPhi( phi, rpcInMatch.front()->getCMSGlobalPhi() );
-	if ( rpcDeltaPhi < -0.05 ) deltaPhiBin->Fill( -0.1 );
-	else if ( rpcDeltaPhi > 0.05 ) deltaPhiBin->Fill( 0.1 );
-	else deltaPhiBin->Fill( rpcDeltaPhi );
+	if ( rpcDeltaPhi < -0.05 ) _deltaPhiBin->Fill( -0.1 );
+	else if ( rpcDeltaPhi > 0.05 ) _deltaPhiBin->Fill( 0.1 );
+	else _deltaPhiBin->Fill( rpcDeltaPhi );
       }
 
       if ( rpcOutMatchSize ) {
 	double rpcDeltaPhi = reco::deltaPhi( phi, rpcOutMatch.front()->getCMSGlobalPhi() );
-	if ( rpcDeltaPhi < -0.05 ) deltaPhiBin->Fill( -0.1 );
-	else if ( rpcDeltaPhi > 0.05 ) deltaPhiBin->Fill( 0.1 );
-	else deltaPhiBin->Fill( rpcDeltaPhi );
+	if ( rpcDeltaPhi < -0.05 ) _deltaPhiBin->Fill( -0.1 );
+	else if ( rpcDeltaPhi > 0.05 ) _deltaPhiBin->Fill( 0.1 );
+	else _deltaPhiBin->Fill( rpcDeltaPhi );
       }
 
 
     }
 
     if ( !dtInTime && ( rpcInListSize || rpcOutListSize ) ) {
-      confirmed[index]->Fill( -1 );
+      _confirmed[index]->Fill( -1 );
       continue;
     }
 
@@ -375,7 +373,7 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
   std::vector<L1MuDTChambPhDigi>::const_iterator iphe = phTrigs->end();
 
   for(; iph !=iphe ; ++iph) {
-    if ( !iph->bxNum() ) dtQualityNew->Fill( iph->stNum(), iph->code() );
+    if ( !iph->bxNum() ) _dtQualityNew->Fill( iph->stNum(), iph->code() );
   }
 //     iph->phi();
 //     iph->phiB();

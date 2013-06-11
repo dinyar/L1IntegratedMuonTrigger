@@ -27,7 +27,10 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_V7A::All', '')
 #infile.append('file:SingleMuFlatPt_plusEta_1GeVto200GeV_GEN_SIM_DIGI_L1_2.root')
 #infile.append('file:SingleMuFlatPt_minusEta_1GeVto200GeV_GEN_SIM_DIGI_L1_2.root')
 
+
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+#process.MessageLogger.cerr.threshold = 'WARNING'
+process.MessageLogger.cerr.threshold = 'ERROR'
 
 infile = ['file:/afs/cern.ch/work/b/battilan/public/SingleMuFlatPt_3GeVto100GeV_GEN_SIM_DIGI_L1.root']
 
@@ -78,3 +81,7 @@ process.outPath = cms.EndPath(process.FEVTDEBUGoutput)
 
 process.schedule = cms.Schedule(process.L1ITMUPath,
                                 process.outPath)
+
+f = file("debug.cfg", 'w')
+f.write(process.dumpPython())
+f.close()
