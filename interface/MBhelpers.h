@@ -16,7 +16,7 @@
 namespace L1ITMu {
   namespace MBhelpers {
 
-    MBLTContainer
+    std::vector< MBLTContainerRef >
       getPrimitivesByMBTriggerInfo(const int wheel,
 				   const int sp_wheel,
 				   const int sector,

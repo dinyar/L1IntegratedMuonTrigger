@@ -83,14 +83,16 @@ namespace {
 namespace L1ITMu {
   namespace MBhelpers {
     
-    MBLTContainer 
+    std::vector< MBLTContainerRef > 
     getPrimitivesByMBTriggerInfo(const int wheel,
 				 const int sp_wheel,
 				 const int sector,
                                 const edm::Handle<MBLTContainer>& mbs,
 				 const unsigned mode,
 				 const std::vector<unsigned>& trkNmbs) {
-      MBLTContainer result;
+//       MBLTContainer result;
+      std::vector< MBLTContainerRef > result;
+
       auto mb = mbs->cbegin();
 //       auto mbbeg = mbs->cbegin();
       auto mbend = mbs->cend();
@@ -106,8 +108,9 @@ namespace L1ITMu {
       int expectedwheel, dwheel, expectedsector, dsector;
 /// JP : not sure if it's correct to match also the trkNmb (1)
 //       unsigned expectedtrkNmb,dtrkNmb;
-
-      for( ; mb != mbend; ++mb ) {                 
+//       
+      for( unsigned int idx = 0; mb != mbend; ++mb, ++idx ) {
+//       for( ; mb != mbend; ++mb ) {                 
         
 	for( ista = sbeg; ista != send; ++ista ) {
 	  station = (ista - sbeg) + 1;
@@ -135,7 +138,9 @@ namespace L1ITMu {
 /// JP : not sure if it's correct to match also the trkNmb (3)
 //               && expectedtrkNmb == dtrkNmb
             ) {
-               result[dtid] = L1ITMu::MBLTCollection(dtid);
+//                result[dtid] = L1ITMu::MBLTCollection(dtid);
+//                MBLTContainerRef myref( mbs, idx );
+               result[idx] = MBLTContainerRef( mbs, idx );
           }
 	}	
       }

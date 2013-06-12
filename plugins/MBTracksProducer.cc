@@ -203,7 +203,7 @@ void MBTracksProducer::produce( edm::Event& ev,
             /// JP : implementation through the MBhelpers class
             ///      the same code could be placed somewhere else
             ///      to be more consistent
-	    L1ITMu::MBLTContainer tplist =  L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo(wheel,
+	    std::vector< MBLTContainerRef > tplist =  L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo(wheel,
                                                                                          sp_wheel,sector+1,
 											    MBCont,mode,
 											    addrs);

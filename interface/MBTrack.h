@@ -75,7 +75,7 @@ namespace L1ITMu{
     void addStub(const std::pair<const DTChamberId, L1ITMu::MBLTCollection>& stub);
 
     /// return list of associated MBLT primitives
-    const MBLTContainer& getStubs() const 
+    const MBLTContainerRef& getStubs() const 
       { return _associatedStubs; }
 
     /// associate a GMTout 
@@ -96,7 +96,7 @@ namespace L1ITMu{
     int _wheel, _sector;
     unsigned _type;
     //pointer to parent, if this was created from a CSC/DT/RPC track
-    MBLTContainer _associatedStubs;
+    MBLTContainerRef _associatedStubs;
     L1MuDTTrackCand _parent;
     std::vector<L1MuGMTExtendedCand> _gmtout;
     std::vector<L1MuRegionalCand> _gmtin;    
