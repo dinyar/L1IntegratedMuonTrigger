@@ -117,11 +117,12 @@ void MBTracksProducer::produce( edm::Event& ev,
 	  if( dttrk ) {
 	    inputTracks->push_back(*dttrk);
 
-
 	    L1ITMu::MBTrack trk(*dttrk);
-	    L1ITMu::DTTrackRef parentRef(dttfProd,inputTracks->size() - 1);
-	    L1ITMu::RegionalCandBaseRef parentBaseRef(parentRef);
-	    trk.setParent(parentBaseRef);
+//             L1ITMu::DTTrackRef parentRef(dttfProd,inputTracks->size() - 1);
+//             L1ITMu::DTTrackPtr parentRef(*dttrk);
+// 	    L1ITMu::RegionalCandBaseRef parentBaseRef(parentRef);
+//          trk.setParent(parentBaseRef);
+            trk.setParent(*dttrk);
 
             int phi_local = dttrk->phi_packed();//range: 0 < phi_local < 31
             if ( phi_local > 15 ) phi_local -= 32; //range: -16 < phi_local < 15
@@ -203,7 +204,7 @@ void MBTracksProducer::produce( edm::Event& ev,
             ///      the same code could be placed somewhere else
             ///      to be more consistent
 	    L1ITMu::MBLTContainer tplist =  L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo(wheel,
-											    sp_wheel,sector+1,
+                                                                                         sp_wheel,sector+1,
 											    MBCont,mode,
 											    addrs);
 

@@ -9,7 +9,7 @@ MBTracksProducer = cms.EDProducer(
     MBLTCollectionSrc = cms.InputTag('MBLTProducer'),
     BX_min = cms.int32(dttfDigis.BX_min.value()),
     BX_max = cms.int32(dttfDigis.BX_max.value()),
-    MaxDeltaPhi = cms.double( 1e-4 ),
+    MaxDeltaPhi = cms.double( 1e-3 ),
     MaxDeltaR   = cms.double( 0.3 )
     )
     

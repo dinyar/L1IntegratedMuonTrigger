@@ -54,14 +54,22 @@ namespace L1ITMu{
     ///  construct starting from a DTTF candidate
     MBTrack(const L1MuDTTrackCand&);
 
+// // //     // return the persistent pointer to the parent of this internal track
+// // //     // may be null if this has no parent
+// // //     RegionalCandBaseRef parent() const { return _parent; }
+// // // 
+// // //     /// set set parent in case you are starting from primitives
+// // //     void setParent(const RegionalCandBaseRef& parent)
+// // //        { _parent = parent; }
+
     // return the persistent pointer to the parent of this internal track
     // may be null if this has no parent
-    RegionalCandBaseRef parent() const { return _parent; }
+    const L1MuDTTrackCand& parent() const { return _parent; }
 
     /// set set parent in case you are starting from primitives
-    void setParent(const RegionalCandBaseRef& parent)
-       { _parent = parent; }
-
+    void setParent(const L1MuDTTrackCand& parent)
+       { _parent = parent; }       
+       
     /// add primitives in case you are starting from tracks
     void addStub(const MBLTCollection& stub);
     void addStub(const std::pair<const DTChamberId, L1ITMu::MBLTCollection>& stub);
@@ -89,7 +97,7 @@ namespace L1ITMu{
     unsigned _type;
     //pointer to parent, if this was created from a CSC/DT/RPC track
     MBLTContainer _associatedStubs;
-    RegionalCandBaseRef _parent;
+    L1MuDTTrackCand _parent;
     std::vector<L1MuGMTExtendedCand> _gmtout;
     std::vector<L1MuRegionalCand> _gmtin;    
   };

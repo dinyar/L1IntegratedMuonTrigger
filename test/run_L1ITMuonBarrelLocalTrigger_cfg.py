@@ -43,9 +43,9 @@ process.L1ITMUSequence = cms.Sequence( process.L1ITMuTriggerPrimitives +
                                        process.L1CSCTFTrackConverter   +
                                        process.L1DTTFTrackConverter    +
                                        process.L1RPCTFTrackConverters  +
-                                       process.MBLTProducer +
-                                       process.MBTracksProducer +
-                                       process.L1ITMuonBarrelPrimitiveProducer )
+                                       process.MBLTProducer            +
+                                       process.L1ITMuonBarrelPrimitiveProducer +
+                                       process.MBTracksProducer        )
 
 process.L1ITMUPath = cms.Path(process.L1ITMUSequence)
 
