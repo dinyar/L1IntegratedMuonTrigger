@@ -9,15 +9,15 @@ L1ITMu::MBTrack::MBTrack(const L1MuDTTrackCand& dttrack) :
   _sector = dttrack.scNum();
 }
 
-void L1ITMu::MBTrack::addStub(const MBLTCollection& stub)
+void L1ITMu::MBTrack::addStub(const MBLTContainerRef& stub)
 { 
-  _associatedStubs[stub.detId()] = stub;
+  _associatedStubs.push_back( stub );
 }
 
-void L1ITMu::MBTrack::addStub(const std::pair<const DTChamberId, L1ITMu::MBLTCollection>& stub)
-{ 
-  _associatedStubs[stub.first] = stub.second;
-}
+// void L1ITMu::MBTrack::addStub(const std::pair<const DTChamberId, L1ITMu::MBLTCollection>& stub)
+// { 
+//   _associatedStubs.push_back( stub.second );
+// }
 
 /// associate a GMTout 
 void L1ITMu::MBTrack::associateGMTout(const L1MuGMTExtendedCand& gmtout)

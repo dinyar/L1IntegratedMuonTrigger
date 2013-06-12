@@ -16,11 +16,11 @@
 namespace L1ITMu {
   namespace MBhelpers {
 
-    std::vector< MBLTContainerRef >
+    MBLTVectorRef
       getPrimitivesByMBTriggerInfo(const int wheel,
 				   const int sp_wheel,
 				   const int sector,
-                                  const edm::Handle<MBLTContainer>& mbs,
+				   const edm::Handle<MBLTContainer>& mbs,
 				   const unsigned mode,
 				   const std::vector<unsigned>& addrs);
   }

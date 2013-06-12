@@ -403,37 +403,37 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
     std::cout << " - MBTrack :\n";
     
     /// loop over MBCollection
-    const L1ITMu::MBLTContainer & mbltContainer = mbtrack.getStubs();
+    const L1ITMu::MBLTVectorRef & mbltContainer = mbtrack.getStubs();
 
-    L1ITMu::MBLTContainer::const_iterator st = mbltContainer.begin();
-    L1ITMu::MBLTContainer::const_iterator stend = mbltContainer.end();
+    L1ITMu::MBLTVectorRef::const_iterator st = mbltContainer.begin();
+    L1ITMu::MBLTVectorRef::const_iterator stend = mbltContainer.end();
 
     std::cout << "  - Getting the MBLTCollection (size " << mbltContainer.size() << ") from the getStubs() method\n";
     
-  for ( ; st != stend; ++st ) {
+    for ( ; st != stend; ++st ) {
 
-    const L1ITMu::MBLTCollection & mbltStation = st->second;
+      const L1ITMu::MBLTCollection & mbltStation = (*st)->second;
 
-    std::cout << "    - Station = " << mbltStation.station() << std::endl;
-    std::cout << "    - Wheel   = " << mbltStation.wheel() << std::endl;
-    std::cout << "    - Sector  = " << mbltStation.sector() - 1 << std::endl;
+      std::cout << "    - Station = " << mbltStation.station() << std::endl;
+      std::cout << "    - Wheel   = " << mbltStation.wheel() << std::endl;
+      std::cout << "    - Sector  = " << mbltStation.sector() - 1 << std::endl;
     
-    /// useful index
-    int station = mbltStation.station();
-    int index = station - 1;
-    int wheel = mbltStation.wheel();
-    int sector = mbltStation.sector() - 1 ;
+      /// useful index
+      int station = mbltStation.station();
+      int index = station - 1;
+      int wheel = mbltStation.wheel();
+      int sector = mbltStation.sector() - 1 ;
 
-    if ( index < 0 || index > 3 )
-      throw cms::Exception("Invalid Station")
-        << "wrong station number " << station << std::endl;
+      if ( index < 0 || index > 3 )
+	throw cms::Exception("Invalid Station")
+	  << "wrong station number " << station << std::endl;
 
-    /// size for primitives vectors
-    size_t dtListSize = mbltStation.getDtSegments().size();
+      /// size for primitives vectors
+      size_t dtListSize = mbltStation.getDtSegments().size();
 
-    std::cout << "     - dtListSize = " << mbltStation.getDtSegments().size() << std::endl;
+      std::cout << "     - dtListSize = " << mbltStation.getDtSegments().size() << std::endl;
 
-  }
+    }
 
 
     /// get dttf    

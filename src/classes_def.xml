@@ -46,6 +46,10 @@
   <class name="edm::Wrapper<L1ITMu::MBLTCollection>"/>
   <class name="L1ITMu::MBLTContainerPair"/>
   <class name="edm::Wrapper<L1ITMu::MBLTContainerPair>"/>
+  <class name="L1ITMu::MBLTContainerRef"/>
+  <class name="edm::Wrapper<L1ITMu::MBLTContainerRef>"/>
+  <class name="L1ITMu::MBLTVectorRef"/>
+  <class name="edm::Wrapper<L1ITMu::MBLTVectorRef>"/>
   <class name="L1ITMu::MBLTContainer"/>
   <class name="edm::Wrapper<L1ITMu::MBLTContainer>"/>
   <class name="L1ITMu::MBLTCollection::primitiveAssociation"/>
@@ -55,11 +59,12 @@
   <class name="std::vector<L1ITMu::MBLTCollection::primitiveAssociation>"/>
   <class name="edm::Wrapper<std::vector<L1ITMu::MBLTCollection::primitiveAssociation> >"/>
 
-  <class name="L1ITMu::MBTrack" ClassVersion="13">
+  <class name="L1ITMu::MBTrack" ClassVersion="14">
    <version ClassVersion="10" checksum="3650627706"/>
    <version ClassVersion="11" checksum="3784341217"/>
    <version ClassVersion="12" checksum="1606770337"/>
    <version ClassVersion="13" checksum="4278858658"/>
+   <version ClassVersion="14" checksum="3503906254"/>
   </class>
   <class name="edm::Wrapper<L1ITMu::MBTrack>"/>
   <class name="L1ITMu::MBTrackCollection"/>

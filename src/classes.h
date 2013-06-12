@@ -62,6 +62,12 @@ namespace {
     MBLTContainer mdss;
     edm::Wrapper<MBLTContainer> wmdss;
 
+    MBLTContainerRef rmdss;
+    edm::Wrapper<MBLTContainerRef> rwdvss;
+
+    MBLTVectorRef rmvss;
+    edm::Wrapper<MBLTVectorRef> rwmvss;
+
     MBLTCollection::primitiveAssociation sspa;
     edm::Wrapper<MBLTCollection::primitiveAssociation> wsspa;
 

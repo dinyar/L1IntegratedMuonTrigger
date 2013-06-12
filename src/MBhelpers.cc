@@ -83,18 +83,17 @@ namespace {
 namespace L1ITMu {
   namespace MBhelpers {
     
-    std::vector< MBLTContainerRef > 
+    MBLTVectorRef
     getPrimitivesByMBTriggerInfo(const int wheel,
 				 const int sp_wheel,
 				 const int sector,
-                                const edm::Handle<MBLTContainer>& mbs,
+				 const edm::Handle<MBLTContainer>& mbs,
 				 const unsigned mode,
 				 const std::vector<unsigned>& trkNmbs) {
-//       MBLTContainer result;
-      std::vector< MBLTContainerRef > result;
+     MBLTVectorRef result;
 
       auto mb = mbs->cbegin();
-//       auto mbbeg = mbs->cbegin();
+      //       auto mbbeg = mbs->cbegin();
       auto mbend = mbs->cend();
       
       std::vector<unsigned>::const_iterator ista;
@@ -106,22 +105,22 @@ namespace L1ITMu {
       // dt chamber identifiers
       int wheel_incr;
       int expectedwheel, dwheel, expectedsector, dsector;
-/// JP : not sure if it's correct to match also the trkNmb (1)
-//       unsigned expectedtrkNmb,dtrkNmb;
-//       
-      for( unsigned int idx = 0; mb != mbend; ++mb, ++idx ) {
-//       for( ; mb != mbend; ++mb ) {                 
+      /// JP : not sure if it's correct to match also the trkNmb (1)
+      //       unsigned expectedtrkNmb,dtrkNmb;
+      //       
+      for ( unsigned int idx = 0; mb != mbend; ++mb, ++idx ) {
+	//       for( ; mb != mbend; ++mb ) {                 
         
-	for( ista = sbeg; ista != send; ++ista ) {
+	for ( ista = sbeg; ista != send; ++ista ) {
 	  station = (ista - sbeg) + 1;
 	  bool station_used = mode & ( 0x1 << (station-1) );
 	  address = *ista;
           DTChamberId dtid = mb->first;
-          if( !station_used || station != dtid.station() ) continue;
+          if ( !station_used || station != dtid.station() ) continue;
           wheel_incr = (isExtrapAcrossWheel(address,station) ? 1 : 0);
           expectedwheel = ( sp_wheel < 0 ? 
-            wheel - wheel_incr :
-            wheel + wheel_incr   );
+			    wheel - wheel_incr :
+			    wheel + wheel_incr   );
 	    
           dwheel = dtid.wheel();
           expectedsector = sector + relativeSector(address,station);
@@ -129,18 +128,18 @@ namespace L1ITMu {
           expectedsector = ( expectedsector == 13 ? 1 : expectedsector);
           dsector = dtid.sector();
           
-/// JP : not sure if it's correct to match also the trkNmb (2)
-//           expectedtrkNmb = address%2 + 1;
-//           dtrkNmb = ;
+	  /// JP : not sure if it's correct to match also the trkNmb (2)
+	  //           expectedtrkNmb = address%2 + 1;
+	  //           dtrkNmb = ;
           
-          if( expectedsector == dsector &&
-              expectedwheel  == dwheel            
-/// JP : not sure if it's correct to match also the trkNmb (3)
-//               && expectedtrkNmb == dtrkNmb
-            ) {
-//                result[dtid] = L1ITMu::MBLTCollection(dtid);
-//                MBLTContainerRef myref( mbs, idx );
-               result[idx] = MBLTContainerRef( mbs, idx );
+          if ( expectedsector == dsector &&
+	       expectedwheel  == dwheel            
+	       /// JP : not sure if it's correct to match also the trkNmb (3)
+	       //               && expectedtrkNmb == dtrkNmb
+	       ) {
+	    //                result[dtid] = L1ITMu::MBLTCollection(dtid);
+	    //                MBLTContainerRef myref( mbs, idx );
+	    result.push_back( MBLTContainerRef( mbs, idx ) );
           }
 	}	
       }
