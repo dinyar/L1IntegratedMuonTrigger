@@ -76,7 +76,7 @@ void L1ITMuTriggerPrimitiveProducer::produce(edm::Event& ev,
   auto coll_itr = collectors.cbegin();
   auto cend = collectors.cend();
   
-  double eta,phi,bend;
+  double eta,rho,phi,bend;
   for( ; coll_itr != cend; ++coll_itr ) {
     std::auto_ptr<TriggerPrimitiveCollection> 
       subs_out(new TriggerPrimitiveCollection);
@@ -87,9 +87,11 @@ void L1ITMuTriggerPrimitiveProducer::produce(edm::Event& ev,
     auto the_tp = subs_out->begin();
     auto tp_end   = subs_out->end();    
     for ( ; the_tp != tp_end; ++the_tp ) {
+      rho = geom->calculateGlobalRho(*the_tp);
       eta  = geom->calculateGlobalEta(*the_tp);
       phi  = geom->calculateGlobalPhi(*the_tp);
       bend = geom->calculateBendAngle(*the_tp);
+      the_tp->setCMSGlobalRho(rho);
       the_tp->setCMSGlobalEta(eta);
       the_tp->setCMSGlobalPhi(phi);
       the_tp->setThetaBend(bend);

@@ -78,6 +78,24 @@ GeometryTranslator::calculateBendAngle(const TriggerPrimitive& tp) const {
   }
 }
 
+double 
+GeometryTranslator::calculateGlobalRho(const TriggerPrimitive& tp) const {
+  switch(tp.subsystem()) {
+  case TriggerPrimitive::kDT:
+    return calcDTSpecificRho(tp);
+    break;
+  case TriggerPrimitive::kCSC:
+    return calcCSCSpecificRho(tp);
+    break;
+  case TriggerPrimitive::kRPC:
+    return calcRPCSpecificRho(tp);
+    break;
+  default:
+    return std::nan("Invalid TP type!");
+    break;
+  }
+}
+
 void GeometryTranslator::checkAndUpdateGeometry(const edm::EventSetup& es) {
   const MuonGeometryRecord& geom = es.get<MuonGeometryRecord>();
   unsigned long long geomid = geom.cacheIdentifier();
@@ -110,6 +128,11 @@ GeometryTranslator::calcRPCSpecificEta(const TriggerPrimitive& tp) const {
 double 
 GeometryTranslator::calcRPCSpecificPhi(const TriggerPrimitive& tp) const {  
   return getRPCSpecificPoint(tp).phi();
+}
+
+double 
+GeometryTranslator::calcRPCSpecificRho(const TriggerPrimitive& tp) const {  
+  return getRPCSpecificPoint(tp).perp();
 }
 
 // this function actually does nothing since RPC
@@ -198,6 +221,11 @@ GeometryTranslator::calcCSCSpecificPhi(const TriggerPrimitive& tp) const {
 }
 
 double 
+GeometryTranslator::calcCSCSpecificRho(const TriggerPrimitive& tp) const {  
+  return getCSCSpecificPoint(tp).perp();
+}
+
+double 
 GeometryTranslator::calcCSCSpecificBend(const TriggerPrimitive& tp) const {  
   return 0.0;
 }
@@ -232,12 +260,21 @@ GeometryTranslator::calcDTSpecificPoint(const TriggerPrimitive& tp) const {
   const GlobalPoint theta_gp = trig_geom->CMSPosition(thetaBTI);
   
   // local phi in sector -> global phi
-  double phi = ((double)tp.getDTData().radialAngle)/4096.0; 
-  phi += tp.getDTData().sector*M_PI/6.0; // add sector offset  
+  double phi_in_sector = ((double)tp.getDTData().radialAngle)/4096.0; 
+  double sector_offset = tp.getDTData().sector*M_PI/6.0;
+  double phi = phi_in_sector + sector_offset; // add sector offset  
 
-  return GlobalPoint( GlobalPoint::Polar( theta_gp.theta(),
-					  phi,
-					  theta_gp.mag() ) );
+  int qual = tp.getDTData().qualityCode;
+  double z_chamber = (qual == 1 || qual == 3) ? trig_geom->ZSL(2) :
+                     (qual == 0 || qual == 2) ? trig_geom->ZSL(0) :
+                     trig_geom->ZcenterSL();
+
+  GlobalPoint ch_coord = trig_geom->toGlobal( LocalPoint(0,0,z_chamber) );
+
+  double rho_p = ch_coord.perp()/cos( acos(cos(ch_coord.phi()-sector_offset)) );
+  double rho = rho_p/cos(phi_in_sector);
+
+  return GlobalPoint( GlobalPoint::Cylindrical( rho, phi, theta_gp.z() ) );
 }
 
 double 
@@ -248,6 +285,11 @@ GeometryTranslator::calcDTSpecificEta(const TriggerPrimitive& tp) const {
 double 
 GeometryTranslator::calcDTSpecificPhi(const TriggerPrimitive& tp) const {
   return calcDTSpecificPoint(tp).phi();
+}
+
+double 
+GeometryTranslator::calcDTSpecificRho(const TriggerPrimitive& tp) const {
+  return calcDTSpecificPoint(tp).perp();
 }
 
 // we have the bend except for station 3

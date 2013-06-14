@@ -13,9 +13,11 @@
    <version ClassVersion="11" checksum="3519618344"/>
    <version ClassVersion="12" checksum="1712212034"/>
   </class>
-  <class name="L1ITMu::TriggerPrimitive" ClassVersion="11">
+  <class name="L1ITMu::TriggerPrimitive" ClassVersion="12">
    <version ClassVersion="10" checksum="798990672"/>
    <version ClassVersion="11" checksum="3799991664"/>
+   <version ClassVersion="12" checksum="3633990395"/>
+
   </class>
   <class name="edm::Wrapper<L1ITMu::TriggerPrimitive>"/>
   <class name="L1ITMu::TriggerPrimitiveCollection"/>

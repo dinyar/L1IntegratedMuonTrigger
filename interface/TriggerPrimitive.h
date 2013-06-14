@@ -24,6 +24,9 @@
 //DetId
 #include "DataFormats/DetId/interface/DetId.h"
 
+//Global point (created on the fly)
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+
 // DT digi types
 class DTChamberId;
 class L1MuDTChambPhDigi;
@@ -136,6 +139,12 @@ namespace L1ITMu {
     void   setCMSGlobalEta(const double eta) { _eta = eta; }
     const double getCMSGlobalPhi() const { return _phi; }    
     void   setCMSGlobalPhi(const double phi) { _phi = phi; }
+    const double getCMSGlobalRho() const { return _rho; }    
+    void   setCMSGlobalRho(const double rho) { _rho = rho; }
+
+    GlobalPoint getGlobalPoint() { double theta = 2. * atan( exp(-_eta) );
+      return GlobalPoint( GlobalPoint::Cylindrical( _rho, _phi, theta) ); };
+
 
     // this is the relative bending angle with respect to the 
     // current phi position. 
@@ -182,7 +191,7 @@ namespace L1ITMu {
 
     unsigned _globalsector; // [1,6] in 60 degree sectors
     unsigned _subsector; // [1,2] in 30 degree partitions of a sector 
-    double _eta,_phi; // global pseudorapidity, phi
+    double _eta,_phi,_rho; // global pseudorapidity, phi, perp rho
     double _theta; // bend angle with respect to ray from (0,0,0)    
   };
 
