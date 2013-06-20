@@ -427,10 +427,12 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 
       for(;dtPrimIt!=dtPrimEnd;++dtPrimIt) {
 
-	std::cout << "\t\t global quality = " << (*dtPrimIt)->getDTData().qualityCode <<std::endl;
-	std::cout << "\t\t global eta = " << (*dtPrimIt)->getCMSGlobalEta() <<std::endl;
-	std::cout << "\t\t global phi = " << (*dtPrimIt)->getCMSGlobalPhi() <<std::endl;
-	std::cout << "\t\t global rho = " << (*dtPrimIt)->getCMSGlobalRho() <<std::endl;
+	const L1ITMu::TriggerPrimitive * dtPrim = dtPrimIt->get();
+
+	std::cout << "\t\t global quality = " << dtPrim->getDTData().qualityCode <<std::endl;
+	std::cout << "\t\t global eta = " << dtPrim->getCMSGlobalEta() <<std::endl;
+	std::cout << "\t\t global phi = " << dtPrim->getCMSGlobalPhi() <<std::endl;
+	std::cout << "\t\t global rho = " << dtPrim->getCMSGlobalRho() <<std::endl;
 
       }
 
