@@ -131,6 +131,7 @@ TriggerPrimitive::TriggerPrimitive(const TriggerPrimitive& tp):
   _subsector(tp._subsector),
   _eta(tp._eta),
   _phi(tp._phi),
+  _rho(tp._rho),
   _theta(tp._theta){
 }
 

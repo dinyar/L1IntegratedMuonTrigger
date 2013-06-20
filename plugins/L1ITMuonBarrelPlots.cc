@@ -417,7 +417,23 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
       std::cout << "    - Station = " << mbltStation.station() << std::endl;
       std::cout << "    - Wheel   = " << mbltStation.wheel() << std::endl;
       std::cout << "    - Sector  = " << mbltStation.sector() - 1 << std::endl;
+
+      L1ITMu::TriggerPrimitiveList dtPrims = mbltStation.getDtSegments();
+
+      std::cout << "  - Getting the DT matched primitives (size " << dtPrims.size() << ") from the getDtSegments() method\n";
     
+      L1ITMu::TriggerPrimitiveList::const_iterator dtPrimIt  = dtPrims.begin();
+      L1ITMu::TriggerPrimitiveList::const_iterator dtPrimEnd = dtPrims.end();
+
+      for(;dtPrimIt!=dtPrimEnd;++dtPrimIt) {
+
+	std::cout << "\t\t global quality = " << (*dtPrimIt)->getDTData().qualityCode <<std::endl;
+	std::cout << "\t\t global eta = " << (*dtPrimIt)->getCMSGlobalEta() <<std::endl;
+	std::cout << "\t\t global phi = " << (*dtPrimIt)->getCMSGlobalPhi() <<std::endl;
+	std::cout << "\t\t global rho = " << (*dtPrimIt)->getCMSGlobalRho() <<std::endl;
+
+      }
+
       /// useful index
       int station = mbltStation.station();
       int index = station - 1;

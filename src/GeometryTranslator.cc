@@ -265,15 +265,15 @@ GeometryTranslator::calcDTSpecificPoint(const TriggerPrimitive& tp) const {
   double phi = phi_in_sector + sector_offset; // add sector offset  
 
   int qual = tp.getDTData().qualityCode;
-  double z_chamber = (qual == 1 || qual == 3) ? trig_geom->ZSL(2) :
-                     (qual == 0 || qual == 2) ? trig_geom->ZSL(0) :
+  double z_chamber = (qual == 1 || qual == 3) ? trig_geom->ZSL(3) :
+                     (qual == 0 || qual == 2) ? trig_geom->ZSL(1) :
                      trig_geom->ZcenterSL();
 
   GlobalPoint ch_coord = trig_geom->toGlobal( LocalPoint(0,0,z_chamber) );
 
   double rho_p = ch_coord.perp()/cos( acos(cos(ch_coord.phi()-sector_offset)) );
   double rho = rho_p/cos(phi_in_sector);
-
+  
   return GlobalPoint( GlobalPoint::Cylindrical( rho, phi, theta_gp.z() ) );
 }
 
