@@ -142,8 +142,8 @@ namespace L1ITMu {
     const double getCMSGlobalRho() const { return _rho; }    
     void   setCMSGlobalRho(const double rho) { _rho = rho; }
 
-    GlobalPoint getGlobalPoint() { double theta = 2. * atan( exp(-_eta) );
-      return GlobalPoint( GlobalPoint::Cylindrical( _rho, _phi, cos(theta)) ); };
+    const GlobalPoint getCMSGlobalPoint() const { double theta = 2. * atan( exp(-_eta) );
+      return GlobalPoint( GlobalPoint::Cylindrical( _rho, _phi, _rho/tan(theta)) ); };
 
 
     // this is the relative bending angle with respect to the 

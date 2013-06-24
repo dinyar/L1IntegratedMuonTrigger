@@ -434,6 +434,10 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 	std::cout << "\t\t global phi = " << dtPrim->getCMSGlobalPhi() <<std::endl;
 	std::cout << "\t\t global rho = " << dtPrim->getCMSGlobalRho() <<std::endl;
 
+	std::cout << "\t\t global eta (from global coordinates) = " << dtPrim->getCMSGlobalPoint().eta()  <<std::endl;
+	std::cout << "\t\t global phi (from global coordinates) = " << dtPrim->getCMSGlobalPoint().phi()  <<std::endl;
+	std::cout << "\t\t global rho (from global coordinates) = " << dtPrim->getCMSGlobalPoint().perp() <<std::endl;
+
       }
 
       /// useful index
