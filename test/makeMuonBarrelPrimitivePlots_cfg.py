@@ -7,13 +7,13 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string('L1ITMuonBarrelPlots.root')
+    fileName=cms.string('L1ITMuonBarrelPrimitivePlots.root')
     )
 
 process.L1ITMuPlotter = cms.EDAnalyzer(
-    'L1ITMuonBarrelPlots',
-    MBLTCollection = cms.InputTag('MBLTProducer'),
-    L1ITDTChambPhContainer = cms.InputTag('L1ITMuonBarrelPrimitiveProducer', '', 'L1ITMU')
+    'L1ITMuonBarrelPrimitivePlots',
+    L1ITDTChambPhContainer = cms.InputTag('simDtTriggerPrimitiveDigis', '', 'L1'),
+    L1ITDTChambPhContainerNew = cms.InputTag('L1ITMuonBarrelPrimitiveProducer', '', 'L1ITMU')
 )
 
 infile = 'file:L1ITMBLT.root'

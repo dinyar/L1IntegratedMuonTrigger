@@ -68,37 +68,24 @@ namespace L1ITMu {
     /// FIXME END
 
   private :
-    /// a struct for internal usage: store primitives relevant variables
-    struct primitive {
-      double x;
-      double z;
-      const L1ITMu::TriggerPrimitive * prim;
-      primitive() : x(0), z(0), prim(0) {};
-      primitive( const L1ITMu::TriggerPrimitive * pr, double xval, double zval )
-	: x(xval), z(zval), prim(pr) {};
-      operator bool() const { return prim; };
-    };
 
     /// a struct for internal usage: store results
     struct results {
-      double phiBComb;
-      double phiBCombResol;
       double radialAngle;
       double bendingAngle;
+      double bendingResol;
       double weight;
-      results() : phiBComb(0), phiBCombResol(0), radialAngle(0), bendingAngle(0), weight(0) {};
+      results() : radialAngle(0), bendingAngle(0), bendingResol(0), weight(0) {};
     };
 
 
-    /// FIXME : Calculates new phiBending, check how to use weights
-    results combineDt( const primitive & dt,
-		       const primitive & rpc );
-    /// FIXME END
+    /// Calculates new phiBending, check how to use weights
+    results combineDt( const L1ITMu::TriggerPrimitive * dt,
+		       const L1ITMu::TriggerPrimitive * rpc );
 
-    /// FIXME : Calculates new phiBending, check how to use weights
-    results combineDtRpc( const primitive & dt,
-			  const primitive & rpc );
-    /// FIXME END
+    /// Calculates new phiBending, check how to use weights
+    results combineDtRpc( const L1ITMu::TriggerPrimitive * dt,
+			  const L1ITMu::TriggerPrimitive * rpc );
 
   private :
     DTChamberId _dtId;
@@ -110,10 +97,10 @@ namespace L1ITMu {
     int _bendingResol;
     bool _isValid;
 
-    primitive _dtHI;
-    primitive _dtHO;
-    primitive _rpcIn;
-    primitive _rpcOut;
+    const L1ITMu::TriggerPrimitive * _dtHI;
+    const L1ITMu::TriggerPrimitive * _dtHO;
+    const L1ITMu::TriggerPrimitive * _rpcIn;
+    const L1ITMu::TriggerPrimitive * _rpcOut;
 
   };
 }
