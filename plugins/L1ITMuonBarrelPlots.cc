@@ -21,9 +21,6 @@
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollectionFwd.h"
 
-#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrack.h"
-#include "L1Trigger/L1IntegratedMuonTrigger/interface/MBTrackFwd.h"
-
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTChambPhDigi.h"
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTChambPhContainer.h"
 
@@ -49,10 +46,9 @@ public:
   void analyze( const edm::Event&, const edm::EventSetup& );  
 private:
   void endJob();
-
-
+  void beginJob();
+  
   edm::InputTag _mbltCollectionInput;
-  edm::InputTag _mbTracksCollectionInput;
   edm::InputTag _l1itDtPhiChInput;
   edm::Service<TFileService> _fs;
   TH1F * _confirmed[4];
@@ -76,17 +72,11 @@ private:
   TH1F * _rpcInHitsPerDtseg;
   TH1F * _rpcOutHitsPerDtseg;
   TH2F * _dtQualityNew;
-
-  TH1F * _deltaPhiDttfGmtOut;
-  TH1F * _deltaPhiDttfGmtOutSameBx;
-//   TH2F * _dtQualityNew;
-  
 };
 
 
 L1ITMuonBarrelPlots::L1ITMuonBarrelPlots(const PSet& p)
   : _mbltCollectionInput( p.getParameter<edm::InputTag>("MBLTCollection") ),
-    _mbTracksCollectionInput( p.getParameter<edm::InputTag>("MBTracksCollection") ),
     _l1itDtPhiChInput( p.getParameter<edm::InputTag>("L1ITDTChambPhContainer") )
 {
 
@@ -151,14 +141,19 @@ L1ITMuonBarrelPlots::L1ITMuonBarrelPlots(const PSet& p)
   _dtQualityNew->GetYaxis()->SetBinLabel( 6, "(LL || HL)" );
   _dtQualityNew->GetYaxis()->SetBinLabel( 7, "HH" );
 
-  _deltaPhiDttfGmtOut       = _fs->make<TH1F>( "deltaPhiDttfGmtOut", "deltaPhiDttfGmtOut", 400, -0.2, 0.2 );
-  _deltaPhiDttfGmtOutSameBx = _fs->make<TH1F>( "deltaPhiDttfGmtOutSameBx", "deltaPhiDttfGmtOutSameBx", 400, -0.2, 0.2 );
 }
   
 L1ITMuonBarrelPlots::~L1ITMuonBarrelPlots()
 {
 }
 
+
+
+
+void L1ITMuonBarrelPlots::beginJob()
+{
+  
+}
 
 
 
@@ -386,148 +381,6 @@ void L1ITMuonBarrelPlots::analyze( const edm::Event& iEvent,
 //     iph->phi();
 //     iph->phiB();
 //     iph->code();
-
-  /// JP : loop over MBtracks
-  edm::Handle<L1ITMu::MBTrackCollection> mbtrContainer;
-  iEvent.getByLabel( _mbTracksCollectionInput, mbtrContainer);
-
-  L1ITMu::MBTrackCollection::const_iterator tr = mbtrContainer->begin();
-  L1ITMu::MBTrackCollection::const_iterator trend = mbtrContainer->end();
-
-  std::cout << "Getting the MBTrackCollection (size " << mbtrContainer->size() << ")\n";
-  
-  for ( ; tr != trend; ++tr ) {
-    
-    const L1ITMu::MBTrack & mbtrack = *tr;
-    
-    std::cout << " - MBTrack :\n";
-    
-    /// loop over MBCollection
-    const L1ITMu::MBLTVectorRef & mbltContainer = mbtrack.getStubs();
-
-    L1ITMu::MBLTVectorRef::const_iterator st = mbltContainer.begin();
-    L1ITMu::MBLTVectorRef::const_iterator stend = mbltContainer.end();
-
-    std::cout << "  - Getting the MBLTCollection (size " << mbltContainer.size() << ") from the getStubs() method\n";
-    
-    for ( ; st != stend; ++st ) {
-
-      const L1ITMu::MBLTCollection & mbltStation = (*st)->second;
-
-      std::cout << "    - Station = " << mbltStation.station() << std::endl;
-      std::cout << "    - Wheel   = " << mbltStation.wheel() << std::endl;
-      std::cout << "    - Sector  = " << mbltStation.sector() - 1 << std::endl;
-
-      L1ITMu::TriggerPrimitiveList dtPrims = mbltStation.getDtSegments();
-
-      std::cout << "  - Getting the DT matched primitives (size " << dtPrims.size() << ") from the getDtSegments() method\n";
-    
-      L1ITMu::TriggerPrimitiveList::const_iterator dtPrimIt  = dtPrims.begin();
-      L1ITMu::TriggerPrimitiveList::const_iterator dtPrimEnd = dtPrims.end();
-
-      for(;dtPrimIt!=dtPrimEnd;++dtPrimIt) {
-
-	const L1ITMu::TriggerPrimitive * dtPrim = dtPrimIt->get();
-
-	std::cout << "\t\t global quality = " << dtPrim->getDTData().qualityCode <<std::endl;
-	std::cout << "\t\t global eta = " << dtPrim->getCMSGlobalEta() <<std::endl;
-	std::cout << "\t\t global phi = " << dtPrim->getCMSGlobalPhi() <<std::endl;
-	std::cout << "\t\t global rho = " << dtPrim->getCMSGlobalRho() <<std::endl;
-
-	std::cout << "\t\t global eta (from global coordinates) = " << dtPrim->getCMSGlobalPoint().eta()  <<std::endl;
-	std::cout << "\t\t global phi (from global coordinates) = " << dtPrim->getCMSGlobalPoint().phi()  <<std::endl;
-	std::cout << "\t\t global rho (from global coordinates) = " << dtPrim->getCMSGlobalPoint().perp() <<std::endl;
-
-      }
-
-      /// useful index
-      int station = mbltStation.station();
-      int index = station - 1;
-      int wheel = mbltStation.wheel();
-      int sector = mbltStation.sector() - 1 ;
-
-      if ( index < 0 || index > 3 )
-	throw cms::Exception("Invalid Station")
-	  << "wrong station number " << station << std::endl;
-
-      /// size for primitives vectors
-      size_t dtListSize = mbltStation.getDtSegments().size();
-
-      std::cout << "     - dtListSize = " << mbltStation.getDtSegments().size() << std::endl;
-
-    }
-
-
-    /// get dttf    
-    const L1MuDTTrackCand& dttf = mbtrack.parent();
-    std::cout << "  - Getting the L1MuDTTrackCand DTTF from the parent() method\n";
-    
-    int dttf_bx      =  dttf.bx();
-    int dttf_qual    =  dttf.quality();
-    int phi_local = dttf.phi_packed();
-    if ( phi_local > 15 ) phi_local -= 32;
-    double dttf_phi_global = (phi_local*(M_PI/72.))+((M_PI/6.)*dttf.scNum());
-    if(dttf_phi_global < 0) dttf_phi_global+=2*M_PI;
-    if(dttf_phi_global > 2*M_PI) dttf_phi_global-=2*M_PI;
-    
-    std::cout << "    - Quality = " << dttf.quality() << std::endl;
-    std::cout << "    - Bx      = " << dttf.bx() << std::endl;
-    std::cout << "    - Phi     = " << dttf_phi_global << std::endl;
-    std::cout << "    - WhNum   = " << dttf.whNum() << std::endl;
-    std::cout << "    - ScNum   = " << dttf.scNum() << std::endl;
-
-    
-    /// loop over GMTout (L1MuGMTExtendedCand)
-    const std::vector<L1MuGMTExtendedCand> l1gmtextcand = mbtrack.getAssociatedGMTout(); 
-
-    std::vector<L1MuGMTExtendedCand>::const_iterator igmtout  = l1gmtextcand.begin();
-    std::vector<L1MuGMTExtendedCand>::const_iterator igmtoutend = l1gmtextcand.end();
-
-    std::cout << "  - Getting the vector<L1MuGMTExtendedCand> (size " << l1gmtextcand.size() << ") from the getAssociatedGMTout() method\n";
-    
-    for ( ; igmtout != igmtoutend; ++igmtout ) {
-      
-      const L1MuGMTExtendedCand & gmtout = *igmtout;
-
-      std::cout << "   - gmtOutput:\n";
-      
-      std::cout << "    - Quality = " << gmtout.quality() << std::endl;
-      std::cout << "    - Phi     = " << gmtout.phiValue() << std::endl;
-      std::cout << "    - Eta     = " << gmtout.etaValue() << std::endl;
-      std::cout << "    - Pt      = " << gmtout.ptValue() << std::endl;
-      std::cout << "    - Bx      = " << gmtout.bx() << std::endl;
-      
-      double dttfGmtDeltaPhi = reco::deltaPhi( dttf_phi_global, gmtout.phiValue() );
-      
-      _deltaPhiDttfGmtOut->Fill(dttfGmtDeltaPhi);
-      
-      if ( dttf_bx == gmtout.bx() ) { 
-        _deltaPhiDttfGmtOutSameBx->Fill(dttfGmtDeltaPhi);
-      }
-      
-    }
-
-    /// loop over GMTin (L1MuRegionalCand)
-    const std::vector<L1MuRegionalCand> l1muregcand = mbtrack.getAssociatedGMTin(); 
-    
-    std::vector<L1MuRegionalCand>::const_iterator igmtin  = l1muregcand.begin();
-    std::vector<L1MuRegionalCand>::const_iterator igmtinend = l1muregcand.end();
-
-    std::cout << "  - Getting the vector<L1MuRegionalCand> (size " << l1muregcand.size() << ") from the getAssociatedGMTin() method\n";
-
-    for ( ; igmtin != igmtinend; ++igmtin ) {
-      
-      const L1MuRegionalCand & gmtin = *igmtin;
-      
-      std::cout << "   - gmtInput:\n";
-      
-      std::cout << "    - Quality = " << gmtin.quality() << std::endl;
-      std::cout << "    - Phi     = " << gmtin.phiValue() << std::endl;
-      std::cout << "    - Bx      = " << gmtin.bx() << std::endl;
-      
-    }
-
-  }
   
 }
 
