@@ -8,8 +8,11 @@
 //
 // Author: 
 //
-#include "DataFormats/MuonDetId/interface/DTChamberId.h"
+
+#include "FWCore/Framework/interface/ESHandle.h"
 #include <cmath>
+
+class DTGeometry;
 
 namespace L1ITMu {
 
@@ -31,8 +34,7 @@ namespace L1ITMu {
     };
 
   public :
-    explicit PrimitiveCombiner( const DTChamberId & dtId, 
-				const resolutions & res );
+    explicit PrimitiveCombiner( const resolutions & res, edm::ESHandle<DTGeometry> & muonGeom );
 
     /// feed the combiner with the available primitives
     void addDt( const L1ITMu::TriggerPrimitive & prim );
@@ -48,8 +50,9 @@ namespace L1ITMu {
     int bx() const { return _bx;};
     int radialAngle() const { return _radialAngle;};
     int bendingAngle() const { return _bendingAngle;};
-    bool isValid() const { return _isValid;};
+    int bendingResol() const { return _bendingResol;};
 
+    bool isValid() const { return ( _dtHI || _dtHO ) && ( _rpcIn || _rpcOut );};
 
     /// FIXME : Calculates new phiBending, check how to use 
     inline float phiBCombined( const float & xDt, const float & zDt,
@@ -74,8 +77,7 @@ namespace L1ITMu {
       double radialAngle;
       double bendingAngle;
       double bendingResol;
-      double weight;
-      results() : radialAngle(0), bendingAngle(0), bendingResol(0), weight(0) {};
+      results() : radialAngle(0), bendingAngle(0), bendingResol(0) {};
     };
 
 
@@ -88,14 +90,13 @@ namespace L1ITMu {
 			  const L1ITMu::TriggerPrimitive * rpc );
 
   private :
-    DTChamberId _dtId;
     resolutions _resol;
+    edm::ESHandle<DTGeometry> _muonGeom;
 
     int _bx;
     int _radialAngle;
     int _bendingAngle;
     int _bendingResol;
-    bool _isValid;
 
     const L1ITMu::TriggerPrimitive * _dtHI;
     const L1ITMu::TriggerPrimitive * _dtHO;

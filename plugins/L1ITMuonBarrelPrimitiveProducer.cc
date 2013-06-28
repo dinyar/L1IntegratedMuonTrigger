@@ -15,9 +15,11 @@
 
 #include "DataFormats/MuonDetId/interface/RPCDetId.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
+
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTChambPhDigi.h"
 #include "DataFormats/L1DTTrackFinder/interface/L1MuDTChambPhContainer.h"
 
+#include "Geometry/Records/interface/MuonGeometryRecord.h"
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/PrimitiveCombiner.h"
 
 // user include files
@@ -32,8 +34,8 @@ public:
 
 private:
   edm::InputTag _mbltCollectionInput;
-   const L1ITMu::PrimitiveCombiner::resolutions _resol;
-
+  const L1ITMu::PrimitiveCombiner::resolutions _resol;
+  edm::ESHandle<DTGeometry> _muonGeom;
 };
 
 
@@ -53,13 +55,11 @@ L1ITMuonBarrelPrimitiveProducer::L1ITMuonBarrelPrimitiveProducer( const edm::Par
 }
 
 
-
 void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent, 
 					      const edm::EventSetup& iSetup )
 {
+  iSetup.get<MuonGeometryRecord>().get(_muonGeom);
 
-//   std::auto_ptr<std::vector<L1MuDTChambPhDigi> >
-//     out ( new std::vector<L1MuDTChambPhDigi> );
   std::auto_ptr<L1MuDTChambPhContainer> out(new L1MuDTChambPhContainer);
   std::vector<L1MuDTChambPhDigi> phiChambVector;
   
@@ -154,12 +154,12 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	match = mbltStation.haveCommonRpc( iDt, closest );
       }
 
-      /// this is just a seto of output variables for building L1ITMuDTChambPhDigi
+      /// this is just a set of output variables for building L1ITMuDTChambPhDigi
       int qualityCode = dt.getDTData().qualityCode;
       int bx = -2;
       int radialAngle = 0;
       int bendingAngle = 0;
-      L1ITMu::PrimitiveCombiner combiner( st->first, _resol );
+      L1ITMu::PrimitiveCombiner combiner( _resol, _muonGeom );
       /// association HI/HO provided by the tool
       combiner.addDt( dt );
 
@@ -202,8 +202,6 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 
       } else { /// there is no match
 
-	bool hasRpcMatch = false;
-
 	L1ITMu::TriggerPrimitiveList rpcInMatch = mbltStation.getRpcInAssociatedStubs( iDt );
 	L1ITMu::TriggerPrimitiveList rpcOutMatch = mbltStation.getRpcOutAssociatedStubs( iDt );
 	size_t rpcInMatchSize = rpcInMatch.size();
@@ -216,16 +214,13 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	  /// only the first is real...
 	  if ( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() ) {
 	    bx = rpcIn.getBX();
-	    hasRpcMatch = true;
 	    combiner.addRpcIn( rpcIn );
 	    combiner.addRpcOut( rpcOut );
 	  } else if ( dt.getBX() == rpcIn.getBX() ) {
 	    bx = rpcIn.getBX();
-	    hasRpcMatch = true;
 	    combiner.addRpcIn( rpcIn );
 	  } else if ( dt.getBX() == rpcOut.getBX() ) {
 	    bx = rpcOut.getBX();
-	    hasRpcMatch = true;
 	    combiner.addRpcOut( rpcOut );
 	  }
 
@@ -234,7 +229,6 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	  const L1ITMu::TriggerPrimitive & rpcIn = *rpcInMatch.front();
 	  if ( dt.getBX() == rpcIn.getBX() ) {
 	    bx = rpcIn.getBX();
-	    hasRpcMatch = true;
 	    combiner.addRpcIn( rpcIn );
 	  }
 
@@ -243,26 +237,25 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	  const L1ITMu::TriggerPrimitive & rpcOut = *rpcOutMatch.front();
 	  if ( dt.getBX() == rpcOut.getBX() ) {
 	    bx = rpcOut.getBX();
-	    hasRpcMatch = true;
 	    combiner.addRpcOut( rpcOut );
 	  }
 
 	}
-
-	// match found, PrimitiveCombiner has the needed variables already calculated
-	if ( hasRpcMatch ) {
-	  combiner.combine();
-	  radialAngle = combiner.radialAngle();
-	  bendingAngle = combiner.bendingAngle();
-	} else {
-	  // no match found, keep the primitive as it is
-	  bx = dt.getBX();
-	  radialAngle = dt.getDTData().radialAngle;
-	  bendingAngle = dt.getDTData().bendingAngle;
-	  qualityCode = ( qualityCode == 2 ) ? 0 : 1;
-	}
-
       }
+
+      // match found, PrimitiveCombiner has the needed variables already calculated
+      if ( combiner.isValid() ) {
+	combiner.combine();
+	radialAngle = combiner.radialAngle();
+	bendingAngle = combiner.bendingAngle();
+      } else {
+	// no match found, keep the primitive as it is
+	bx = dt.getBX();
+	radialAngle = dt.getDTData().radialAngle;
+	bendingAngle = dt.getDTData().bendingAngle;
+	qualityCode = ( qualityCode == 2 ) ? 0 : 1;
+      }
+
       L1MuDTChambPhDigi chamb( bx, wheel, sector, station, radialAngle,
 			       bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );

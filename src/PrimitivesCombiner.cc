@@ -1,12 +1,23 @@
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/PrimitiveCombiner.h"
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/TriggerPrimitive.h"
+
+#include "Geometry/Records/interface/MuonGeometryRecord.h"
+#include "Geometry/DTGeometry/interface/DTGeometry.h"
+#include "Geometry/DTGeometry/interface/DTChamber.h"
+
+#include "DataFormats/MuonDetId/interface/RPCDetId.h"
+#include "DataFormats/MuonDetId/interface/DTChamberId.h"
+
 #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+#include "DataFormats/GeometryVector/interface/LocalPoint.h"
+
 #include "FWCore/Utilities/interface/Exception.h"
 
-L1ITMu::PrimitiveCombiner::PrimitiveCombiner( const DTChamberId & dtId, 
-					      const L1ITMu::PrimitiveCombiner::resolutions & res )
-  : _dtId(dtId), _resol(res), _bx(0),
-    _radialAngle(0), _bendingAngle(0), _bendingResol(0), _isValid(0),
+
+L1ITMu::PrimitiveCombiner::PrimitiveCombiner( const L1ITMu::PrimitiveCombiner::resolutions & res,
+					      edm::ESHandle<DTGeometry> & muonGeom )
+  : _resol(res), _muonGeom(muonGeom),
+    _bx(0), _radialAngle(0), _bendingAngle(0), _bendingResol(0),
     _dtHI(0), _dtHO(0), _rpcIn(0), _rpcOut(0)
 {}
 
@@ -64,6 +75,8 @@ void L1ITMu::PrimitiveCombiner::addRpcOut( const L1ITMu::TriggerPrimitive & prim
 
 void L1ITMu::PrimitiveCombiner::combine()
 {
+  if ( !isValid() ) return;
+
   typedef L1ITMu::PrimitiveCombiner::results localResult;
   std::vector<localResult> localResults;
 
@@ -76,22 +89,24 @@ void L1ITMu::PrimitiveCombiner::combine()
   if ( _dtHI ) {
     if ( _rpcIn ) {
       localResults.push_back( combineDtRpc( _dtHI, _rpcIn ) );
+      _radialAngle = _radialAngle ? _radialAngle :_dtHI->getDTData().radialAngle;
     }
     if ( _rpcOut ) {
       localResults.push_back( combineDtRpc( _dtHI, _rpcOut ) );
+      _radialAngle = _radialAngle ? _radialAngle :_dtHI->getDTData().radialAngle;
     }
-    if ( ! _radialAngle ) _radialAngle = localResults.back().radialAngle;
   }
 
 
   if ( _dtHO ) {
     if ( _rpcIn ) {
       localResults.push_back( combineDtRpc( _dtHO, _rpcIn ) );
+      _radialAngle = _radialAngle ? _radialAngle :_dtHO->getDTData().radialAngle;
     }
     if ( _rpcOut ) {
       localResults.push_back( combineDtRpc( _dtHO, _rpcOut ) );
+      _radialAngle = _radialAngle ? _radialAngle :_dtHO->getDTData().radialAngle;
     }
-    if ( ! _radialAngle ) _radialAngle = localResults.back().radialAngle;
   }
 
   double weightSum = 0;
@@ -103,13 +118,11 @@ void L1ITMu::PrimitiveCombiner::combine()
   for ( ; it != itend; ++it ) {
     weightSum += it->bendingResol;
     _bendingAngle += it->bendingAngle * it->bendingResol;
-    _bendingResol += it->bendingResol;
+    _bendingResol += it->bendingResol * it->bendingResol;
   }
 
   _bendingAngle /= weightSum;
-  _bendingResol /= weightSum;
-
-  _isValid = true;
+  _bendingResol = sqrt( _bendingResol );
 
 }
 
@@ -120,13 +133,22 @@ L1ITMu::PrimitiveCombiner::combineDt( const L1ITMu::TriggerPrimitive * dt1,
 				      const L1ITMu::TriggerPrimitive * dt2 )
 {
 
-  GlobalPoint point1 = dt1->getCMSGlobalPoint();
-  GlobalPoint point2 = dt2->getCMSGlobalPoint();
+  const DTChamber* chamb1 = _muonGeom->chamber( dt1->detId<DTChamberId>() );
+  LocalPoint point1 = chamb1->toLocal( dt1->getCMSGlobalPoint() );
+
+  const DTChamber* chamb2 = _muonGeom->chamber( dt2->detId<DTChamberId>() );
+  LocalPoint point2 = chamb2->toLocal( dt2->getCMSGlobalPoint() );
 
   results localResult;
-  localResult.bendingAngle = phiBCombined( point1.x(), point2.x(), point1.z(), point2.z() );
+  localResult.bendingAngle = phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() ) * 512;
   localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xDt );
-  localResult.radialAngle = (dt1->getCMSGlobalPhi() + dt2->getCMSGlobalPhi()) * 0.5;
+  localResult.radialAngle = 0.5 * ( dt1->getDTData().radialAngle + dt2->getDTData().radialAngle );
+
+  //  std::cout << "dt-dt radial : " << dt1->getDTData().radialAngle << " * " << dt2->getDTData().radialAngle << " = " << localResult.radialAngle << '\n';
+  std::cout << '\t' << point1.x() << '\t' << point1.z() << '\t' << dt1->getDTData().qualityCode << '\n';
+    std::cout << '\t' << point2.x() << '\t' << point2.z() << '\t' << dt2->getDTData().qualityCode << '\n';
+  std::cout << "dt-dt bending : " << dt1->getDTData().bendingAngle << " * " << dt2->getDTData().bendingAngle << " = " << localResult.bendingAngle << '\n';
+
   return localResult;
 
 }
@@ -136,13 +158,22 @@ L1ITMu::PrimitiveCombiner::combineDtRpc( const L1ITMu::TriggerPrimitive * dt,
 					 const L1ITMu::TriggerPrimitive * rpc )
 {
 
-  GlobalPoint point1 = dt->getCMSGlobalPoint();
-  GlobalPoint point2 = rpc->getCMSGlobalPoint();
+  const DTChamber* chamb1 = _muonGeom->chamber( dt->detId<DTChamberId>() );
+  LocalPoint point1 = chamb1->toLocal( dt->getCMSGlobalPoint() );
+
+  int station = rpc->detId<RPCDetId>().station();
+  int sector  = rpc->detId<RPCDetId>().sector();
+  int wheel = rpc->detId<RPCDetId>().ring();
+  const DTChamber* chamb2 = _muonGeom->chamber( DTChamberId( wheel, station, sector ) );
+  LocalPoint point2 = chamb2->toLocal( rpc->getCMSGlobalPoint() );
 
   results localResult;
-  localResult.bendingAngle = phiBCombined( point1.x(), point2.x(), point1.z(), point2.z() );
+  localResult.bendingAngle = phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() ) * 512;
   localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xRpc );
-  localResult.radialAngle = dt->getCMSGlobalPhi();
+  localResult.radialAngle = dt->getDTData().radialAngle;
+
+  //std::cout << "dt-rpc bending : " << dt->getDTData().bendingAngle << " -> " << localResult.bendingAngle << '\n';
+
   return localResult;
 
 }

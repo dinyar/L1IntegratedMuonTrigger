@@ -51,26 +51,24 @@ private:
   edm::InputTag _l1itDtPhiChInput;
   edm::InputTag _l1itDtPhiChInputNew;
   edm::Service<TFileService> _fs;
-  TH1F * _confirmed[4];
-  TH1F * _timingConf[4];
-  TH1F * _timingConfIn[4];
-  TH1F * _timingConfOut[4];
 
-  TH2F * _dtDist[4];
-  TH2F * _rpcInDist[4];
-  TH2F * _rpcOutDist[4];
-  TH2F * _dtQuality[4];
+  TH1F * _uncorrelated;
+  TH1F * _uncorrelatedNorm;
+  // TH1F * _deltaPhi;
 
-  TH1F * _deltaPhi;
-  TH1F * _deltaEta;
-  TH1F * _deltaR;
-  TH2F * _deltaPhiR;
-  TH1F * _deltaPhiBin;
+  TH2F * _bendingAngle;
+  TH2F * _radialAngle;
 
-  TH1F * _deltaPhiDt;
+  TH1F * _bendingAngleDiff;
+  TH1F * _radialAngleDiff;
 
-  TH1F * _rpcInHitsPerDtseg;
-  TH1F * _rpcOutHitsPerDtseg;
+  TH2F * _bendingAnglePhys;
+  TH2F * _radialAnglePhys;
+
+  TH1F * _bendingAnglePhysDiff;
+  TH1F * _radialAnglePhysDiff;
+
+  TH2F * _dtQuality;
   TH2F * _dtQualityNew;
 };
 
@@ -80,55 +78,48 @@ L1ITMuonBarrelPrimitivePlots::L1ITMuonBarrelPrimitivePlots(const PSet& p)
     _l1itDtPhiChInputNew( p.getParameter<edm::InputTag>("L1ITDTChambPhContainerNew") )
 {
 
-  for ( int i = 0; i < 4; ++i ) {
-    TString stname = Form( "st%d", i+1 );
-    _confirmed[i] = _fs->make<TH1F>( "confirmed_"+stname, "confirmed in "+stname, 5, -1, 4 );
+  _uncorrelated = _fs->make<TH1F>( "uncorrelated", "uncorrelated", 4, 1, 5 );
+  _uncorrelated->GetXaxis()->SetBinLabel( 1, "total");
+  _uncorrelated->GetXaxis()->SetBinLabel( 2, "final");
+  _uncorrelated->GetXaxis()->SetBinLabel( 3, "final+rpc");
+  _uncorrelated->GetXaxis()->SetBinLabel( 4, "rematched");
+  _uncorrelatedNorm = _fs->make<TH1F>( "uncorrelatedNorm", "uncorrelatedNorm", 4, 1, 5 );
+  _uncorrelatedNorm->GetXaxis()->SetBinLabel( 1, "total");
+  _uncorrelatedNorm->GetXaxis()->SetBinLabel( 2, "final");
+  _uncorrelatedNorm->GetXaxis()->SetBinLabel( 3, "final+rpc");
+  _uncorrelatedNorm->GetXaxis()->SetBinLabel( 4, "rematched");
 
-    _confirmed[i]->GetXaxis()->SetBinLabel( 1, "RPC Only");
-    _confirmed[i]->GetXaxis()->SetBinLabel( 2, "Un_confirmed");
-    _confirmed[i]->GetXaxis()->SetBinLabel( 3, "In+Out");
-    _confirmed[i]->GetXaxis()->SetBinLabel( 4, "In");
-    _confirmed[i]->GetXaxis()->SetBinLabel( 5, "Out");
 
-    _timingConf[i] = _fs->make<TH1F>( "timing_"+stname, "dt vs rpc timing in "+stname, 4, -2, 2 );
-    _timingConfIn[i] = _fs->make<TH1F>( "timingIn_"+stname, "dt vs rpcIn timing in "+stname, 3, -1, 2 );
-    _timingConfOut[i] = _fs->make<TH1F>( "timingOut_"+stname, "dt vs rpcOut timing in "+stname, 3, -1, 2 );
+  _bendingAngle = _fs->make<TH2F>( "bendingAngle", "bendingAngle", 104, -520, 520, 104, -520, 520 );
+  _radialAngle = _fs->make<TH2F>( "radialAngle", "radialAngle", 360, -1800, 1800, 360, -1800, 1800 );
 
-    _dtDist[i] = _fs->make<TH2F>( "dtDist_"+stname, "dt primitives in "+stname, 5, -2, 3, 12, 1, 13 );
-    _rpcInDist[i] = _fs->make<TH2F>( "rpcInDist_"+stname, "rpc inner primitives in "+stname, 5, -2, 3, 12, 1, 13 );
-    _rpcOutDist[i] = _fs->make<TH2F>( "rpcOutDist_"+stname, "rpc outer primitives in "+stname, 5, -2, 3, 12, 1, 13 );
+  _bendingAngleDiff = _fs->make<TH1F>( "bendingAngleDiff", "bendingAngleDiff", 500, -500, 500 );
+  _radialAngleDiff = _fs->make<TH1F>( "radialAngleDiff", "radialAngleDiff", 200, -100, 100 );
 
-    /// DT quality stuff
-    _dtQuality[i] = _fs->make<TH2F>( "dtQuality_"+stname, "dt quality vs rpc match in "+stname, 4, 0, 4, 7, 0, 7);
-    _dtQuality[i]->GetXaxis()->SetBinLabel( 1, "Un_confirmed");
-    _dtQuality[i]->GetXaxis()->SetBinLabel( 2, "In+Out");
-    _dtQuality[i]->GetXaxis()->SetBinLabel( 3, "In");
-    _dtQuality[i]->GetXaxis()->SetBinLabel( 4, "Out");
 
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 1, "LI" );
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 2, "LO" );
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 3, "HI" );
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 4, "HO" );
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 5, "LL" );
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 6, "HL" );
-    _dtQuality[i]->GetYaxis()->SetBinLabel( 7, "HH" );
+  _bendingAnglePhys = _fs->make<TH2F>( "bendingAnglePhys", "bendingAnglePhys", 63, -3.15, 3.15, 63, -3.15, 3.15 );
+  _radialAnglePhys = _fs->make<TH2F>( "radialAnglePhys", "radialAnglePhys", 63, -3.15, 3.15, 63, -3.15, 3.15 );
 
-  }
+  _bendingAnglePhysDiff = _fs->make<TH1F>( "bendingAnglePhysDiff", "bendingAnglePhysDiff", 100, -1, 1 );
+  _radialAnglePhysDiff = _fs->make<TH1F>( "radialAnglePhysDiff", "radialAnglePhysDiff", 200, -2, 2 );
 
-  _deltaPhiDt = _fs->make<TH1F>( "deltaPhiDt", "deltaPhiDt", 400, -0.2, 0.2 );
 
-  _deltaPhi = _fs->make<TH1F>( "deltaPhi", "deltaPhi", 400, -0.2, 0.2 );
-  _deltaPhiBin = _fs->make<TH1F>( "deltaPhiBin", "deltaPhi bins", 3, -0.15, 0.15 );
-
-  _deltaEta = _fs->make<TH1F>( "deltaEta", "deltaEta", 40, 0, 0.4 );
-  _deltaR = _fs->make<TH1F>( "deltaR", "deltaR", 100, 0, 1 );
-  _rpcInHitsPerDtseg = _fs->make<TH1F>( "rpcInHitsPerDtseg", "number of inner rpc hits matching a dt sector", 20, 0, 20 );
-  _rpcOutHitsPerDtseg = _fs->make<TH1F>( "rpcOutHitsPerDtseg", "number of outer rpc hits matching a dt sector", 20, 0, 20 );
-
-  _deltaPhiR = _fs->make<TH2F>( "deltaPhiR", "deltaR vs deltaPhi", 400, 0, 0.4, 100, 0, 0.5 );
+  /// DT quality stuff
+  _dtQuality = _fs->make<TH2F>( "dtQuality", "dt quality vs station", 4, 1, 5, 7, 0, 7);
+  _dtQuality->GetXaxis()->SetBinLabel( 1, "MB1");
+  _dtQuality->GetXaxis()->SetBinLabel( 2, "MB2");
+  _dtQuality->GetXaxis()->SetBinLabel( 3, "MB3");
+  _dtQuality->GetXaxis()->SetBinLabel( 4, "MB4");
+  _dtQuality->GetYaxis()->SetBinLabel( 1, "LI" );
+  _dtQuality->GetYaxis()->SetBinLabel( 2, "LO" );
+  _dtQuality->GetYaxis()->SetBinLabel( 3, "HI" );
+  _dtQuality->GetYaxis()->SetBinLabel( 4, "HO" );
+  _dtQuality->GetYaxis()->SetBinLabel( 5, "LL" );
+  _dtQuality->GetYaxis()->SetBinLabel( 6, "HL" );
+  _dtQuality->GetYaxis()->SetBinLabel( 7, "HH" );
 
   /// DT quality stuff according to new definition
-  _dtQualityNew = _fs->make<TH2F>( "dtQualityNew", "dt quality vs station", 4, 1, 5, 7, 0, 7);
+  _dtQualityNew = _fs->make<TH2F>( "dtQualityNew", "New dt quality vs station", 4, 1, 5, 7, 0, 7);
   _dtQualityNew->GetXaxis()->SetBinLabel( 1, "MB1");
   _dtQualityNew->GetXaxis()->SetBinLabel( 2, "MB2");
   _dtQualityNew->GetXaxis()->SetBinLabel( 3, "MB3");
@@ -160,29 +151,21 @@ void L1ITMuonBarrelPrimitivePlots::beginJob()
 void L1ITMuonBarrelPrimitivePlots::endJob()
 {
 
-  for ( int i = 0; i < 4; ++i ) {
-
-    /// per station quality plots
-    for ( int q = 1; q < 8; ++q ) {
-      double quality = 0;
-      for ( int m = 1; m < 5; ++m ) {
-	quality += _dtQuality[i]->GetBinContent( m, q );
-      }
-      for ( int m = 1; m < 5; ++m ) {
-	if ( quality )
-	  _dtQuality[i]->SetBinContent( m, q, _dtQuality[i]->GetBinContent( m, q ) / quality );
-	else
-	  _dtQuality[i]->SetBinContent( m, q, 0 );
-      }
-    }
+  for ( int st = 1; st < 5; ++st ) {
 
     /// new quality plot
-    int st = i + 1;
+    double quality = 0;
     double qualityNew = 0;
     for ( int q = 1; q < 8; ++q ) {
+      quality += _dtQuality->GetBinContent( st, q );
       qualityNew += _dtQualityNew->GetBinContent( st, q );
     }
     for ( int q = 1; q < 8; ++q ) {
+      if ( quality )
+	_dtQuality->SetBinContent( st, q, _dtQuality->GetBinContent( st, q ) / quality );
+      else
+	_dtQuality->SetBinContent( st, q, 0 );
+
       if ( qualityNew )
 	_dtQualityNew->SetBinContent( st, q, _dtQualityNew->GetBinContent( st, q ) / qualityNew );
       else
@@ -190,38 +173,105 @@ void L1ITMuonBarrelPrimitivePlots::endJob()
     }
   }
 
+  double totUnc = _uncorrelated->GetBinContent( 1 );
+  for ( int i = 1; i < 5; ++i ) {
+    _uncorrelatedNorm->SetBinContent( i, _uncorrelated->GetBinContent( i ) / totUnc );
+  }
+
 }
 
-
-// double phiBending()
-// {
-// phib_DT-RPC = (x_RPC - x_DT) / (y_RPC - y_DT) and resol_phib-RPC = sqrt(resol_x_RPC^2 + resol_x_DT^2) 
-
-
-// }
 
 
 void L1ITMuonBarrelPrimitivePlots::analyze( const edm::Event& iEvent, 
 					 const edm::EventSetup& iSetup )
 {
 
+  std::vector<double> oldBendingAngle;
+  std::vector<double> oldRadialAngle;
+  std::vector<double> newBendingAngle;
+  std::vector<double> newRadialAngle;
+
   /// Old primitives loop
-
-
-  /// New primitives loop
   edm::Handle<L1MuDTChambPhContainer> phiChambContainer;
   iEvent.getByLabel( _l1itDtPhiChInput, phiChambContainer );
+
   std::vector<L1MuDTChambPhDigi>* phTrigs = phiChambContainer->getContainer();
-
   std::vector<L1MuDTChambPhDigi>::const_iterator iph  = phTrigs->begin();
-  std::vector<L1MuDTChambPhDigi>::const_iterator iphe = phTrigs->end();
+  std::vector<L1MuDTChambPhDigi>::const_iterator iphEnd = phTrigs->end();
 
-  for(; iph !=iphe ; ++iph) {
-    if ( !iph->bxNum() ) _dtQualityNew->Fill( iph->stNum(), iph->code() );
+  for ( ; iph != iphEnd ; ++iph ) {
+
+
+    if ( iph->code() == 2 || iph->code() == 3 ) {
+      _uncorrelated->Fill( 1 );
+      oldBendingAngle.push_back( iph->phiB() );
+      oldRadialAngle.push_back( iph->phi() );
+    }
+
+    if ( iph->bxNum() ) continue;
+    _dtQuality->Fill( iph->stNum(), iph->code() );
   }
-//     iph->phi();
-//     iph->phiB();
-//     iph->code();
+
+  /// New primitives loop
+  edm::Handle<L1MuDTChambPhContainer> phiChambContainerNew;
+  iEvent.getByLabel( _l1itDtPhiChInputNew, phiChambContainerNew );
+
+  std::vector<L1MuDTChambPhDigi>* phTrigsNew = phiChambContainerNew->getContainer();
+  std::vector<L1MuDTChambPhDigi>::const_iterator iphNew  = phTrigsNew->begin();
+  std::vector<L1MuDTChambPhDigi>::const_iterator iphNewEnd = phTrigsNew->end();
+
+  for ( ; iphNew != iphNewEnd ; ++iphNew ) {
+
+
+    if ( iphNew->code() < 4  ) {
+
+      // any uncorrelated is bin 2
+      _uncorrelated->Fill( 2 );
+
+      // uncorrelated with rpc match is bin 3 and has bending recalculation
+      if ( iphNew->code() > 1  ) {
+	_uncorrelated->Fill( 3 );
+	newBendingAngle.push_back( iphNew->phiB() );
+      }
+
+      /// recombined uncorrelated is bin 4 and has phi and phiB recalculated
+    } else if ( iphNew->code() == 4 ) {
+      _uncorrelated->Fill( 4 );
+      newRadialAngle.push_back( iphNew->phi() );
+      newBendingAngle.push_back( iphNew->phiB() );
+    }
+
+    if ( iphNew->bxNum() ) continue;
+    _dtQualityNew->Fill( iphNew->stNum(), iphNew->code() );
+
+  }
+
+  /// the following loops make sense only if there is a new dt+dt+rpc or dt+rpc match
+  for ( size_t j = 0; j < newBendingAngle.size(); ++j ) {
+    for ( size_t i = 0; i < oldBendingAngle.size(); ++i ) {
+
+      double diff = oldBendingAngle.at(i) - newBendingAngle.at(j);
+      _bendingAngle->Fill( oldBendingAngle.at(i), newBendingAngle.at(j) );
+      _bendingAngleDiff->Fill( diff);
+
+      _bendingAnglePhys->Fill( oldBendingAngle.at(i)/515., newBendingAngle.at(j)/515. );
+      _bendingAnglePhysDiff->Fill( diff/515. );
+    }
+  }
+
+  for ( size_t j = 0; j < newRadialAngle.size(); ++j ) {
+    for ( size_t i = 0; i < oldRadialAngle.size(); ++i ) {
+
+      double diff = oldRadialAngle.at(i) - newRadialAngle.at(j);
+      _radialAngle->Fill( oldRadialAngle.at(i), newRadialAngle.at(j) );
+      _radialAngleDiff->Fill( oldRadialAngle.at(i) - newRadialAngle.at(j) );
+
+      _radialAnglePhys->Fill( oldRadialAngle.at(i)/4096., newRadialAngle.at(j)/4096. );
+      _radialAnglePhysDiff->Fill( diff/4096. );
+    }
+  }
+
+
   
 }
 
