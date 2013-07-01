@@ -52,7 +52,13 @@ namespace L1ITMu {
     int bendingAngle() const { return _bendingAngle;};
     int bendingResol() const { return _bendingResol;};
 
-    bool isValid() const { return ( _dtHI || _dtHO ) && ( _rpcIn || _rpcOut );};
+    bool isValid() const {
+      int ret = _dtHI ? 1 : 0;
+      ret += _dtHO ? 1 : 0;
+      ret += _rpcIn ? 1 : 0;
+      ret += _rpcOut ? 1 : 0;
+      return ret > 1 ;
+    };
 
     /// FIXME : Calculates new phiBending, check how to use 
     inline float phiBCombined( const float & xDt, const float & zDt,

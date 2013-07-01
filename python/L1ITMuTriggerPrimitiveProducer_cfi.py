@@ -12,7 +12,7 @@ L1ITMuTriggerPrimitives = cms.EDProducer(
                      src = cms.InputTag('simDtTriggerPrimitiveDigis'),
                      BX_min = cms.int32(dttfDigis.BX_min.value()),
                      BX_max = cms.int32(dttfDigis.BX_max.value()),
-                     runBunchCrossingCleaner = cms.bool(True),
+                     runBunchCrossingCleaner = cms.bool(False),
                      bxCleanerCfg = DTBunchCrossingCleanerCfg ),
     
     RPC = cms.PSet( collectorType = cms.string('RPCCollector'),

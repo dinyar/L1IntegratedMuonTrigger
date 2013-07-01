@@ -145,9 +145,10 @@ L1ITMu::PrimitiveCombiner::combineDt( const L1ITMu::TriggerPrimitive * dt1,
   localResult.radialAngle = 0.5 * ( dt1->getDTData().radialAngle + dt2->getDTData().radialAngle );
 
   //  std::cout << "dt-dt radial : " << dt1->getDTData().radialAngle << " * " << dt2->getDTData().radialAngle << " = " << localResult.radialAngle << '\n';
-  std::cout << '\t' << point1.x() << '\t' << point1.z() << '\t' << dt1->getDTData().qualityCode << '\n';
-    std::cout << '\t' << point2.x() << '\t' << point2.z() << '\t' << dt2->getDTData().qualityCode << '\n';
-  std::cout << "dt-dt bending : " << dt1->getDTData().bendingAngle << " * " << dt2->getDTData().bendingAngle << " = " << localResult.bendingAngle << '\n';
+//   std::cout << '\t' << point1.x() << '\t' << point1.z() << '\t' << dt1->getDTData().qualityCode << '\n';
+//     std::cout << '\t' << point2.x() << '\t' << point2.z() << '\t' << dt2->getDTData().qualityCode << '\n';
+//   std::cout << "dt-dt bending : " << dt1->getDTData().bendingAngle << " * " << dt2->getDTData().bendingAngle << " = "
+// 	    << localResult.bendingAngle << '\n';
 
   return localResult;
 
