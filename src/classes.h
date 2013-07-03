@@ -55,7 +55,7 @@ namespace {
     // subdetector tracks
     MBLTCollection dss;
     edm::Wrapper<MBLTCollection> wdss;
-
+    
     MBLTContainerPair pdss;
     edm::Wrapper<MBLTContainerPair> wpdss;
 
@@ -64,6 +64,9 @@ namespace {
 
     MBLTContainerRef rmdss;
     edm::Wrapper<MBLTContainerRef> rwdvss;
+    
+    MBLTContainerRefPair rpmdss;
+    edm::Wrapper<MBLTContainerRefPair> rwpmdss;
 
     MBLTVectorRef rmvss;
     edm::Wrapper<MBLTVectorRef> rwmvss;

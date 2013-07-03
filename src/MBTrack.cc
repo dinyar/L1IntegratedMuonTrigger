@@ -9,7 +9,7 @@ L1ITMu::MBTrack::MBTrack(const L1MuDTTrackCand& dttrack) :
   _sector = dttrack.scNum();
 }
 
-void L1ITMu::MBTrack::addStub(const MBLTContainerRef& stub)
+void L1ITMu::MBTrack::addStub(const MBLTContainerRefPair& stub)
 { 
   _associatedStubs.push_back( stub );
 }

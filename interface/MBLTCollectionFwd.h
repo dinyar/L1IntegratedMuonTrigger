@@ -12,8 +12,10 @@ namespace L1ITMu {
   typedef std::pair<DTChamberId, MBLTCollection> MBLTContainerPair;
   typedef std::map<DTChamberId, MBLTCollection> MBLTContainer;
   typedef edm::Ref<MBLTContainer> MBLTContainerRef;
-  typedef std::vector<MBLTContainerRef> MBLTVectorRef;
-
+//   typedef std::vector<MBLTContainerRef> MBLTVectorRef;
+  typedef std::pair<MBLTContainerRef,TriggerPrimitiveRef> MBLTContainerRefPair;
+  typedef std::vector<MBLTContainerRefPair> MBLTVectorRef;
+  
 }
 
 #endif

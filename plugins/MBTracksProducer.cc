@@ -51,7 +51,7 @@ public:
   void produce(edm::Event&, const edm::EventSetup&);
 private:
   edm::InputTag _dtTrackSrc, _gmtSrc, _mbCollSrc;
-  double _maxDeltaPhi, _maxDeltaR;
+  double _maxDeltaPhiGmtIn, _maxDeltaPhiGmtOut;
   const int _min_bx, _max_bx;
 };
 
@@ -59,8 +59,8 @@ MBTracksProducer::MBTracksProducer(const PSet& ps):
   _dtTrackSrc(ps.getParameter<edm::InputTag>("DTTrackSrc")),
   _gmtSrc(ps.getParameter<edm::InputTag>("gmtDigis")),
   _mbCollSrc(ps.getParameter<edm::InputTag>("MBLTCollectionSrc")),
-  _maxDeltaPhi(ps.getParameter<double>("MaxDeltaPhi")),
-  _maxDeltaR(ps.getParameter<double>("MaxDeltaR")),
+  _maxDeltaPhiGmtIn(ps.getParameter<double>("MaxDeltaPhiGmtIn")),
+  _maxDeltaPhiGmtOut(ps.getParameter<double>("MaxDeltaPhiGmtOut")),
   _min_bx(ps.getParameter<int>("BX_min")),
   _max_bx(ps.getParameter<int>("BX_max")) {
   produces<L1ITMu::DTTrackCollection>("input");
@@ -68,7 +68,7 @@ MBTracksProducer::MBTracksProducer(const PSet& ps):
 }
 
 void MBTracksProducer::produce( edm::Event& ev,
-				const edm::EventSetup& es) {
+                                const edm::EventSetup& es) {
   std::auto_ptr<L1ITMu::MBTrackCollection>
     convertedTracks (new L1ITMu::MBTrackCollection());
   std::auto_ptr<L1ITMu::DTTrackCollection> inputTracks(new L1ITMu::DTTrackCollection);
@@ -107,23 +107,19 @@ void MBTracksProducer::produce( edm::Event& ev,
     wheel = sp_wheel < 0 ? -wheel : wheel;
     for( int sector = 0; sector <= 11; ++sector ) {
       for( int bx = _min_bx; bx <= _max_bx; ++bx ) {
-	for( int itrk = 1; itrk <=2; ++itrk ) {
-	  std::unique_ptr<L1MuDTTrackCand> dttrk;
-	  if( itrk == 1 )
-	    dttrk.reset(dtTracks->dtTrackCand1(sp_wheel,sector,bx));
-	  else
-	    dttrk.reset(dtTracks->dtTrackCand2(sp_wheel,sector,bx));
+        for( int itrk = 1; itrk <=2; ++itrk ) {
+          std::unique_ptr<L1MuDTTrackCand> dttrk;
+          if( itrk == 1 )
+            dttrk.reset(dtTracks->dtTrackCand1(sp_wheel,sector,bx));
+          else
+            dttrk.reset(dtTracks->dtTrackCand2(sp_wheel,sector,bx));
 
-	  if( dttrk ) {
-	    inputTracks->push_back(*dttrk);
-
-	    L1ITMu::MBTrack trk(*dttrk);
-//             L1ITMu::DTTrackRef parentRef(dttfProd,inputTracks->size() - 1);
-//             L1ITMu::DTTrackPtr parentRef(*dttrk);
-// 	    L1ITMu::RegionalCandBaseRef parentBaseRef(parentRef);
-//          trk.setParent(parentBaseRef);
+          if( dttrk ) {
+            inputTracks->push_back(*dttrk);
+            
+            L1ITMu::MBTrack trk(*dttrk);
             trk.setParent(*dttrk);
-
+            
             int phi_local = dttrk->phi_packed();//range: 0 < phi_local < 31
             if ( phi_local > 15 ) phi_local -= 32; //range: -16 < phi_local < 15
             double dttrk_phi_global = (phi_local*(M_PI/72.))+((M_PI/6.)*dttrk->scNum());// + 12*i->scNum(); //range: -16 < phi_global < 147
@@ -132,93 +128,112 @@ void MBTracksProducer::produce( edm::Event& ev,
 
             const L1MuTriggerScales* scales = trigscales_h.product();
             float dttrk_eta_global = scales->getRegionalEtaScale(0)->getValue(dttrk->eta_packed());
-	    // float phi_global_new = 180. / acos(-1.) * scales->getPhiScale()->getValue(dttrk->phi_packed());
+            // float phi_global_new = 180. / acos(-1.) * scales->getPhiScale()->getValue(dttrk->phi_packed());
+
             /// JP: GMT-DTTF matching
             for ( ; RRItr != RREnd; ++RRItr ) {
-
+              
               // loop over GMT input collection
               std::vector<L1MuRegionalCand> dttfCands = RRItr->getDTBXCands();
               std::vector<L1MuRegionalCand>::iterator dttfCand = dttfCands.begin();
               std::vector<L1MuRegionalCand>::iterator dttfCandEnd = dttfCands.end();
-
               for( ; dttfCand != dttfCandEnd; ++dttfCand ) {
 
                 if ( dttfCand->empty() ) continue;
 
-		edm::LogWarning( "GMTin - DTTF matching" )
-		  << "\n\tdttfCand->quality()    = " << dttfCand->quality()
-		  << "\n\tdttfCand->phi_packed() = " << dttfCand->phi_packed()
-		  << "\n\tdttfCand->phiValue()   = " << dttfCand->phiValue()
-		  << "\n\tdttrk->quality()       = " << dttrk->quality()
-		  << "\n\tdttrk->phi_packed()    = " << dttrk->phi_packed()
-		  << "\n\tdttrk_phi_global       = " << dttrk_phi_global
-		  << "\n\tdttfCand->phiValue()   = " << dttfCand->phiValue();
-
-		if ( (dttfCand->quality() == dttrk->quality() ) &&
-		    (fabs(dttfCand->phiValue() - dttrk_phi_global) < _maxDeltaPhi) ) {
-		  trk.associateGMTin(*dttfCand);
-		}
-
+                edm::LogWarning( "GMTin - DTTF matching" )
+                  << "\n\tdttfCand->quality()    = " << dttfCand->quality()
+                  << "\n\tdttfCand->phi_packed() = " << dttfCand->phi_packed()
+                  << "\n\tdttfCand->phiValue()   = " << dttfCand->phiValue()
+                  << "\n\tdttfCand->bx()         = " << dttfCand->bx()
+                  << "\n\tdttrk->quality()       = " << dttrk->quality()
+                  << "\n\tdttrk->phi_packed()    = " << dttrk->phi_packed()
+                  << "\n\tdttrk_phi_global       = " << dttrk_phi_global
+                  << "\n\tdttrk->bx()            = " << dttrk->bx();                  
+                
+              if ( (dttfCand->quality() == dttrk->quality() ) &&
+                   (fabs(dttfCand->phiValue() - dttrk_phi_global) < _maxDeltaPhiGmtIn ) &&
+                   ( dttfCand->bx() == dttrk->bx() ) ) {
+                  trk.associateGMTin(*dttfCand);
+                }
               }
-
+                
+              // get the GMT input associated with the DTTF (if any) and check for GMT outputs
+              if ( 0 == trk.getAssociatedGMTin().size() ) continue;                   
+              L1MuRegionalCand GMTin = trk.getAssociatedGMTin().at(0);
+              
               // loop over GMT output collection
               std::vector<L1MuGMTExtendedCand> gmtCands = RRItr->getGMTBrlCands();
               std::vector<L1MuGMTExtendedCand>::iterator gmtCand = gmtCands.begin();
               std::vector<L1MuGMTExtendedCand>::iterator gmtCandEnd = gmtCands.end();
 
               for( ; gmtCand != gmtCandEnd; ++gmtCand ) {
-
+                
                 if(gmtCand->empty()) continue;
-		edm::LogWarning( "GMTout - DTTF matching" )
-		  << "\n\tgmtCand->etaValue()   = " << gmtCand->etaValue()
-		  << "\n\tgmtCand->phiValue()   = " << gmtCand->phiValue()
-		  << "\n\tdttrk->eta_packed()   = " << dttrk->eta_packed()
-		  << "\n\tdttrk_eta_global      = " << dttrk_eta_global
-		  << "\n\tdttrk->phi_packed()   = " << dttrk->phi_packed()
-		  << "\n\tdttrk_phi_global      = " << dttrk_phi_global;
-
-                float dphi = gmtCand->phiValue() - dttrk_phi_global;
-                float deta = gmtCand->etaValue() - dttrk_eta_global;
-                float dr   = sqrt(dphi*dphi + deta*deta);
-                if( dr < _maxDeltaR ) {
-
+                
+                edm::LogWarning( "GMTout - DTTF matching" )
+                  << "\n\tgmtCand->etaValue()   = " << gmtCand->etaValue()
+                  << "\n\tgmtCand->phiValue()   = " << gmtCand->phiValue()
+                  << "\n\tgmtCand->bx()         = " << gmtCand->bx()         
+                  << "\n\tinGmt->etaValue()   = " << GMTin.etaValue()
+                  << "\n\tinGmt->phiValue()   = " << GMTin.phiValue()
+                  << "\n\tinGmt->bx()         = " << GMTin.bx()
+                  << "\n\tdttrk->eta_packed()   = " << dttrk->eta_packed()
+                  << "\n\tdttrk_eta_global      = " << dttrk_eta_global
+                  << "\n\tdttrk->phi_packed()   = " << dttrk->phi_packed()
+                  << "\n\tdttrk_phi_global      = " << dttrk_phi_global
+                  << "\n\tdttrk->bx()           = " << dttrk->bx();
+                  
+                if ( ( gmtCand->quality() > 5 ) &&
+                     ( fabs( gmtCand->phiValue() - GMTin.phiValue() ) < _maxDeltaPhiGmtOut ) &&             
+                     ( gmtCand->bx() == dttrk->bx() ) ){
                   trk.associateGMTout(*gmtCand);
-
-                }
+                }                
               }
             }
-
+            
+            edm::LogWarning( "DTTF Info" )
+                      << "\n\tWheel  " << wheel
+                      << "\n\tSector " << sector
+                      << "\n\tBx     " << bx
+                      << "\n\tT2Tag  " << itrk;
+                                  
             /// JP: MB-DTTF matching
             std::vector<unsigned> addrs;
             addrs.reserve(4);
-	    for( int station = 1; station <= 4; ++ station ) {
-	      addrs.push_back(dttrk->stNum(station));
-	    }	
+            for( int station = 1; station <= 4; ++ station ) {
+              addrs.push_back(dttrk->stNum(station));
+              edm::LogWarning( " " )
+                      << "\n\tAddress[" << station << "] = " << dttrk->stNum(station);
+            }	
 
-	    // in DTs the mode is encoded by the track class
-	    // mode is a 4 bit word , the bit position indicates the station
-	    // if the bit is 1 then the station was used in track building
-	    const unsigned mode = tc2bitmap((TrackClass)dttrk->TCNum());
+            // in DTs the mode is encoded by the track class
+            // mode is a 4 bit word , the bit position indicates the station
+            // if the bit is 1 then the station was used in track building
+            const unsigned mode = tc2bitmap((TrackClass)dttrk->TCNum());
 
             /// JP : implementation through the MBhelpers class
             ///      the same code could be placed somewhere else
             ///      to be more consistent
-	    L1ITMu::MBLTVectorRef tplist =
-	      L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo( wheel,
-							       sp_wheel, sector+1,
-							       MBCont,mode,
-							       addrs );
+            L1ITMu::MBLTVectorRef mblist =
+              L1ITMu::MBhelpers::getPrimitivesByMBTriggerInfo( wheel,
+                                                               sp_wheel, 
+                                                               sector+1,
+                                                               bx,
+                                                               MBCont,
+                                                               mode,
+                                                               addrs );
+                            
+            auto stub = mblist.cbegin();
+            auto stend = mblist.cend();
+            for( ; stub != stend; ++stub ) {
+              trk.addStub(*stub);
+            }
 
-	    auto stub = tplist.cbegin();
-	    auto stend = tplist.cend();
-	    for( ; stub != stend; ++stub ) {
-	      trk.addStub(*stub);
-	    }
-
-	    convertedTracks->push_back(trk);
-	  }
-	  dttrk.release();
-	}
+            convertedTracks->push_back(trk);
+          }
+          dttrk.release();
+        }
       }
     }
   }

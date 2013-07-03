@@ -480,7 +480,11 @@ void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup&
     
     for ( ; mbPrimIt != mbPrimEnd; ++mbPrimIt ) {
       
-      const L1ITMu::MBLTCollection & mbPrim = (*mbPrimIt)->second;
+      
+      const L1ITMu::MBLTContainerRef    & mbCont  = (*mbPrimIt).first;
+      const L1ITMu::TriggerPrimitiveRef & dtMatch = (*mbPrimIt).second;
+      
+      const L1ITMu::MBLTCollection & mbPrim = mbCont->second;
 
       int iSt = mbPrim.station() -1;
       if ( iSt > 1) continue; //CB using only MB1 and MB2 

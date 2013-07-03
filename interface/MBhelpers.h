@@ -12,17 +12,20 @@
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollectionFwd.h"
 #include "L1Trigger/L1IntegratedMuonTrigger/interface/MBLTCollection.h"
 #include "DataFormats/Common/interface/Handle.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "DataFormats/Common/interface/Ref.h"
 
 namespace L1ITMu {
   namespace MBhelpers {
 
     MBLTVectorRef
       getPrimitivesByMBTriggerInfo(const int wheel,
-				   const int sp_wheel,
-				   const int sector,
-				   const edm::Handle<MBLTContainer>& mbs,
-				   const unsigned mode,
-				   const std::vector<unsigned>& addrs);
+                                   const int sp_wheel,
+                                   const int sector,
+                                   const int bx,
+                                   const edm::Handle<MBLTContainer>& mbs,
+                                   const unsigned mode,
+                                   const std::vector<unsigned>& addrs);
   }
 }
 

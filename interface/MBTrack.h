@@ -71,7 +71,7 @@ namespace L1ITMu{
        { _parent = parent; }       
        
     /// add primitives in case you are starting from tracks
-    void addStub(const MBLTContainerRef& stub);
+    void addStub(const MBLTContainerRefPair& stub);
     /*     void addStub(const std::pair<const DTChamberId, L1ITMu::MBLTCollection>& stub); */
 
     /// return list of associated MBLT primitives
