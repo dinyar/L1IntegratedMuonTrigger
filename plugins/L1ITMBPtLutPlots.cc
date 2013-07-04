@@ -481,28 +481,17 @@ void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup&
     for ( ; mbPrimIt != mbPrimEnd; ++mbPrimIt ) {
       
       
-      const L1ITMu::MBLTContainerRef    & mbCont  = (*mbPrimIt).first;
       const L1ITMu::TriggerPrimitiveRef & dtMatch = (*mbPrimIt).second;
       
-      const L1ITMu::MBLTCollection & mbPrim = mbCont->second;
-
-      int iSt = mbPrim.station() -1;
-      if ( iSt > 1) continue; //CB using only MB1 and MB2 
-
-      L1ITMu::TriggerPrimitiveList dtPrims = mbPrim.getDtSegments();
-
-      L1ITMu::TriggerPrimitiveList::const_iterator dtPrimIt  = dtPrims.begin();
-      L1ITMu::TriggerPrimitiveList::const_iterator dtPrimEnd = dtPrims.end();
-
-      for( ; dtPrimIt!=dtPrimEnd; ++dtPrimIt ) {
-	
-	int bestPrimQual = dtBestPrims[iSt] ? dtBestPrims[iSt]->getDTData().qualityCode : -1;
-	int primQual     = (*dtPrimIt)->getDTData().qualityCode;
-	if ( primQual > bestPrimQual )  //CB need matching via addresses now checking only highest qual
-	  dtBestPrims[iSt] = dtPrimIt->get(); 
-
+      int iSt = dtMatch->getDTData().station - 1;
+      if ( iSt > 1) continue; //CB using only MB1 and MB2
+      if (dtMatch->getDTData().qualityCode == -1) {
+	std::cout << "[L1ITMBPtLutPlots]::analyze : WRONG quality for DTTF matched primitive. skipping.\n";
+	continue;
       }
-      
+
+      dtBestPrims[iSt] = dtMatch.get();
+
     }
 
     if (dtBestPrims[0] && dtBestPrims[1]) { // has MB1 and MB2
