@@ -264,8 +264,8 @@ void L1ITMBPrimitiveResolutionPlots::analyze(const edm::Event& e, const edm::Eve
       
       map<string, TH1F*> &chMap = chHistos[chId.rawId()];
 
-      if (trigQualBest[wheel+3][station][scsector] > 3 &&  // residuals only for correlate triggers
-	  trigQualBest[wheel+3][station][scsector] < 7 &&
+      if (trigQualBest[wheel+3][station][scsector] > -1 &&  // residuals only for correlate triggers
+	  trigQualBest[wheel+3][station][scsector] < 7  &&
 	  nHitsPhi>=7 ) {
 					
 	float trigPos = trigGeomUtils->trigPos(trigBest[wheel+3][station][scsector]);

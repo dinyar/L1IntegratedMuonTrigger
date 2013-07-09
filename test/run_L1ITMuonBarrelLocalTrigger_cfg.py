@@ -32,7 +32,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.cerr.threshold = 'ERROR'
 
-infile = ['file:/afs/cern.ch/work/b/battilan/public/SingleMuFlatPt_3GeVto100GeV_GEN_SIM_DIGI_L1.root']
+infile = ['file:/afs/cern.ch/user/b/battilan/work/public/SingleMuFlatPt_3GeVto100GeV_GEN_SIM_DIGI_L1.root']
 
 process.source = cms.Source(
     'PoolSource',
@@ -50,6 +50,7 @@ process.L1ITMUSequence = cms.Sequence( process.L1ITMuTriggerPrimitives +
 process.L1ITMUPath = cms.Path(process.L1ITMUSequence)
 
 outCommands = cms.untracked.vstring('drop *')
+outCommands.append('keep *_simMuonDTDigis_*_*')
 outCommands.append('keep *_genParticles_*_*')
 outCommands.append('keep *_simCsctfDigis_*_*')
 outCommands.append('keep *_simDttfDigis_*_*')
