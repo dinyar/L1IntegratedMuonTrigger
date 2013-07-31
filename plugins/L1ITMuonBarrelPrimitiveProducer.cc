@@ -105,7 +105,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       default : qualityCode = dtquality; break;
       }
 
-      L1MuDTChambPhDigi chamb( dt->getBX(), wheel, sector, station, dt->getDTData().radialAngle,
+      L1MuDTChambPhDigi chamb( dt->getBX(), wheel, sector-1, station, dt->getDTData().radialAngle,
 			       dt->getDTData().bendingAngle, qualityCode,
 			       dt->getDTData().Ts2TagCode, dt->getDTData().BxCntCode );
       phiChambVector.push_back( chamb );
@@ -256,7 +256,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	qualityCode = ( qualityCode == 2 ) ? 0 : 1;
       }
 
-      L1MuDTChambPhDigi chamb( bx, wheel, sector, station, radialAngle,
+      L1MuDTChambPhDigi chamb( bx, wheel, sector-1, station, radialAngle,
 			       bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );
       phiChambVector.push_back( chamb );
