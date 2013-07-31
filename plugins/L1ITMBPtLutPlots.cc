@@ -203,16 +203,30 @@ public:
   const DTTFId & dttfId() const { return _id.dttfId(); };
 
   void book(TFileService * fs);
-  void fill(float inValue, float outValue, float pt);
+  void fill(const L1ITMu::TriggerPrimitive * in, const L1ITMu::TriggerPrimitive * out, float pt);
   void draw() const;
 
 private:
 
   ChambPairId _id;
 
-  TProfile * _pBendvsPt;
-  TH2F     * _hBendvsPt;
+  TProfile * _pdPhivsPt;
+  TH2F     * _hdPhivsPt;
 
+  TProfile * _pdPhiBendvsPt;
+  TH2F     * _hdPhiBendvsPt;
+
+  TProfile * _pdPhivsPtCenter;
+  TH2F     * _hdPhivsPtCenter;
+
+  TProfile * _pdPhiBendvsPtCenter;
+  TH2F     * _hdPhiBendvsPtCenter;
+
+  TProfile * _pdPhivsPtBorder;
+  TH2F     * _hdPhivsPtBorder;
+
+  TProfile * _pdPhiBendvsPtBorder;
+  TH2F     * _hdPhiBendvsPtBorder;
 };
 
 
@@ -235,22 +249,50 @@ ChambPairPlotter::ChambPairPlotter(ChambPairId id, TFileService * fs) : _id(id)
 
 
 ChambPairPlotter::ChambPairPlotter(const ChambPairPlotter & plotter) :
-  _id(plotter._id), _pBendvsPt(plotter._pBendvsPt), _hBendvsPt(plotter._hBendvsPt)
+  _id(plotter._id), _pdPhivsPt(plotter._pdPhivsPt), _hdPhivsPt(plotter._hdPhivsPt), _pdPhiBendvsPt(plotter._pdPhiBendvsPt), _hdPhiBendvsPt(plotter._hdPhiBendvsPt), _pdPhivsPtCenter(plotter._pdPhivsPtCenter), _hdPhivsPtCenter(plotter._hdPhivsPtCenter), _pdPhiBendvsPtCenter(plotter._pdPhiBendvsPtCenter), _hdPhiBendvsPtCenter(plotter._hdPhiBendvsPtCenter), _pdPhivsPtBorder(plotter._pdPhivsPtBorder), _hdPhivsPtBorder(plotter._hdPhivsPtBorder), _pdPhiBendvsPtBorder(plotter._pdPhiBendvsPtBorder), _hdPhiBendvsPtBorder(plotter._hdPhiBendvsPtBorder)
 {
   
 }
 
-
-void ChambPairPlotter::fill(float inValue, float outValue, float pt) 
+void ChambPairPlotter::fill(const L1ITMu::TriggerPrimitive * in, const L1ITMu::TriggerPrimitive * out, float pt) 
 { 
-    
-  float delta = fabs(inValue-outValue); // CB for now it is fabs, change to mu+ mu- 
-
-  _pBendvsPt->Fill(pt,delta);
-  _hBendvsPt->Fill(pt,delta);
   
-}
+  float inPhiValue  = in->getCMSGlobalPhi();  
+  float outPhiValue = out->getCMSGlobalPhi();
+  float inPhiBendValue  = in->getDTData().bendingAngle;
+  float outPhiBendValue = out->getDTData().bendingAngle;
+  
+  float inRelPhiValue = fmod(inPhiValue,(M_PI/6)); // phi relative to the center of the inner chamber (-pi/12;pi/12)
+  if (inRelPhiValue > (M_PI/12) ) inRelPhiValue -= (M_PI/6);
 
+  float outRelPhiValue = fmod(outPhiValue,(M_PI/6));  // phi relative to the center of the outner chamber (-pi/12;pi/12)
+  if (outRelPhiValue> (M_PI/12) ) outRelPhiValue -= (M_PI/6);  
+  
+  float deltaPhi     = fabs(inPhiValue-outPhiValue); // CB for now it is fabs, change to mu+ mu- 
+  float deltaPhiBend = fabs(inPhiBendValue-outPhiBendValue); // CB for now it is fabs, change to mu+ mu- 
+
+  _pdPhivsPt->Fill(pt,deltaPhi);
+  _hdPhivsPt->Fill(pt,deltaPhi);
+
+  _pdPhiBendvsPt->Fill(pt,deltaPhiBend);
+  _hdPhiBendvsPt->Fill(pt,deltaPhiBend);  
+  
+  if ( ( fabs(inRelPhiValue) < M_PI/24 ) && ( fabs(outRelPhiValue) < M_PI/24 ) ){ // fill ch-center histos
+    _pdPhivsPtCenter->Fill(pt,deltaPhi);
+    _hdPhivsPtCenter->Fill(pt,deltaPhi);
+    
+    _pdPhiBendvsPtCenter->Fill(pt,deltaPhiBend);
+    _hdPhiBendvsPtCenter->Fill(pt,deltaPhiBend);  
+  } 
+  else { // fill ch-border histos
+    _pdPhivsPtBorder->Fill(pt,deltaPhi);
+    _hdPhivsPtBorder->Fill(pt,deltaPhi);
+    
+    _pdPhiBendvsPtBorder->Fill(pt,deltaPhiBend);
+    _hdPhiBendvsPtBorder->Fill(pt,deltaPhiBend);  
+  }
+   
+}
 
 void ChambPairPlotter::book(TFileService * fs) 
 { 
@@ -260,42 +302,193 @@ void ChambPairPlotter::book(TFileService * fs)
   
   TFileDirectory folder  = fs->mkdir(hDir.c_str());
   
-  _pBendvsPt = folder.make<TProfile>(("pBendvsPt"+hName).c_str(), 
-				     ("obj bending vs pt for "+hName).c_str(), 
-				     60, -0.5, 119.5, 0, .05);
+  _pdPhivsPt = folder.make<TProfile>(("pdPhivsPt"+hName).c_str(), 
+                                     ("obj #Delta#phi vs pt for "+hName).c_str(), 
+                                     60, -0.5, 119.5, 0, .05);
 
-  _hBendvsPt = folder.make<TH2F>(("hBendvsPt"+hName).c_str(), 
-				 ("obj bending vs pt for "+hName).c_str(),
-				 60, -0.5, 119.5, 100, -0, .05);
+  _hdPhivsPt = folder.make<TH2F>(("hdPhivsPt"+hName).c_str(), 
+                                 ("obj #Delta#phi vs pt for "+hName).c_str(),
+                                 60, -0.5, 119.5, 100, -0, .05);
+
+  _pdPhiBendvsPt = folder.make<TProfile>(("pdPhiBendvsPt"+hName).c_str(), 
+                                     ("obj #Delta#phi_{b} vs pt for "+hName).c_str(), 
+                                     60, -0.5, 119.5, 0, 100);
+
+  _hdPhiBendvsPt = folder.make<TH2F>(("hdPhiBendvsPt"+hName).c_str(), 
+                                 ("obj #Delta#phi_{b} vs pt for "+hName).c_str(),
+                                 60, -0.5, 119.5, 100, 0, 100);
+
+  _pdPhivsPtCenter = folder.make<TProfile>(("pdPhivsPtCenter"+hName).c_str(), 
+                                     ("obj #Delta#phi vs pt for "+hName+" - center").c_str(), 
+                                     60, -0.5, 119.5, 0, .05);
+
+  _hdPhivsPtCenter = folder.make<TH2F>(("hdPhivsPtCenter"+hName).c_str(), 
+                                 ("obj #Delta#phi vs pt for "+hName+" - center").c_str(),
+                                 60, -0.5, 119.5, 100, -0, .05);
+
+  _pdPhiBendvsPtCenter = folder.make<TProfile>(("pdPhiBendvsPtCenter"+hName).c_str(), 
+                                     ("obj #Delta#phi_{b} vs pt for "+hName+" - center").c_str(), 
+                                     60, -0.5, 119.5, 0, 100);
+
+  _hdPhiBendvsPtCenter = folder.make<TH2F>(("hdPhiBendvsPtCenter"+hName).c_str(), 
+                                 ("obj #Delta#phi_{b} vs pt for "+hName+" - center").c_str(),
+                                 60, -0.5, 119.5, 100, 0, 100);
+  
+  _pdPhivsPtBorder = folder.make<TProfile>(("pdPhivsPtBorder"+hName).c_str(), 
+                                     ("obj #Delta#phi vs pt for "+hName+" - border").c_str(), 
+                                     60, -0.5, 119.5, 0, .05);
+
+  _hdPhivsPtBorder = folder.make<TH2F>(("hdPhivsPtBorder"+hName).c_str(), 
+                                 ("obj #Delta#phi vs pt for "+hName+" - border").c_str(),
+                                 60, -0.5, 119.5, 100, -0, .05);
+
+  _pdPhiBendvsPtBorder = folder.make<TProfile>(("pdPhiBendvsPtBorder"+hName).c_str(), 
+                                     ("obj #Delta#phi_{b} vs pt for "+hName+" - border").c_str(), 
+                                     60, -0.5, 119.5, 0, 100);
+
+  _hdPhiBendvsPtBorder = folder.make<TH2F>(("hdPhiBendvsPtBorder"+hName).c_str(), 
+                                 ("obj #Delta#phi_{b} vs pt for "+hName+" - border").c_str(),
+                                 60, -0.5, 119.5, 100, 0, 100);
   
   std::string title = _id.inObjName() + " - " + _id.outObjName();
   
-  _pBendvsPt->GetXaxis()->SetTitle("GEN  mu p_{T}");
-  _pBendvsPt->GetYaxis()->SetTitle(title.c_str());
+  _pdPhivsPt->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _pdPhivsPt->GetYaxis()->SetTitle(title.c_str());
   
-  _hBendvsPt->GetXaxis()->SetTitle("GEN  mu p_{T}");
-  _hBendvsPt->GetYaxis()->SetTitle(title.c_str());
+  _hdPhivsPt->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _hdPhivsPt->GetYaxis()->SetTitle(title.c_str());
 
+  _pdPhiBendvsPt->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _pdPhiBendvsPt->GetYaxis()->SetTitle(title.c_str());
+  
+  _hdPhiBendvsPt->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _hdPhiBendvsPt->GetYaxis()->SetTitle(title.c_str());
+
+  _pdPhivsPtCenter->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _pdPhivsPtCenter->GetYaxis()->SetTitle(title.c_str());
+  
+  _hdPhivsPtCenter->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _hdPhivsPtCenter->GetYaxis()->SetTitle(title.c_str());
+
+  _pdPhiBendvsPtCenter->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _pdPhiBendvsPtCenter->GetYaxis()->SetTitle(title.c_str());
+  
+  _hdPhiBendvsPtCenter->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _hdPhiBendvsPtCenter->GetYaxis()->SetTitle(title.c_str());
+
+  _pdPhivsPtBorder->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _pdPhivsPtBorder->GetYaxis()->SetTitle(title.c_str());
+  
+  _hdPhivsPtBorder->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _hdPhivsPtBorder->GetYaxis()->SetTitle(title.c_str());
+
+  _pdPhiBendvsPtBorder->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _pdPhiBendvsPtBorder->GetYaxis()->SetTitle(title.c_str());
+  
+  _hdPhiBendvsPtBorder->GetXaxis()->SetTitle("GEN  mu p_{T}");
+  _hdPhiBendvsPtBorder->GetYaxis()->SetTitle(title.c_str());
 }
 
 
 void ChambPairPlotter::draw() const 
 { 
 
-  std::string cName = "c" + name();
+  std::string cName;
+  
+  cName = "cPhi" + name();
 
   system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
 
-  TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
-  c->cd();
-  c->SetGrid();  
+  TCanvas * cphi = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+  cphi->cd();
+  cphi->SetGrid();  
 
   gStyle->SetPalette(52);
-  _hBendvsPt->Draw("colz");
-  _pBendvsPt->Draw("sameP");
+  _hdPhivsPt->Draw("colz");
+  _pdPhivsPt->Draw("sameP");
   
-  c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+  cphi->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
+  ///
   
+  cName = "cPhiBend" + name();
+  
+  system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+
+  TCanvas * cphibend = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+  cphibend->cd();
+  cphibend->SetGrid();  
+
+  gStyle->SetPalette(52);
+  _hdPhiBendvsPt->Draw("colz");
+  _pdPhiBendvsPt->Draw("sameP");
+  
+  cphibend->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
+  ///
+
+  cName = "cPhiCenter" + name();
+
+  system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+
+  TCanvas * cphicent = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+  cphicent->cd();
+  cphicent->SetGrid();  
+
+  gStyle->SetPalette(52);
+  _hdPhivsPtCenter->Draw("colz");
+  _pdPhivsPtCenter->Draw("sameP");
+  
+  cphicent->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
+  ///
+  
+  cName = "cPhiBendCenter" + name();
+  
+  system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+
+  TCanvas * cphibendcent = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+  cphibendcent->cd();
+  cphibendcent->SetGrid();  
+
+  gStyle->SetPalette(52);
+  _hdPhiBendvsPtCenter->Draw("colz");
+  _pdPhiBendvsPtCenter->Draw("sameP");
+  
+  cphibendcent->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
+  ///
+
+  cName = "cPhiBorder" + name();
+
+  system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+
+  TCanvas * cphibord = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+  cphibord->cd();
+  cphibord->SetGrid();  
+
+  gStyle->SetPalette(52);
+  _hdPhivsPtBorder->Draw("colz");
+  _pdPhivsPtBorder->Draw("sameP");
+  
+  cphibord->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
+  ///
+  
+  cName = "cPhiBendBorder" + name();
+  
+  system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+
+  TCanvas * cphibendbord = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+  cphibendbord->cd();
+  cphibendbord->SetGrid();  
+
+  gStyle->SetPalette(52);
+  _hdPhiBendvsPtBorder->Draw("colz");
+  _pdPhiBendvsPtBorder->Draw("sameP");
+  
+  cphibendbord->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
 }
 
 
@@ -502,9 +695,10 @@ void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup&
       int chPairRawId = ChambPairId(wheel,sector,1,2,mb1Obj,mb2Obj).rawId();
       
       ChambPairPlotter *plotter = getPlotter(dttfRawId,chPairRawId);
-      if (plotter) plotter->fill(dtBestPrims[0]->getCMSGlobalPhi(),
-				 dtBestPrims[1]->getCMSGlobalPhi(),
-				 bestGen->pt());
+
+      if (plotter) plotter->fill(dtBestPrims[0], 
+                                 dtBestPrims[1],
+                                 bestGen->pt());
     }
     
   }
