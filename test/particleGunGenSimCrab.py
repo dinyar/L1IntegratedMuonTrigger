@@ -26,7 +26,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(300)
+    input = cms.untracked.int32(1000)
 )
 
 # Input source
@@ -49,7 +49,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
-    fileName = cms.untracked.string('/data2/battilan/L1Trigger/BarrelDTTFUpgrade/SingleMuFlatPt_3GeVto140GeV_GEN_SIM_DIGI_L1_CrabJ.root'),
+    fileName = cms.untracked.string('SingleMuFlatPt_3GeVto140GeV_GEN_SIM_DIGI_L1.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('')
@@ -77,7 +77,7 @@ process.generator = cms.EDProducer("FlatRandomPtGunProducer",
         MinEta = cms.double(-0.85)        
     ),
     Verbosity = cms.untracked.int32(0),
-    psethack = cms.string('single mu pt 5to100'),
+    psethack = cms.string('single mu pt 3to140'),
     AddAntiParticle = cms.bool(False), #need *single* muons dammit
     firstRun = cms.untracked.uint32(1)
 )
