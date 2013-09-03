@@ -102,6 +102,7 @@ public:
   enum chamb_objects {DTIN=0, DTCORR, DTDIR, DTOUT, NONE};
 
   ChambPairId(int wh, int sec, int inCh, int outCh, int inChObj, int outChObj);
+  ChambPairId(DTTFId dttf, int inCh, int outCh, int inChObj, int outChObj);
   ChambPairId(const ChambPairId & id);
 
   ~ChambPairId() { };
@@ -123,6 +124,19 @@ private:
   std::string MBPtChambObjectName[5];
   
 };
+
+
+ChambPairId::ChambPairId(DTTFId dttf, int inCh, int outCh, int inChObj, int outChObj) :
+  _dttfId(dttf), _inCh(inCh), _outCh(outCh), _inChObj(inChObj), _outChObj(outChObj) 
+{
+
+  MBPtChambObjectName[DTIN]   = "DTIN";
+  MBPtChambObjectName[DTCORR] = "DTCORR";
+  MBPtChambObjectName[DTDIR]  = "DTDIR";
+  MBPtChambObjectName[DTOUT]  = "DTOUT";
+  MBPtChambObjectName[NONE]   = "NONE";
+    
+}
 
 
 ChambPairId::ChambPairId(int wh, int sec, int inCh, int outCh, int inChObj, int outChObj) :
@@ -384,6 +398,30 @@ void ChambPairPlotter::draw() const
       c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
     }
 
+
+  TProfile * pCenter = static_cast<TProfile *>(getProfile("dPhivsPtCenter")->Clone("center"));
+  TProfile * pBorder = static_cast<TProfile *>(getProfile("dPhivsPtBorder")->Clone("border"));
+      
+  std::string cName = "cdPhivsPtComparison" + name();
+      
+  system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+      
+  TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+      
+  c->cd();
+  c->SetGrid();  
+      
+  pCenter->SetLineColor(1);
+  pBorder->SetLineColor(2);
+
+  pCenter->Draw("P");
+  pBorder->Draw("sameP");
+
+  c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+
+  delete pCenter;
+  delete pBorder;
+
 }
 
 
@@ -407,6 +445,8 @@ public:
   int objFromPrim(const L1ITMu::TriggerPrimitive * prim);
   ChambPairPlotter* getPlotter(int dttfRawId, int chPairRawId); 
 
+  void drawChambPair(DTTFId dttfId, int inCh, int outCh);
+
 private:
 
 
@@ -415,6 +455,8 @@ private:
   edm::InputTag _genParticlesTag;
   
   edm::Service<TFileService> _fs;
+
+  std::vector<int> _mbPtChambObjects;   
 
   std::map< int, std::map<int, ChambPairPlotter*> > histos; // <DTTF rawId, <ChambPair rawId, Plotter *> > 
 
@@ -431,22 +473,20 @@ L1ITMBPtLutPlots::L1ITMBPtLutPlots(const edm::ParameterSet& p) :
   // for now just booking DT IN, OUT CORR
   // and ch 1 and 2 of DTTF wh 1 sec 1
   
-  std::vector<int> mbPtChambObjects;   
-
-  mbPtChambObjects.push_back(ChambPairId::DTIN);
-  mbPtChambObjects.push_back(ChambPairId::DTOUT);
-  mbPtChambObjects.push_back(ChambPairId::DTCORR);
+  _mbPtChambObjects.push_back(ChambPairId::DTIN);
+  _mbPtChambObjects.push_back(ChambPairId::DTOUT);
+  _mbPtChambObjects.push_back(ChambPairId::DTCORR);
 
   for (int wheel = -3; wheel <=3; ++wheel) {
     for (int sector = 0; sector <=0; ++sector) {
       for (int inCh = 1; inCh <=1; ++inCh) {
 	for (int outCh = inCh + 1; outCh <=2; ++outCh) {
 	  
-	  std::vector<int>::const_iterator inObjIt = mbPtChambObjects.begin();
-	  std::vector<int>::const_iterator objEnd  = mbPtChambObjects.end();
+	  std::vector<int>::const_iterator inObjIt = _mbPtChambObjects.begin();
+	  std::vector<int>::const_iterator objEnd  = _mbPtChambObjects.end();
 	  
 	  for (; inObjIt != objEnd; ++inObjIt) {
-	    std::vector<int>::const_iterator outObjIt = mbPtChambObjects.begin();
+	    std::vector<int>::const_iterator outObjIt = _mbPtChambObjects.begin();
 	    for (; outObjIt != objEnd; ++outObjIt) {
 	      
 	      ChambPairId id(wheel, sector, inCh, outCh, (*inObjIt), (*outObjIt));
@@ -474,6 +514,16 @@ L1ITMBPtLutPlots::~L1ITMBPtLutPlots()
 void L1ITMBPtLutPlots::endJob()
 {
 
+  for (int wheel = -3; wheel <=3; ++wheel) {
+    for (int sector = 0; sector <=0; ++sector) {
+      for (int inCh = 1; inCh <=1; ++inCh) {
+	for (int outCh = inCh + 1; outCh <=2; ++outCh) {
+	  drawChambPair(DTTFId(wheel,sector), inCh, outCh); 
+	}
+      }
+    }
+  }
+  
   std::map<int,std::map<int,ChambPairPlotter*> >::iterator dttfIt  = histos.begin();
   std::map<int,std::map<int,ChambPairPlotter*> >::iterator dttfEnd = histos.end();
   
@@ -493,6 +543,7 @@ void L1ITMBPtLutPlots::endJob()
   }
   
 }
+
 
 void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 {
@@ -631,6 +682,58 @@ ChambPairPlotter* L1ITMBPtLutPlots::getPlotter(int dttfRawId, int chPairRawId)
   }
   
   return histos[dttfRawId][chPairRawId];
+
+}
+
+
+void  L1ITMBPtLutPlots::drawChambPair(DTTFId dttfId, int inCh, int outCh) 
+{
+
+  std::vector<TProfile *> histos;
+
+  std::vector<int>::const_iterator inObjIt = _mbPtChambObjects.begin();
+  std::vector<int>::const_iterator objEnd  = _mbPtChambObjects.end();
+	  
+  for (; inObjIt != objEnd; ++inObjIt) {
+    std::vector<int>::const_iterator outObjIt = _mbPtChambObjects.begin();
+    for (; outObjIt != objEnd; ++outObjIt) {
+      
+      ChambPairId id(dttfId, inCh, outCh, (*inObjIt), (*outObjIt));
+      ChambPairPlotter * plotter = getPlotter(dttfId.rawId(),id.rawId());
+      TProfile *histo = (TProfile*)(plotter->getProfile("dPhivsPt")->Clone(plotter->name().c_str()));
+      histos.push_back(histo);
+
+    }
+  }
+
+  // CB fixme should be chambers not DTTF id 
+  std::string cName = "c" + dttfId.name() + "dPhivsPtComparison"; 
+
+  system(std::string("mkdir -p plots/" + dttfId.name()).c_str());
+      
+  TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+      
+  c->cd();
+  c->SetGrid();  
+      
+  std::vector<TProfile *>::iterator histoIt  = histos.begin();
+  std::vector<TProfile *>::iterator histoEnd = histos.end();
+
+  for (int iColor = 1; histoIt != histoEnd; ++histoIt, ++iColor)
+    {
+      (*histoIt)->SetLineColor(iColor);
+      (*histoIt)->Draw(iColor == 1 ? "P" :"sameP");
+    }
+      
+  c->SaveAs(("plots/" + dttfId.name() + "/" + cName+".pdf").c_str());
+
+  histoIt  = histos.begin();
+  histoEnd = histos.end();
+
+  for (; histoIt != histoEnd; ++histoIt)
+    {
+      delete (*histoIt);
+    }  
 
 }
 
