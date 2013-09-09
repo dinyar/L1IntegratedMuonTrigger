@@ -35,6 +35,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TProfile.h"
+#include "TEfficiency.h"
 #include "TCanvas.h"
 #include "TStyle.h"
 
@@ -215,20 +216,26 @@ public:
   std::string name() const { return _id.name(); };
 
   const TProfile * getProfile(std::string name) const { return _pPlots.find(name)->second; }
-  const TH2F     * getHisto(std::string name) const   { return _hPlots.find(name)->second; }
+  const TH1      * getHisto(std::string name) const   { return _hPlots.find(name)->second; }
 
   const DTTFId & dttfId() const { return _id.dttfId(); };
 
   void book(TFileService * fs);
-  void fill(const L1ITMu::TriggerPrimitive * in, const L1ITMu::TriggerPrimitive * out, float pt);
+
+  void fillPtLut(const L1ITMu::TriggerPrimitive * in, 
+		 const L1ITMu::TriggerPrimitive * out, float pt);
+
+  void fillEfficicency(float dttfPt, float pt);
   void draw() const;
 
 private:
 
   ChambPairId _id;
 
-  std::map<std::string, TProfile *> _pPlots;
-  std::map<std::string, TH2F     *> _hPlots;
+  std::map<std::string, TEfficiency *> _ePlots;
+  std::map<std::string, TProfile *>    _pPlots;
+  std::map<std::string, TH1      *>    _hPlots;
+
 
 };
 
@@ -257,7 +264,8 @@ ChambPairPlotter::ChambPairPlotter(const ChambPairPlotter & plotter) :
 
 }
 
-void ChambPairPlotter::fill(const L1ITMu::TriggerPrimitive * in, const L1ITMu::TriggerPrimitive * out, float pt) 
+void ChambPairPlotter::fillPtLut(const L1ITMu::TriggerPrimitive * in, 
+				 const L1ITMu::TriggerPrimitive * out, float pt) 
 { 
   
   float inPhiValue  = in->getCMSGlobalPhi();  
@@ -287,25 +295,35 @@ void ChambPairPlotter::fill(const L1ITMu::TriggerPrimitive * in, const L1ITMu::T
       _pPlots["dPhivsPtCenter"]->Fill(pt,deltaPhi);
       _hPlots["dPhivsPtCenter"]->Fill(pt,deltaPhi);
     
-      _pPlots["phiBendInvsPtCenter"]->Fill(pt,inPhiBendValue);
-      _hPlots["phiBendInvsPtCenter"]->Fill(pt,inPhiBendValue);  
+      _pPlots["phiBendInvsPtCenter"]->Fill(pt,fabs(inPhiBendValue));
+      _hPlots["phiBendInvsPtCenter"]->Fill(pt,fabs(inPhiBendValue));  
 
-      _pPlots["phiBendOutvsPtCenter"]->Fill(pt,outPhiBendValue);
-      _hPlots["phiBendOutvsPtCenter"]->Fill(pt,outPhiBendValue);    
+      _pPlots["phiBendOutvsPtCenter"]->Fill(pt,fabs(outPhiBendValue));
+      _hPlots["phiBendOutvsPtCenter"]->Fill(pt,fabs(outPhiBendValue));    
     } 
   else if ( inRelPhiBin>=2 && outRelPhiBin>=2 ) 
     { // fill ch-border histos
       _pPlots["dPhivsPtBorder"]->Fill(pt,deltaPhi);
       _hPlots["dPhivsPtBorder"]->Fill(pt,deltaPhi);
     
-      _pPlots["phiBendInvsPtBorder"]->Fill(pt,inPhiBendValue);
-      _hPlots["phiBendInvsPtBorder"]->Fill(pt,inPhiBendValue);  
+      _pPlots["phiBendInvsPtBorder"]->Fill(pt,fabs(inPhiBendValue));
+      _hPlots["phiBendInvsPtBorder"]->Fill(pt,fabs(inPhiBendValue));  
 
-      _pPlots["phiBendOutvsPtBorder"]->Fill(pt,outPhiBendValue);
-      _hPlots["phiBendOutvsPtBorder"]->Fill(pt,outPhiBendValue);  
+      _pPlots["phiBendOutvsPtBorder"]->Fill(pt,fabs(outPhiBendValue));
+      _hPlots["phiBendOutvsPtBorder"]->Fill(pt,fabs(outPhiBendValue));  
     }
    
 }
+
+
+void ChambPairPlotter::fillEfficicency(float dttfPt, float pt) 
+{ 
+  
+  _ePlots["effvsPt"]->Fill(dttfPt >= 20,pt); // CB only 20 now...
+  _hPlots["ptResol"]->Fill((dttfPt - pt)/ pt);
+
+}
+
 
 void ChambPairPlotter::book(TFileService * fs) 
 { 
@@ -313,8 +331,8 @@ void ChambPairPlotter::book(TFileService * fs)
   std::string hDir  = dttfId().name();
   std::string hName = name();
   
-  TFileDirectory folder  = fs->mkdir(hDir.c_str());
-
+  TFileDirectory baseFolder = fs->mkdir(hDir.c_str());
+      
   std::string phiReg[3] = { "", "Center", "Border" };
 
   for (int iPhiReg = 0; iPhiReg < 3; ++ iPhiReg )
@@ -322,46 +340,51 @@ void ChambPairPlotter::book(TFileService * fs)
 
       std::string reg = phiReg[iPhiReg];
 
+      TFileDirectory folder = baseFolder.mkdir(reg.c_str());
+      
       _pPlots["dPhivsPt" + reg] = folder.make<TProfile>(("pdPhivsPt" + reg + hName).c_str(), 
-							("obj #Delta#phi vs pt for "+ hName).c_str(), 
+							("obj #Delta#phi vs pt for " + hName +
+							 ";GEN  mu p_{T};#Delta#phi").c_str(), 
 							60, -0.5, 119.5, 0, .05);
 
       _hPlots["dPhivsPt" + reg] = folder.make<TH2F>(("hdPhivsPt" + reg + hName).c_str(), 
-						    ("obj #Delta#phi vs pt for "+ hName).c_str(),
+						    ("obj #Delta#phi vs pt for "+ hName +
+						     ";GEN  mu p_{T};#Delta#phi").c_str(),
 						    60, -0.5, 119.5, 100, -0, .05);
 
       _pPlots["phiBendInvsPt" + reg] = folder.make<TProfile>(("pdPhiBendvsPt" + reg + hName).c_str(), 
-							     ("obj #Delta#phi_{b} vs pt for " + hName).c_str(), 
+							     ("obj #Delta#phi_{b} vs pt for " + hName +
+							      ";GEN  mu p_{T};#Delta#phi_{b}").c_str(), 
 							     60, -0.5, 119.5, 0, 100);
       
       _hPlots["phiBendInvsPt" + reg] = folder.make<TH2F>(("hdPhiBendvsPt" + reg + hName).c_str(), 
-							 ("obj #Delta#phi_{b} vs pt for " + hName).c_str(),
+							 ("obj #Delta#phi_{b} vs pt for " + hName +
+							  ";GEN  mu p_{T};#Delta#phi_{b}").c_str(),
 							 60, -0.5, 119.5, 100, 0, 100);
 
 
       _pPlots["phiBendOutvsPt" + reg] = folder.make<TProfile>(("pdPhiBendvsPt" + reg + hName).c_str(), 
-							      ("obj #Delta#phi_{b} vs pt for " + hName).c_str(), 
+							      ("obj #Delta#phi_{b} vs pt for " + hName +
+							       ";GEN  mu p_{T};#Delta#phi_{b}").c_str(), 
 							      60, -0.5, 119.5, 0, 100);
       
       _hPlots["phiBendOutvsPt" + reg] = folder.make<TH2F>(("hdPhiBendvsPt" + reg + hName).c_str(), 
-							  ("obj #Delta#phi_{b} vs pt for " + hName).c_str(),
+							  ("obj #Delta#phi_{b} vs pt for " + hName +
+							   ";GEN  mu p_{T};#Delta#phi_{b}").c_str(),
 							  60, -0.5, 119.5, 100, 0, 100);
 
     }
-      
-  
-  std::map<std::string, TProfile *>::const_iterator pPlotsIt  =  _pPlots.begin();
-  std::map<std::string, TProfile *>::const_iterator pPlotsEnd =  _pPlots.end();
-  
-  for (; pPlotsIt != pPlotsEnd; ++pPlotsIt)
-    pPlotsIt->second->GetXaxis()->SetTitle("GEN  mu p_{T}");
-  
-  std::map<std::string, TH2F *>::const_iterator hPlotsIt  =  _hPlots.begin();
-  std::map<std::string, TH2F *>::const_iterator hPlotsEnd =  _hPlots.end();
-  
-  for (; hPlotsIt != hPlotsEnd; ++hPlotsIt)
-    hPlotsIt->second->GetXaxis()->SetTitle("GEN  mu p_{T}");
-  
+
+  TFileDirectory folderEff = baseFolder.mkdir("Efficiency");
+
+  _ePlots["effvsPt"] = folderEff.make<TEfficiency>(("eEffvsPt" + hName).c_str(), 
+						   ("obj efficiency vs pt for " + hName + 
+						    ";GEN  mu p_{T};p_{T} assign. eff.").c_str(), 
+						   60, -0.5, 119.5);
+
+  _hPlots["ptResol"] = folderEff.make<TH1F>(("hPtResol" + hName).c_str(), ("obj (dttf_[pt] - pt) / pt for " + hName +
+				     	    ";(DTTF  mu p_{T} - GEN  mu p_{T}) / GEN  mu p_{T}").c_str(), 120, -5., 5.);
+
 }
 
 
@@ -373,15 +396,13 @@ void ChambPairPlotter::draw() const
   std::map<std::string, TProfile *>::const_iterator pPlotsIt  =  _pPlots.begin();
   std::map<std::string, TProfile *>::const_iterator pPlotsEnd =  _pPlots.end();
 
-  std::map<std::string, TH2F *>::const_iterator hPlotsIt  =  _hPlots.begin();
-  std::map<std::string, TH2F *>::const_iterator hPlotsEnd =  _hPlots.end();
-
-  for (; pPlotsIt != pPlotsEnd && hPlotsIt != hPlotsEnd ; ++pPlotsIt, ++hPlotsIt)
+  for (; pPlotsIt != pPlotsEnd; ++pPlotsIt)
     {
  
-      TH2F * hHisto = hPlotsIt->second;
       TProfile * pHisto = pPlotsIt->second;
+
       std::string histoName = pPlotsIt->first;
+      TH1 * hHisto = _hPlots.find(histoName)->second;
       
       std::string cName = "c" + histoName + name();
       
@@ -398,6 +419,54 @@ void ChambPairPlotter::draw() const
       c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
     }
 
+  std::map<std::string, TH1 *>::const_iterator hPlotsIt  =  _hPlots.begin();
+  std::map<std::string, TH1 *>::const_iterator hPlotsEnd =  _hPlots.end();
+
+  for (; hPlotsIt != hPlotsEnd ; ++hPlotsIt)
+    {
+
+      TH1 * hHisto = hPlotsIt->second;
+
+      if ( hPlotsIt->first != "ptResol" )  continue;
+ 
+      std::string histoName = hPlotsIt->first;
+      
+      std::string cName = "c" + histoName + name();
+      
+      system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+      
+      TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+      
+      c->cd();
+      c->SetGrid();  
+      
+      hHisto->Draw("");
+
+      c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+    }
+
+  std::map<std::string, TEfficiency *>::const_iterator ePlotsIt  =  _ePlots.begin();
+  std::map<std::string, TEfficiency *>::const_iterator ePlotsEnd =  _ePlots.end();
+
+  for (; ePlotsIt != ePlotsEnd ; ++ePlotsIt)
+    {
+
+      TEfficiency * histo = ePlotsIt->second;
+      std::string histoName = ePlotsIt->first;
+      
+      std::string cName = "c" + histoName + name();
+      
+      system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+      
+      TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
+      
+      c->cd();
+      c->SetGrid();  
+      
+      histo->Draw("E0PA");
+      
+      c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+    }
 
   TProfile * pCenter = static_cast<TProfile *>(getProfile("dPhivsPtCenter")->Clone("center"));
   TProfile * pBorder = static_cast<TProfile *>(getProfile("dPhivsPtBorder")->Clone("border"));
@@ -478,6 +547,7 @@ L1ITMBPtLutPlots::L1ITMBPtLutPlots(const edm::ParameterSet& p) :
   _mbPtChambObjects.push_back(ChambPairId::DTCORR);
 
   for (int wheel = -3; wheel <=3; ++wheel) {
+    if (wheel == 0) continue;
     for (int sector = 0; sector <=0; ++sector) {
       for (int inCh = 1; inCh <=1; ++inCh) {
 	for (int outCh = inCh + 1; outCh <=2; ++outCh) {
@@ -515,6 +585,7 @@ void L1ITMBPtLutPlots::endJob()
 {
 
   for (int wheel = -3; wheel <=3; ++wheel) {
+    if (wheel == 0) continue;
     for (int sector = 0; sector <=0; ++sector) {
       for (int inCh = 1; inCh <=1; ++inCh) {
 	for (int outCh = inCh + 1; outCh <=2; ++outCh) {
@@ -603,6 +674,9 @@ void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup&
     const L1MuDTTrackCand& dttf = mbTrack.parent();    
     if(dttf.bx() != 0) continue; // CB using only in time DTTF tracks 
 
+    float gmtInPt = mbTrack.getAssociatedGMTin().size() == 1  ?
+                    mbTrack.getAssociatedGMTin()[0].ptValue() : -10.;    
+
     int sector = dttf.scNum();
     int wheel  = dttf.whNum();
 
@@ -642,9 +716,19 @@ void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup&
       
       ChambPairPlotter *plotter = getPlotter(dttfRawId,chPairRawId);
 
-      if (plotter) plotter->fill(dtBestPrims[0], 
-                                 dtBestPrims[1],
-                                 bestGen->pt());
+      if (plotter) 
+	{
+	  plotter->fillPtLut(dtBestPrims[0], 
+			     dtBestPrims[1],
+			     bestGen->pt());
+
+	  if (gmtInPt >= 0.)
+	    {	
+	      plotter->fillEfficicency(gmtInPt,bestGen->pt());
+	    }
+
+	}
+	  
     }
     
   }
