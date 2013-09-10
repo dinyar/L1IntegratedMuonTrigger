@@ -285,8 +285,8 @@ void ChambPairPlotter::fillPtLut(const L1ITMu::TriggerPrimitive * in,
   
   float inPhiValue  = in->getCMSGlobalPhi();  
   float outPhiValue = out->getCMSGlobalPhi();
-  float inPhiBendValue  = in->getDTData().bendingAngle;
-  float outPhiBendValue = out->getDTData().bendingAngle;
+  float inPhiBendValue  = fabs(in->getDTData().bendingAngle);
+  float outPhiBendValue = fabs(out->getDTData().bendingAngle);
   
   int inPhiBin  = acos(cos(inPhiValue))  / (M_PI/24.); // phi bin (0,48)
   int outPhiBin = acos(cos(outPhiValue)) / (M_PI/24.); // phi bin (0;48)
@@ -299,33 +299,33 @@ void ChambPairPlotter::fillPtLut(const L1ITMu::TriggerPrimitive * in,
   _pPlots["dPhivsPt"]->Fill(pt,deltaPhi);
   _hPlots["dPhivsPt"]->Fill(pt,deltaPhi);
 
-  _pPlots["phiBendInvsPt"]->Fill(pt,fabs(inPhiBendValue));
-  _hPlots["phiBendInvsPt"]->Fill(pt,fabs(inPhiBendValue));  
+  _pPlots["phiBendInvsPt"]->Fill(pt,inPhiBendValue);
+  _hPlots["phiBendInvsPt"]->Fill(pt,inPhiBendValue);  
 
-  _pPlots["phiBendOutvsPt"]->Fill(pt,fabs(outPhiBendValue));
-  _hPlots["phiBendOutvsPt"]->Fill(pt,fabs(outPhiBendValue));  
+  _pPlots["phiBendOutvsPt"]->Fill(pt,outPhiBendValue);
+  _hPlots["phiBendOutvsPt"]->Fill(pt,outPhiBendValue);  
   
   if ( inRelPhiBin<2 && outRelPhiBin<2 )
     { // fill ch-center histos
       _pPlots["dPhivsPtCenter"]->Fill(pt,deltaPhi);
       _hPlots["dPhivsPtCenter"]->Fill(pt,deltaPhi);
     
-      _pPlots["phiBendInvsPtCenter"]->Fill(pt,fabs(inPhiBendValue));
-      _hPlots["phiBendInvsPtCenter"]->Fill(pt,fabs(inPhiBendValue));  
+      _pPlots["phiBendInvsPtCenter"]->Fill(pt,inPhiBendValue);
+      _hPlots["phiBendInvsPtCenter"]->Fill(pt,inPhiBendValue);  
 
-      _pPlots["phiBendOutvsPtCenter"]->Fill(pt,fabs(outPhiBendValue));
-      _hPlots["phiBendOutvsPtCenter"]->Fill(pt,fabs(outPhiBendValue));    
+      _pPlots["phiBendOutvsPtCenter"]->Fill(pt,outPhiBendValue);
+      _hPlots["phiBendOutvsPtCenter"]->Fill(pt,outPhiBendValue);    
     } 
   else if ( inRelPhiBin>=2 && outRelPhiBin>=2 ) 
     { // fill ch-border histos
       _pPlots["dPhivsPtBorder"]->Fill(pt,deltaPhi);
       _hPlots["dPhivsPtBorder"]->Fill(pt,deltaPhi);
     
-      _pPlots["phiBendInvsPtBorder"]->Fill(pt,fabs(inPhiBendValue));
-      _hPlots["phiBendInvsPtBorder"]->Fill(pt,fabs(inPhiBendValue));  
+      _pPlots["phiBendInvsPtBorder"]->Fill(pt,inPhiBendValue);
+      _hPlots["phiBendInvsPtBorder"]->Fill(pt,inPhiBendValue);  
 
-      _pPlots["phiBendOutvsPtBorder"]->Fill(pt,fabs(outPhiBendValue));
-      _hPlots["phiBendOutvsPtBorder"]->Fill(pt,fabs(outPhiBendValue));  
+      _pPlots["phiBendOutvsPtBorder"]->Fill(pt,outPhiBendValue);
+      _hPlots["phiBendOutvsPtBorder"]->Fill(pt,outPhiBendValue);  
     }
    
 }
@@ -345,7 +345,7 @@ void ChambPairPlotter::fillEfficicency(float dttfPt, float pt)
       std::string dttfPtTag = ptCut.str();
 
       _ePlots["effvsPt" + dttfPtTag]->Fill(dttfPt >= dttfPtCut,pt);
-      if (pt > dttfPtCut) _hPlots["ptResol" + dttfPtTag]->Fill((dttfPt - pt)/ pt);
+      if (pt > dttfPtCut) _hPlots["ptResol" + dttfPtTag]->Fill((pt - dttfPt)/ pt);
     }
 
 }
@@ -421,7 +421,7 @@ void ChambPairPlotter::book(TFileService * fs)
       _hPlots["ptResol" + dttfPtTag] = folderEff.make<TH1F>(("hPtResol" + hName + dttfPtTag).c_str(), 
 							    ("obj (dttf_[pt] - pt) / pt for " + hName + dttfPtTag + 
 							     ";(DTTF  mu p_{T} - GEN  mu p_{T}) / GEN  mu p_{T}").c_str(), 
-							    120, -1., 5.);
+							    120, -5., 1.);
     }
 
 
