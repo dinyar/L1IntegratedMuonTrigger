@@ -232,6 +232,8 @@ private:
 
   ChambPairId _id;
 
+  std::vector<int> _dttfPtCuts;
+  
   std::map<std::string, TEfficiency *> _ePlots;
   std::map<std::string, TProfile *>    _pPlots;
   std::map<std::string, TH1      *>    _hPlots;
@@ -245,6 +247,12 @@ ChambPairPlotter::ChambPairPlotter(int wh, int sec, int inCh, int outCh,
   _id(wh,sec,inCh,outCh,inChObj,outChObj) 
 { 
   
+  // CB DTTF pt cuts for plots (now one per object)  
+  _dttfPtCuts.push_back(12);
+  _dttfPtCuts.push_back(16);
+  _dttfPtCuts.push_back(20);
+  _dttfPtCuts.push_back(24);
+
   book(fs); 
   
 }
@@ -253,13 +261,20 @@ ChambPairPlotter::ChambPairPlotter(int wh, int sec, int inCh, int outCh,
 ChambPairPlotter::ChambPairPlotter(ChambPairId id, TFileService * fs) : _id(id) 
 { 
   
+  // CB DTTF pt cuts for plots (now one per object)  
+  _dttfPtCuts.push_back(12);
+  _dttfPtCuts.push_back(16);
+  _dttfPtCuts.push_back(20);
+  _dttfPtCuts.push_back(24);
+
   book(fs); 
   
 }
 
 
 ChambPairPlotter::ChambPairPlotter(const ChambPairPlotter & plotter) :
-  _id(plotter._id), _pPlots(plotter._pPlots), _hPlots(plotter._hPlots)
+  _id(plotter._id), _dttfPtCuts(plotter._dttfPtCuts), _ePlots(plotter._ePlots), 
+  _pPlots(plotter._pPlots), _hPlots(plotter._hPlots)
 {
 
 }
@@ -318,9 +333,20 @@ void ChambPairPlotter::fillPtLut(const L1ITMu::TriggerPrimitive * in,
 
 void ChambPairPlotter::fillEfficicency(float dttfPt, float pt) 
 { 
+
+  std::vector<int>::const_iterator dttfPtCutIt  =  _dttfPtCuts.begin();
+  std::vector<int>::const_iterator dttfPtCutEnd =  _dttfPtCuts.end();
   
-  _ePlots["effvsPt"]->Fill(dttfPt >= 20,pt); // CB only 20 now...
-  _hPlots["ptResol"]->Fill((dttfPt - pt)/ pt);
+  for (; dttfPtCutIt != dttfPtCutEnd; ++dttfPtCutIt)
+    {
+      int dttfPtCut = (*dttfPtCutIt);
+
+      std::stringstream ptCut; ptCut << dttfPtCut;
+      std::string dttfPtTag = ptCut.str();
+
+      _ePlots["effvsPt" + dttfPtTag]->Fill(dttfPt >= dttfPtCut,pt);
+      if (pt > dttfPtCut) _hPlots["ptResol" + dttfPtTag]->Fill((dttfPt - pt)/ pt);
+    }
 
 }
 
@@ -377,13 +403,27 @@ void ChambPairPlotter::book(TFileService * fs)
 
   TFileDirectory folderEff = baseFolder.mkdir("Efficiency");
 
-  _ePlots["effvsPt"] = folderEff.make<TEfficiency>(("eEffvsPt" + hName).c_str(), 
-						   ("obj efficiency vs pt for " + hName + 
-						    ";GEN  mu p_{T};p_{T} assign. eff.").c_str(), 
-						   60, -0.5, 119.5);
+  std::vector<int>::const_iterator dttfPtCutIt  =  _dttfPtCuts.begin();
+  std::vector<int>::const_iterator dttfPtCutEnd =  _dttfPtCuts.end();
+  
+  for (; dttfPtCutIt != dttfPtCutEnd; ++dttfPtCutIt)
+    {
+      int dttfPtCut = (*dttfPtCutIt);
 
-  _hPlots["ptResol"] = folderEff.make<TH1F>(("hPtResol" + hName).c_str(), ("obj (dttf_[pt] - pt) / pt for " + hName +
-				     	    ";(DTTF  mu p_{T} - GEN  mu p_{T}) / GEN  mu p_{T}").c_str(), 120, -5., 5.);
+      std::stringstream ptCut; ptCut << dttfPtCut;
+      std::string dttfPtTag = ptCut.str();
+  
+      _ePlots["effvsPt" + dttfPtTag] = folderEff.make<TEfficiency>(("eEffvsPt" + hName + dttfPtTag).c_str(), 
+								   ("obj efficiency vs pt for " + hName + dttfPtTag + 
+								    ";GEN  mu p_{T};p_{T} assign. eff.").c_str(), 
+								   60, -0.5, 119.5);
+
+      _hPlots["ptResol" + dttfPtTag] = folderEff.make<TH1F>(("hPtResol" + hName + dttfPtTag).c_str(), 
+							    ("obj (dttf_[pt] - pt) / pt for " + hName + dttfPtTag + 
+							     ";(DTTF  mu p_{T} - GEN  mu p_{T}) / GEN  mu p_{T}").c_str(), 
+							    120, -1., 5.);
+    }
+
 
 }
 
@@ -427,7 +467,7 @@ void ChambPairPlotter::draw() const
 
       TH1 * hHisto = hPlotsIt->second;
 
-      if ( hPlotsIt->first != "ptResol" )  continue;
+      if ( hPlotsIt->first.find("ptResol") == std::string::npos )  continue;
  
       std::string histoName = hPlotsIt->first;
       
@@ -674,6 +714,7 @@ void L1ITMBPtLutPlots::analyze( const edm::Event& iEvent, const edm::EventSetup&
     const L1MuDTTrackCand& dttf = mbTrack.parent();    
     if(dttf.bx() != 0) continue; // CB using only in time DTTF tracks 
 
+    // CB using GMT pt (after sorting) as DTTF has no valid ptValue()
     float gmtInPt = mbTrack.getAssociatedGMTin().size() == 1  ?
                     mbTrack.getAssociatedGMTin()[0].ptValue() : -10.;    
 
