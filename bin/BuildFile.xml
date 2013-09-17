@@ -1,0 +1,24 @@
+<use   name="rootgraphics"/>
+<use   name="rootminuit"/>
+<use   name="rootminuit2"/>
+<use   name="root"/>
+<use   name="rootinteractive"/>
+<use   name="rootmath"/>
+<use   name="Utilities/General"/>
+<use   name="FWCore/FWLite"/>
+<use   name="DataFormats/FWLite"/>
+
+
+<bin   file="efficiencyLut.cc" name="efficiencyLut">
+<Flags CXXFLAGS="-g -lHistPainter"/>
+  <use   name="boost_program_options"/>
+  <use   name="boost"/>
+</bin>
+
+
+<bin   file="DTTFLutReader.cc" name="DTTFLutReader">
+<Flags CXXFLAGS="-g"/>
+  <use   name="boost_program_options"/>
+  <use   name="boost"/>
+</bin>
+
