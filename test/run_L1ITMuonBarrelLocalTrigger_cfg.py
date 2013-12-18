@@ -32,7 +32,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.cerr.threshold = 'ERROR'
 
-infile = ['file:/afs/cern.ch/user/b/battilan/work/public/SingleMuFlatPt_3GeVto100GeV_GEN_SIM_DIGI_L1.root']
+infile = ['/store/caf/user/battilan/L1Trigger/BarrelTF/Generation/v1/SingleMuFlatPt_3GeVto140GeV_GEN_SIM_DIGI_L1_1_1_96z.root']
 
 process.source = cms.Source(
     'PoolSource',
