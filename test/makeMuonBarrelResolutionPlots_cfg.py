@@ -25,6 +25,8 @@ process.L1ITMuResolutionPlotter = cms.EDAnalyzer(
     'L1ITMBPrimitiveResolutionPlots',
     # labels of DDU/DCC data and 4D segments
     inputTagDCC = cms.untracked.InputTag("simDtTriggerPrimitiveDigis"),
+    # replace the previous with the following line to run using "super primitives" as input 
+    #inputTagDCC = cms.untracked.InputTag("L1ITMuonBarrelPrimitiveProducer"),
     inputTagSEG = cms.untracked.InputTag("dt4DSegments"),
     # set outflows to boudaries
     rebinOutFlowsInGraph = cms.untracked.bool(True),
