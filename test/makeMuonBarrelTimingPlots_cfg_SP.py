@@ -18,15 +18,15 @@ process.dt1DRecHits.dtDigiLabel = 'simMuonDTDigis'
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string('L1ITMuonBarrelTimingPlots.root')
+    fileName=cms.string('L1ITMuonBarrelTimingPlots_SP.root')
     )
 
 process.L1ITMuTimingPlotter = cms.EDAnalyzer(
     'L1ITMBPrimitiveTimingPlots',
     # labels of DDU/DCC data and 4D segments
-    inputTagDCC = cms.untracked.InputTag("simDtTriggerPrimitiveDigis"),
+ #   inputTagDCC = cms.untracked.InputTag("simDtTriggerPrimitiveDigis"),
     # replace the previous with the following line to run using "super primitives" as input 
- #   inputTagDCC = cms.untracked.InputTag("L1ITMuonBarrelPrimitiveProducer"),
+    inputTagDCC = cms.untracked.InputTag("L1ITMuonBarrelPrimitiveProducer"),
     inputTagSEG = cms.untracked.InputTag("dt4DSegments"),
     # set outflows to boudaries
     rebinOutFlowsInGraph = cms.untracked.bool(True),
