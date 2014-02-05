@@ -22,3 +22,6 @@
 
 <use name="FWCore/PluginManager"/>
 <use name="rootrflx"/>
+
+<use name="boost_program_options"/>
+<use name="boost"/>

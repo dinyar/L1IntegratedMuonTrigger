@@ -14,11 +14,3 @@
   <use   name="boost_program_options"/>
   <use   name="boost"/>
 </bin>
-
-
-<bin   file="DTTFLutReader.cc" name="DTTFLutReader">
-<Flags CXXFLAGS="-g"/>
-  <use   name="boost_program_options"/>
-  <use   name="boost"/>
-</bin>
-
