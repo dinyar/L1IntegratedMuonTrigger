@@ -140,15 +140,23 @@ L1ITMu::PrimitiveCombiner::combineDt( const L1ITMu::TriggerPrimitive * dt1,
   LocalPoint point2 = chamb2->toLocal( dt2->getCMSGlobalPoint() );
 
   results localResult;
-  localResult.bendingAngle = phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() ) * 512;
-  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xDt );
   localResult.radialAngle = 0.5 * ( dt1->getDTData().radialAngle + dt2->getDTData().radialAngle );
-
-  //  std::cout << "dt-dt radial : " << dt1->getDTData().radialAngle << " * " << dt2->getDTData().radialAngle << " = " << localResult.radialAngle << '\n';
-//   std::cout << '\t' << point1.x() << '\t' << point1.z() << '\t' << dt1->getDTData().qualityCode << '\n';
-//     std::cout << '\t' << point2.x() << '\t' << point2.z() << '\t' << dt2->getDTData().qualityCode << '\n';
-//   std::cout << "dt-dt bending : " << dt1->getDTData().bendingAngle << " * " << dt2->getDTData().bendingAngle << " = "
-// 	    << localResult.bendingAngle << '\n';
+  if ((dt1->getDTData().wheel>0) ||
+      ((dt1->getDTData().wheel==0) && (dt1->getDTData().sector==0 || dt1->getDTData().sector==3 || dt1->getDTData().sector==4 || 
+				      dt1->getDTData().sector==7 || dt1->getDTData().sector==8 || dt1->getDTData().sector==11))) 
+    localResult.bendingAngle = (atan(phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
+  else
+    localResult.bendingAngle = (atan(-phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
+  //phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() ) * 512;
+  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xDt );
+  
+  //std::cout<<" == === COMBINING DT-DT === == "<<std::endl;
+  // std::cout << "dt-dt radial : " << dt1->getDTData().radialAngle << " * " << dt2->getDTData().radialAngle << " = " << localResult.radialAngle << '\n';
+  // std::cout << " " << point1.x() << " " << point1.z() << " " << dt1->getDTData().qualityCode << '\n';
+  // std::cout << " " << point2.x() << " " << point2.z() << " " << dt2->getDTData().qualityCode << '\n';
+  // std::cout << "dt-dt bending : " << dt1->getDTData().bendingAngle << " * " << dt2->getDTData().bendingAngle << " = "
+  //    << localResult.bendingAngle << '\n';
+  // std::cout<<" --- this was sector "<<dt1->getDTData().sector<<" and wheel "<<dt1->getDTData().wheel<<std::endl;
 
   return localResult;
 
@@ -169,11 +177,27 @@ L1ITMu::PrimitiveCombiner::combineDtRpc( const L1ITMu::TriggerPrimitive * dt,
   LocalPoint point2 = chamb2->toLocal( rpc->getCMSGlobalPoint() );
 
   results localResult;
-  localResult.bendingAngle = phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() ) * 512;
-  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xRpc );
   localResult.radialAngle = dt->getDTData().radialAngle;
+  if ((dt->getDTData().wheel>0) ||
+      ((dt->getDTData().wheel==0) && (dt->getDTData().sector==0 || dt->getDTData().sector==3 || dt->getDTData().sector==4 || 
+				       dt->getDTData().sector==7 || dt->getDTData().sector==8 || dt->getDTData().sector==11))) 
+    localResult.bendingAngle = (atan(phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
+  else
+    localResult.bendingAngle = (atan(-phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
+  //phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() ) * 512;
+  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xRpc );
 
-  //std::cout << "dt-rpc bending : " << dt->getDTData().bendingAngle << " -> " << localResult.bendingAngle << '\n';
+  //std::cout<<" == === COMBINING DT-RPC === == "<<std::endl;
+  //std::cout << "   DT  " << point1.x() << ' ' << point1.z() << " " << dt->getDTData().qualityCode << "\n";
+  //std::cout << "   RPC " << point2.x() << " " << point2.z() << " " << "\n";
+  // std::cout << "dt to dt-rpc bending : " << dt->getDTData().bendingAngle << " --> "<< localResult.bendingAngle << "\n";
+  //  std::cout<<" --- this was sector "<<dt->getDTData().sector<<" and wheel "<<dt1->getDTData().wheel<<std::endl;
+     //std::cout<<"Trying corrected phib computation"<<std::endl;
+   
+
+
+
+   //std::cout << "dt-rpc bending : " << dt->getDTData().bendingAngle << " -> " << localResult.bendingAngle << '\n';
 
   return localResult;
 
