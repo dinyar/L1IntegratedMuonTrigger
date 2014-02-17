@@ -267,12 +267,12 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 			       bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );
       phiChambVector.push_back( chamb );
-      if (abs(bendingAngle)>511||1==1){
-	std::cout<<"Got bending angle: "<<bendingAngle<<std::endl;
-	std::cout<<"Original DT primitive had bending angle: "<<dt.getDTData().bendingAngle<<std::endl;
-	std::cout<<"Quality: "<<qualityCode<<std::endl;
-	std::cout<<"Station: "<<station<<std::endl;
-      }
+      //if (abs(bendingAngle)>511||1==1){
+      //std::cout<<"Got bending angle: "<<bendingAngle<<std::endl;
+      //std::cout<<"Original DT primitive had bending angle: "<<dt.getDTData().bendingAngle<<std::endl;
+      //std::cout<<"Quality: "<<qualityCode<<std::endl;
+      //std::cout<<"Station: "<<station<<std::endl;
+      //}
 
     } /// end of the Uncorrelated loop
 
