@@ -35,6 +35,7 @@ public:
 private:
   edm::InputTag _mbltCollectionInput;
   const L1ITMu::PrimitiveCombiner::resolutions _resol;
+  const int _qualityRemappingMode;
   edm::ESHandle<DTGeometry> _muonGeom;
 };
 
@@ -48,7 +49,10 @@ L1ITMuonBarrelPrimitiveProducer::L1ITMuonBarrelPrimitiveProducer( const edm::Par
     _resol( iConfig.getParameter<double>("xDtResol"), 
 	    iConfig.getParameter<double>("xRpcResol"),
 	    iConfig.getParameter<double>("phibDtCorrResol"),
-	    iConfig.getParameter<double>("phibDtUnCorrResol") )
+	    iConfig.getParameter<double>("phibDtUnCorrResol")
+	    ),
+    _qualityRemappingMode( iConfig.getParameter<int>("qualityRemappingMode") )
+ 
 {
   produces<L1MuDTChambPhContainer>();
   // produces<std::vector<L1MuDTChambPhDigi> >();
@@ -144,13 +148,14 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	if ( deltaPhiDt < minDeltaPhiDt ) {
 	  closest = jDt;
 	  closestIdx = jdxDt;
+	  minDeltaPhiDt=deltaPhiDt;
 	}
       }
 
       /// check if the pair shares the closest rpc hit
       L1ITMu::MBLTCollection::bxMatch match = L1ITMu::MBLTCollection::NOMATCH;
-      // if ( closest > 0 && minDeltaPhiDt < 0.05 ) {
-      if ( closest > 0 ) {
+      if ( closest > 0 && minDeltaPhiDt < 0.05 ) {
+      //if ( closest > 0 ) {
 	match = mbltStation.haveCommonRpc( iDt, closest );
       }
 
@@ -212,7 +217,8 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	  const L1ITMu::TriggerPrimitive & rpcIn = *rpcInMatch.front();
 	  const L1ITMu::TriggerPrimitive & rpcOut = *rpcOutMatch.front();
 	  /// only the first is real...
-	  if ( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() ) {
+	  // LG try also to reassign BX to single H using RPC BX, e.g. do not ask for DT and RPC to have the same BX
+	  if (( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() ) || (_qualityRemappingMode>1 && rpcIn.getBX()==rpcOut.getBX() && abs(dt.getBX()-rpcIn.getBX())<=1)) {
 	    bx = rpcIn.getBX();
 	    combiner.addRpcIn( rpcIn );
 	    combiner.addRpcOut( rpcOut );
@@ -227,7 +233,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	/// the uncorrelated has a possible inner confirmation
 	} else if ( rpcInMatchSize ) {
 	  const L1ITMu::TriggerPrimitive & rpcIn = *rpcInMatch.front();
-	  if ( dt.getBX() == rpcIn.getBX() ) {
+	  if ( dt.getBX() == rpcIn.getBX() || (_qualityRemappingMode>1 && abs(dt.getBX()-rpcIn.getBX())<=1)) {
 	    bx = rpcIn.getBX();
 	    combiner.addRpcIn( rpcIn );
 	  }
@@ -235,7 +241,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	/// the uncorrelated has a possible outer confirmation
 	} else if ( rpcOutMatchSize ) {
 	  const L1ITMu::TriggerPrimitive & rpcOut = *rpcOutMatch.front();
-	  if ( dt.getBX() == rpcOut.getBX() ) {
+	  if ( dt.getBX() == rpcOut.getBX()|| (_qualityRemappingMode>1  && abs(dt.getBX()-rpcOut.getBX())<=1)) {
 	    bx = rpcOut.getBX();
 	    combiner.addRpcOut( rpcOut );
 	  }
@@ -253,6 +259,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	bx = dt.getBX();
 	radialAngle = dt.getDTData().radialAngle;
 	bendingAngle = dt.getDTData().bendingAngle;
+	//if (_qualityRemappingMode==0) 
 	qualityCode = ( qualityCode == 2 ) ? 0 : 1;
       }
 
@@ -260,6 +267,12 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 			       bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );
       phiChambVector.push_back( chamb );
+      if (abs(bendingAngle)>511||1==1){
+	std::cout<<"Got bending angle: "<<bendingAngle<<std::endl;
+	std::cout<<"Original DT primitive had bending angle: "<<dt.getDTData().bendingAngle<<std::endl;
+	std::cout<<"Quality: "<<qualityCode<<std::endl;
+	std::cout<<"Station: "<<station<<std::endl;
+      }
 
     } /// end of the Uncorrelated loop
 
