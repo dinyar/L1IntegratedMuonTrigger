@@ -1,15 +1,15 @@
 /*
  * EDAnalyzer L1ITMBPrimitiveResolutionComparePlots
- * 
+ *
  * This analyzer is based on the L1ITMBPrimitiveResolutionPlots.
  * It creates the same plots but for two DCC input tags at once (e.g.
  * the old and the new trigger algorithms). It also creates the related
  * scatterplots.
- * 
+ *
  * The code is a heavily modified version of the original class/config.
  * In addition to implementing the new features it has also been
  * cleaned up.
- * 
+ *
  * The main differences are:
  *  - the analyzer now takes two DCC input tags (inputTagDCC_old, inputTagDCC_new)
  *  - it does not generate the unnecessary "Segment" directory
@@ -302,7 +302,7 @@ void L1ITMBPrimitiveResolutionComparePlots::searchDccBest(t_vars &vars, std::vec
 		int qualitycode = trigIt->code();
 
 		if(qualitycode > vars.trigQualBest[whId][stId][secId] && qualitycode < 7) {
-			vars.trigQualBest[whId][stId][secId] = qualitycode; 
+			vars.trigQualBest[whId][stId][secId] = qualitycode;
 			vars.trigBest[whId][stId][secId] = &(*trigIt);
 		}
 	}
