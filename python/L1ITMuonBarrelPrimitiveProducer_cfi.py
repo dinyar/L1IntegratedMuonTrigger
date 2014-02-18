@@ -6,5 +6,6 @@ L1ITMuonBarrelPrimitiveProducer = cms.EDProducer(
     xDtResol = cms.double( 1 ),
     xRpcResol = cms.double( 20 ),
     phibDtCorrResol = cms.double( 0.005 ),
-    phibDtUnCorrResol = cms.double( 0.04 )
+    phibDtUnCorrResol = cms.double( 0.04 ),
+    qualityRemappingMode = cms.int32( 2 )
     )
