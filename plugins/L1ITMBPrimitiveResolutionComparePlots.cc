@@ -66,6 +66,7 @@ class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 		DTTrigGeomUtils* trigGeomUtils;
 		edm::ESHandle<DTGeometry> muonGeom;
 		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistos;
+		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistosQs[7];
 
 		struct t_vars {
 			edm::InputTag dccInputTag;
@@ -73,13 +74,15 @@ class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 			int trigQualBest[6][5][13];
 			const L1MuDTChambPhDigi* trigBest[6][5][13];
 			std::map<uint32_t, std::map<std::string, TH1F*>> chHistos;
+			std::map<uint32_t, std::map<std::string, TH1F*>> chHistosQs[7];
 		} oldVars, newVars;
 
 		struct t_deltas {
 			float deltaPos, deltaDir;
+			int quality;
 		};
 
-		void bookHistos(t_vars &vars, TFileDirectory &folder, const std::string chTag, const DTChamberId &chId);
+		void bookHistos(const std::string &hName, const DTChamberId &chId, TFileDirectory &folder);
 		bool analyze_tag(t_vars &vars, std::vector<const DTRecSegment4D*>::const_iterator &bestTrackIt, t_deltas &deltas);
 		void searchDccBest(t_vars &vars, std::vector<L1MuDTChambPhDigi>* trigs);
 };
@@ -129,52 +132,63 @@ void L1ITMBPrimitiveResolutionComparePlots::beginRun(const edm::Run& run, const 
 	for(; chambIt!=chambEnd; ++chambIt) {
 		DTChamberId chId = (*chambIt)->id();
 
-		ostringstream tdir_path, chTag;
-		//tdir_path << "Wheel" << chId.wheel() << "/Sector" << chId.sector() << "/Station" << chId.station() << "/Segment";
+		ostringstream tdir_path;
 		tdir_path << "Wheel" << chId.wheel() << "/Sector" << chId.sector() << "/Station" << chId.station();
-		chTag << "_W" << chId.wheel() << "_Sec" << chId.sector() << "_St" << chId.station();
+		TFileDirectory folder = fs->mkdir(tdir_path.str());
 
-		TFileDirectory folder = fs->mkdir(tdir_path.str().c_str());
-
-		bookHistos(newVars, folder, chTag.str(), chId);
-		bookHistos(oldVars, folder, chTag.str(), chId);
-
-		string hName;
-		map<std::string, TH2F*> &chambMap2D = scatterHistos[chId.rawId()];
-
-		hName = "DCC_PhiResidual_scatter";
-		chambMap2D[hName] = folder.make<TH2F>(
-			(hName+chTag.str()).c_str(),
-			"Trigger local position - Segment local position (correlated triggers) - scatter plot new vs. old",
-			nPhiBins,-rangePhi,rangePhi,nPhiBins,-rangePhi,rangePhi
-		);
-
-		hName = "DCC_PhibResidual_scatter";
-		chambMap2D[hName] = folder.make<TH2F>(
-			(hName+chTag.str()).c_str(),
-			"Trigger local direction - Segment local direction (correlated triggers) - scatter plot new vs. old",
-			nPhibBins,-rangePhiB,rangePhiB,nPhibBins,-rangePhiB,rangePhiB
-		);
+		bookHistos("DCC_PhiResidual", chId, folder);
+		bookHistos("DCC_PhibResidual", chId, folder);
 	}
 }
 
-void L1ITMBPrimitiveResolutionComparePlots::bookHistos(t_vars &vars, TFileDirectory &folder, const string chTag, const DTChamberId &chId) {
-	string hName;
-	map<std::string, TH1F*> &chambMap = vars.chHistos[chId.rawId()];
+void L1ITMBPrimitiveResolutionComparePlots::bookHistos(const string &hName, const DTChamberId &chId, TFileDirectory &folder) {
+	TFileDirectory subfolder = folder.mkdir(hName);
 
-	hName = "DCC_PhiResidual";
-	chambMap[hName] = folder.make<TH1F>(
-		(hName+"_"+vars.identifier+chTag).c_str(),
+	ostringstream chTag_oss;
+	chTag_oss << "_W" << chId.wheel() << "_Sec" << chId.sector() << "_St" << chId.station();
+	string chTag = chTag_oss.str();
+
+	this->newVars.chHistos[chId.rawId()][hName] = subfolder.make<TH1F>(
+		(hName+"_"+newVars.identifier+chTag).c_str(),
 		"Trigger local position - Segment local position (correlated triggers)",
-		nPhiBins,-rangePhi,rangePhi\
+		nPhiBins,-rangePhi,rangePhi
 	);
 
-	hName = "DCC_PhibResidual";
-	chambMap[hName] = folder.make<TH1F>(
-		(hName+"_"+vars.identifier+chTag).c_str(),
-		"Trigger local direction - Segment local direction (correlated triggers)",
-		nPhibBins,-rangePhiB,rangePhiB
+	this->oldVars.chHistos[chId.rawId()][hName] = subfolder.make<TH1F>(
+		(hName+"_"+oldVars.identifier+chTag).c_str(),
+		"Trigger local position - Segment local position (correlated triggers)",
+		nPhiBins,-rangePhi,rangePhi
 	);
+
+	this->scatterHistos[chId.rawId()][hName+"_scatter"] = subfolder.make<TH2F>(
+		(hName+"_scatter"+chTag).c_str(),
+		"Trigger local position - Segment local position (correlated triggers) - scatter plot new vs. old",
+		nPhiBins,-rangePhi,rangePhi,nPhiBins,-rangePhi,rangePhi
+	);
+
+	for(int i=0; i<7; i++) {
+		ostringstream qdir_oss; qdir_oss << "quality_" << i;
+		TFileDirectory qdir = subfolder.mkdir(qdir_oss.str());
+
+		string chTagQ = chTag + "_" + qdir_oss.str();
+		this->newVars.chHistosQs[i][chId.rawId()][hName] = qdir.make<TH1F>(
+			(hName+"_"+newVars.identifier+chTagQ).c_str(),
+			"Trigger local position - Segment local position (correlated triggers)",
+			nPhiBins,-rangePhi,rangePhi
+		);
+
+		this->oldVars.chHistosQs[i][chId.rawId()][hName] = qdir.make<TH1F>(
+			(hName+"_"+oldVars.identifier+chTagQ).c_str(),
+			"Trigger local position - Segment local position (correlated triggers)",
+			nPhiBins,-rangePhi,rangePhi
+		);
+
+		this->scatterHistosQs[i][chId.rawId()][hName+"_scatter"] = qdir.make<TH2F>(
+			(hName+"_scatter"+chTagQ).c_str(),
+			"Trigger local position - Segment local position (correlated triggers) - scatter plot new vs. old",
+			nPhiBins,-rangePhi,rangePhi,nPhiBins,-rangePhi,rangePhi
+		);
+	}
 }
 
 /*
@@ -233,10 +247,14 @@ void L1ITMBPrimitiveResolutionComparePlots::analyze(const edm::Event& e, const e
 	vector<const DTRecSegment4D*>::const_iterator bestTrackEnd = best4DSegments.end();
 	for(; bestTrackIt!=bestTrackEnd; ++bestTrackIt) {
 		t_deltas deltas_new, deltas_old;
-		map<string, TH2F*> &scatterMap = scatterHistos[(*bestTrackIt)->chamberId().rawId()];
 		if(analyze_tag(newVars, bestTrackIt, deltas_new) && analyze_tag(oldVars, bestTrackIt, deltas_old)) {
+			map<string, TH2F*> &scatterMap = scatterHistos[(*bestTrackIt)->chamberId().rawId()];
 			scatterMap.find("DCC_PhiResidual_scatter")->second->Fill(deltas_old.deltaPos, deltas_new.deltaPos);
 			scatterMap.find("DCC_PhibResidual_scatter")->second->Fill(deltas_old.deltaDir, deltas_new.deltaDir);
+
+			map<string, TH2F*> &scatterMapQ = scatterHistosQs[deltas_new.quality][(*bestTrackIt)->chamberId().rawId()];
+			scatterMapQ.find("DCC_PhiResidual_scatter")->second->Fill(deltas_old.deltaPos, deltas_new.deltaPos);
+			scatterMapQ.find("DCC_PhibResidual_scatter")->second->Fill(deltas_old.deltaDir, deltas_new.deltaDir);
 		}
 	}
 }
@@ -252,13 +270,12 @@ bool L1ITMBPrimitiveResolutionComparePlots::analyze_tag(t_vars &vars, vector<con
 		float trackPosPhi, trackPosEta, trackDirPhi, trackDirEta;
 		trigGeomUtils->computeSCCoordinates((*bestTrackIt),scsector,trackPosPhi,trackDirPhi,trackPosEta,trackDirEta);
 
-		map<string, TH1F*> &chMap = vars.chHistos[chId.rawId()];
+		int best_qualitycode = vars.trigQualBest[wheel+3][station][scsector];
+		const L1MuDTChambPhDigi* best_trig = vars.trigBest[wheel+3][station][scsector];
 
-		if(vars.trigQualBest[wheel+3][station][scsector] > -1 // residuals only for correlate triggers
-		  && vars.trigQualBest[wheel+3][station][scsector] < 7
-		  && nHitsPhi>=7) {
-			float trigPos = trigGeomUtils->trigPos(vars.trigBest[wheel+3][station][scsector]);
-			float trigDir = trigGeomUtils->trigDir(vars.trigBest[wheel+3][station][scsector]);
+		if(best_qualitycode > -1 && best_qualitycode < 7 && nHitsPhi >= 7) {
+			float trigPos = trigGeomUtils->trigPos(best_trig);
+			float trigDir = trigGeomUtils->trigDir(best_trig);
 			trigGeomUtils->trigToSeg(station,trigPos,trackDirPhi);
 
 			double deltaPos = trigPos-trackPosPhi;
@@ -266,11 +283,17 @@ bool L1ITMBPrimitiveResolutionComparePlots::analyze_tag(t_vars &vars, vector<con
 			double deltaDir = trigDir-trackDirPhi;
 			deltaDir = overUnderIn ? max(min(deltaDir,rangePhiB-0.01),-rangePhiB+0.01) : deltaDir;
 
+			map<string, TH1F*> &chMap = vars.chHistos[chId.rawId()];
 			chMap.find("DCC_PhiResidual")->second->Fill(deltaPos);
 			chMap.find("DCC_PhibResidual")->second->Fill(deltaDir);
 
+			map<string, TH1F*> &chMapQ = vars.chHistosQs[best_qualitycode][chId.rawId()];
+			chMapQ.find("DCC_PhiResidual")->second->Fill(deltaPos);
+			chMapQ.find("DCC_PhibResidual")->second->Fill(deltaDir);
+
 			deltas.deltaPos = deltaPos;
 			deltas.deltaDir = deltaDir;
+			deltas.quality = best_qualitycode;
 			return true;
 		}
 	}
