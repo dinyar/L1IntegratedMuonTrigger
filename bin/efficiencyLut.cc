@@ -145,7 +145,7 @@ void efficiency::run( bool byTh )
 
 
   int wheels[6] = { -3, -2, -1, 1, 2, 3 };
-  TString params[2] = { "Phi", "PhiBend" };
+  TString params[3] = { "Phi", "PhiBendIn","PhiBendOut" };
   TString ref[4] = { "DTCORR", "DTDIR", "DTIN", "DTOUT" };
   int inCh[2] = { 1, 2 };
   int outCh[2] = { 1, 2 };
@@ -153,18 +153,20 @@ void efficiency::run( bool byTh )
 
   for ( int sector = 0; sector < 12; ++sector ) {
     for ( size_t w = 0; w < 6; ++w ) {
-      for ( size_t p = 0; p < 2; ++p ) {
+      for ( size_t p = 0; p < 3; ++p ) {
 
 	TString fname = Form( "%s/%sWh%dSc%d", outdir_.Data(), params[p].Data(), wheels[w], sector );
 	std::ofstream outfile( fname.Data() );
       
-	for ( size_t rf1 = 0; rf1 < 3; ++rf1 ) {
-	  for ( size_t rf2 = 0; rf2 < 3; ++rf2 ) {
+	for ( size_t rf1 = 0; rf1 < 4; ++rf1 ) {
+	  for ( size_t rf2 = 0; rf2 < 4; ++rf2 ) {
 	    for ( size_t ch1 = 0; ch1 < 2; ++ch1 ) {
 	      for ( size_t ch2 = 0; ch2 < 2; ++ch2 ) {
 
 		TString name = Form( "L1ITMuPtPlotter/Wh%dSc%d/hd%svsPtWh%dSc%dinCh%doutCh%d%s%s",
 				     wheels[w], sector, params[p].Data(), wheels[w], sector, inCh[ch1], outCh[ch2], ref[rf1].Data(), ref[rf2].Data() );
+
+		//if(rf1==1) std::cout<<" name "<<name.Data()<<std::endl;
 		TH2F * plot = (TH2F *)(file_->Get( name ));
 
 		// std::cout <<  w << '\t' << wheels[w] << '\t' << name.Data() << std::endl;
