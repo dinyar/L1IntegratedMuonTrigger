@@ -25,9 +25,7 @@ void WeightCreator(string wh, string sc, string cut){
   Float_t RMSGMT;
  
   string outputfile = "Weight/Wh" +wh+"Sc"+sc+".txt";
-  stringstream weight;
-  weight<<RMSGMT;
-
+ 
   ofstream outputFile(outputfile.c_str());
   outputFile<<"# DT1 DT2 RMSGMT RMSDeltaPhi RMSPhiBIn RMSPhiBOut "<<endl;
 
