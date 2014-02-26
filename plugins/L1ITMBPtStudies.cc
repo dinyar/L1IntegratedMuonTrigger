@@ -68,6 +68,8 @@ public:
 
   const DTTFId & dttfId() const { return _id.dttfId(); };
 
+  void draw() const ;
+
   void book(TFileService * fs);
 
   void fillPtLut(const L1ITMu::TriggerPrimitive * in, 
@@ -77,7 +79,6 @@ public:
 
   void SetWeight( Float_t & whGMT, Float_t & whBIn, Float_t &whBOut, Float_t & whDPhi, Int_t mb1Obj, Int_t mb2Obj, std::string PlaceName);
  
-  void draw() const;
 
 private:
 
@@ -147,7 +148,7 @@ void ChPairPlotter::fillPtLut(const L1ITMu::TriggerPrimitive * in,
 
 void ChPairPlotter::SetWeight( Float_t & whGMT, Float_t & whBIn, Float_t &whBOut, Float_t & whDPhi, Int_t mb1Obj, Int_t mb2Obj, std::string PlaceName){
     
-  std::string  FileName="../test/Macros/Weight/"+PlaceName+".txt";
+  std::string  FileName="../test/MacrosMine/Weight/"+PlaceName+".txt"; //FIXME
   
   //std::cout<<"FileName "<<FileName.c_str()<<std::endl;
   std::ifstream datafileIn(FileName.c_str(),std::ifstream::in);
@@ -359,20 +360,21 @@ void ChPairPlotter::book(TFileService * fs)
 }
 
 
-void ChPairPlotter::draw() const 
-{ 
+void ChPairPlotter::draw() const
+{
 
   gStyle->SetPalette(52);
-
-  std::map<std::string, TH1 *>::const_iterator hPlotsIt  =  _hPlots.begin();
-  std::map<std::string, TH1 *>::const_iterator hPlotsEnd =  _hPlots.end();
+  
+  
+  std::map<std::string, TH1 *>::const_iterator hPlotsIt = _hPlots.begin();
+  std::map<std::string, TH1 *>::const_iterator hPlotsEnd = _hPlots.end();
 
   for (; hPlotsIt != hPlotsEnd ; ++hPlotsIt)
     {
 
       TH1 * hHisto = hPlotsIt->second;
 
-      if ( hPlotsIt->first.find("ptResol") == std::string::npos )  continue;
+      if ( hPlotsIt->first.find("ptResol") == std::string::npos ) continue;
  
       std::string histoName = hPlotsIt->first;
       
@@ -383,13 +385,16 @@ void ChPairPlotter::draw() const
       TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
       
       c->cd();
-      c->SetGrid();  
+      c->SetGrid();
       
       hHisto->Draw("");
 
       c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
     }
+
 }
+
+
 
 
 // --------------------------------------------------
@@ -405,6 +410,7 @@ public:
   L1ITMBPtStudies( const edm::ParameterSet & );
   ~L1ITMBPtStudies();
 
+  void endJob();
   void analyze( const edm::Event &, const edm::EventSetup & );  
 
   float GetDeltaPhi(const L1ITMu::TriggerPrimitive * in, 
@@ -573,6 +579,39 @@ L1ITMBPtStudies::~L1ITMBPtStudies()
 
 }
 
+void L1ITMBPtStudies::endJob()
+{
+
+  // for (int wheel = -3; wheel <=3; ++wheel) {
+//     if (wheel == 0) continue;
+//     for (int sector = 0; sector <=0; ++sector) {
+//       for (int inCh = 1; inCh <=1; ++inCh) {
+// for (int outCh = inCh + 1; outCh <=2; ++outCh) {
+// drawChambPair(DTTFId(wheel,sector), inCh, outCh);
+// }
+//       }
+//     }
+//   }
+  
+  std::map<int,std::map<int,ChPairPlotter*> >::iterator dttfIt = histos.begin();
+  std::map<int,std::map<int,ChPairPlotter*> >::iterator dttfEnd = histos.end();
+  
+  for(; dttfIt!=dttfEnd; ++dttfIt) {
+    
+    std::map<int,ChPairPlotter*>::iterator chambPairIt = dttfIt->second.begin();
+    std::map<int,ChPairPlotter*>::iterator chambPairEnd = dttfIt->second.end();
+    
+    for(; chambPairIt!=chambPairEnd; ++chambPairIt) {
+      
+      ChPairPlotter *plotter = chambPairIt->second;
+
+      plotter->draw();
+      delete plotter;
+      
+    }
+  }
+  
+}
 
 void L1ITMBPtStudies::analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup )
 {
@@ -747,6 +786,9 @@ ChPairPlotter* L1ITMBPtStudies::getPlotter(int dttfRawId, int chPairRawId)
   }
   return histos[dttfRawId][chPairRawId];
 }
+
+
+
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(L1ITMBPtStudies);
