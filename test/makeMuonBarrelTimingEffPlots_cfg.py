@@ -18,11 +18,13 @@ process.dt1DRecHits.dtDigiLabel = 'simMuonDTDigis'
 
 process.TFileService = cms.Service(
     "TFileService",
-    fileName=cms.string('L1ITMuonBarrelTimingPlots.root')
+    #fileName=cms.string('L1ITMuonBarrelTimingPlots_befLuigi.root')
+    #fileName=cms.string('L1ITMuonBarrelTimingPlots_afLuigi.root')
+    fileName=cms.string('L1ITMuonBarrelTimingEffPlots_17april.root')
     )
 
 process.L1ITMuTimingPlotter = cms.EDAnalyzer(
-    'L1ITMBPrimitiveTimingPlots',
+    'L1ITMBPrimitiveTimingEffPlots',
     # labels of DDU/DCC data and 4D segments
     inputTagDCC = cms.untracked.InputTag("simDtTriggerPrimitiveDigis"),
     # replace the previous with the following line to run using "super primitives" as input 
@@ -34,7 +36,8 @@ process.L1ITMuTimingPlotter = cms.EDAnalyzer(
     geomLabel = cms.untracked.string("idealForDigi"),
     )
 
-infile = 'file:L1ITMBLT.root'
+#infile = 'file:L1ITMBLT_befLuigi17feb2014.root'
+infile = 'file:L1ITMBLT_afLuigi.root'
 
 process.source = cms.Source(
     'PoolSource',
