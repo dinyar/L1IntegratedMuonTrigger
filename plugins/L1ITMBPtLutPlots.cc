@@ -225,25 +225,25 @@ void ChambPairPlotter::book(TFileService * fs)
 						     ";GEN  mu p_{T};#Delta#phi").c_str(),
 						    60, -0.5, 119.5, 100, -0, .05);
 
-      _pPlots["phiBendInvsPt" + reg] = folder.make<TProfile>(("pdPhiBendvsPt" + reg + hName).c_str(), 
-							     ("obj #Delta#phi_{b} vs pt for " + hName +
-							      ";GEN  mu p_{T};#Delta#phi_{b}").c_str(), 
+      _pPlots["phiBendInvsPt" + reg] = folder.make<TProfile>(("pdPhiBendInvsPt" + reg + hName).c_str(), 
+							     ("obj #Delta#phi_{b}In vs pt for " + hName +
+							      ";GEN  mu p_{T};#Delta#phi_{b}In").c_str(), 
 							     60, -0.5, 119.5, 0, 100);
       
-      _hPlots["phiBendInvsPt" + reg] = folder.make<TH2F>(("hdPhiBendvsPt" + reg + hName).c_str(), 
-							 ("obj #Delta#phi_{b} vs pt for " + hName +
-							  ";GEN  mu p_{T};#Delta#phi_{b}").c_str(),
+      _hPlots["phiBendInvsPt" + reg] = folder.make<TH2F>(("hdPhiBendInvsPt" + reg + hName).c_str(), 
+							 ("obj #Delta#phi_{b}In vs pt for " + hName +
+							  ";GEN  mu p_{T};#Delta#phi_{b}In").c_str(),
 							 60, -0.5, 119.5, 100, 0, 100);
 
 
-      _pPlots["phiBendOutvsPt" + reg] = folder.make<TProfile>(("pdPhiBendvsPt" + reg + hName).c_str(), 
-							      ("obj #Delta#phi_{b} vs pt for " + hName +
-							       ";GEN  mu p_{T};#Delta#phi_{b}").c_str(), 
+      _pPlots["phiBendOutvsPt" + reg] = folder.make<TProfile>(("pdPhiBendOutvsPt" + reg + hName).c_str(), 
+							      ("obj #Delta#phi_{b}Out vs pt for " + hName +
+							       ";GEN  mu p_{T};#Delta#phi_{b}Out").c_str(), 
 							      60, -0.5, 119.5, 0, 100);
       
-      _hPlots["phiBendOutvsPt" + reg] = folder.make<TH2F>(("hdPhiBendvsPt" + reg + hName).c_str(), 
-							  ("obj #Delta#phi_{b} vs pt for " + hName +
-							   ";GEN  mu p_{T};#Delta#phi_{b}").c_str(),
+      _hPlots["phiBendOutvsPt" + reg] = folder.make<TH2F>(("hdPhiBendOutvsPt" + reg + hName).c_str(), 
+							  ("obj #Delta#phi_{b}Out vs pt for " + hName +
+							   ";GEN  mu p_{T};#Delta#phi_{b}Out").c_str(),
 							  60, -0.5, 119.5, 100, 0, 100);
 
     }
