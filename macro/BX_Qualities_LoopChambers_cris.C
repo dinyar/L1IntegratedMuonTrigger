@@ -26,7 +26,7 @@ TCanvas *c1 = new TCanvas("c1", "Data", 1000, 600);
 TFile f("L1ITMuonBarrelTimingEffPlots_17aprilT0.root");
 
 //SECOND FILE************************+
-TFile fsp("L1ITMuonBarrelTimingEffPlots_17aprilT0.root");
+TFile fsp("L1ITMuonBarrelTimingEffPlots_SP_17aprilT0.root");
 
 
 TH1F *MB1s_bx_All=new TH1F("mb1All","BX distribution for MB1 All Qualities",16,-8,8);
