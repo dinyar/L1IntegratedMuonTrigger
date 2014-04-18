@@ -23,8 +23,11 @@ TCanvas *c1 = new TCanvas("c1", "Data", 1000, 600);
 //0 all qualities, 1 Q46_old - Q56_new, 2 Q03_old - Q04_new
 
 //FIRST FILE************************+
-TFile f("L1ITMuonBarrelTimingPlots_5marz.root");
-//TH1F *hh=(TH1F*)f.Get("L1ITMuTimingPlotter/Wheel0/Sector1/Station1/Timing_DTprim_BX_W0_Sec1_St1");
+TFile f("L1ITMuonBarrelTimingEffPlots_17aprilT0.root");
+
+//SECOND FILE************************+
+TFile fsp("L1ITMuonBarrelTimingEffPlots_17aprilT0.root");
+
 
 TH1F *MB1s_bx_All=new TH1F("mb1All","BX distribution for MB1 All Qualities",16,-8,8);
 TH1F *MB1s_bx_High=new TH1F("mb1High","BX distribution for MB1 High Qualities",16,-8,8);
@@ -530,11 +533,6 @@ ALL_bx_Q6->SetLineStyle(1);
 ALL_bx_Q6->Draw();
 c1->Update();
 c1->SetLogy();
-
-
-//SECOND FILE************************+
-TFile fsp("L1ITMuonBarrelTimingPlots_SP_5marz.root");
-//TH1F *hh=(TH1F*)f.Get("L1ITMuTimingPlotter/Wheel0/Sector1/Station1/Timing_DTprim_BX_W0_Sec1_St1");
 
 TH1F *MB1s_bx_All_SP=new TH1F("mb1All_SP","BX distribution for MB1 All Qualities",16,-8,8);
 TH1F *MB1s_bx_High_SP=new TH1F("mb1High_SP","BX distribution for MB1 High Qualities",16,-8,8);

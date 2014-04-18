@@ -21,14 +21,14 @@ TCanvas *c1 = new TCanvas("c1", "Data", 1000, 600);
 //c1->cd(1);
 
 //FIRST FILE************************+
-TFile f("L1ITMuonBarrelTimingEffPlots_17april.root");
+TFile f("L1ITMuonBarrelTimingEffPlots_17aprilT0.root");
 TEfficiency *eff=(TEfficiency*)f.Get("L1ITMuTimingPlotter/Wheel0/Sector1/Station1/TP_Efficiency_posPhi_W0_Sec1_St1");
 eff->SetLineColor(kBlue);
 eff->SetLineStyle(1);
 eff->Draw();
 
 //SECOND FILE************************+
-TFile fsp("L1ITMuonBarrelTimingEffPlots_SP_17april.root");
+TFile fsp("L1ITMuonBarrelTimingEffPlots_SP_17aprilT0.root");
 TEfficiency *eff_SP=(TEfficiency*)fsp.Get("L1ITMuTimingPlotter/Wheel0/Sector1/Station1/TP_Efficiency_posPhi_W0_Sec1_St1");
 
 eff_SP->SetLineColor(kRed);
