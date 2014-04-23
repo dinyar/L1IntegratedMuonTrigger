@@ -83,8 +83,8 @@ class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 		};
 
 		void bookHistos(const std::string &hName, const DTChamberId &chId, TFileDirectory &folder);
-		bool analyze_tag(t_vars &vars, std::vector<const DTRecSegment4D*>::const_iterator &bestTrackIt, t_deltas &deltas);
-		void searchDccBest(t_vars &vars, std::vector<L1MuDTChambPhDigi>* trigs);
+		bool analyze_tag(t_vars &vars, const DTRecSegment4D* bestTrack, t_deltas &deltas);
+		void searchDccBest(t_vars &vars, std::vector<L1MuDTChambPhDigi> &trigs);
 };
 
 using namespace std;
@@ -126,11 +126,8 @@ void L1ITMBPrimitiveResolutionComparePlots::beginRun(const edm::Run& run, const 
 	context.get<MuonGeometryRecord>().get(theGeomLabel,muonGeom);
 	trigGeomUtils = new DTTrigGeomUtils(muonGeom);
 
-	std::vector<DTChamber*>::const_iterator chambIt  = muonGeom->chambers().begin();
-	std::vector<DTChamber*>::const_iterator chambEnd = muonGeom->chambers().end();
-
-	for(; chambIt!=chambEnd; ++chambIt) {
-		DTChamberId chId = (*chambIt)->id();
+	for(const DTChamber * chamber : muonGeom->chambers()) {
+		DTChamberId chId = chamber->id();
 
 		ostringstream tdir_path;
 		tdir_path << "Wheel" << chId.wheel() << "/Sector" << chId.sector() << "/Station" << chId.station();
@@ -211,24 +208,23 @@ void L1ITMBPrimitiveResolutionComparePlots::analyze(const edm::Event& e, const e
 	edm::Handle<L1MuDTChambPhContainer> trigHandle;
 
 	e.getByLabel(oldVars.dccInputTag, trigHandle);
-	searchDccBest(oldVars, trigHandle->getContainer());
+	searchDccBest(oldVars, *trigHandle->getContainer());
 
 	e.getByLabel(newVars.dccInputTag, trigHandle);
-	searchDccBest(newVars, trigHandle->getContainer());
+	searchDccBest(newVars, *trigHandle->getContainer());
 
 	Handle<DTRecSegment4DCollection> segments4D;
 	e.getByLabel(segInputTag,segments4D);
 
 	// Preliminary loop finds best 4D Segment and high quality ones
 	vector<const DTRecSegment4D*> best4DSegments;
-	DTRecSegment4DCollection::id_iterator chamberId;
-	for(chamberId = segments4D->id_begin(); chamberId != segments4D->id_end(); ++chamberId) {
-		DTRecSegment4DCollection::range  rangeInCh = segments4D->get(*chamberId);
-		DTRecSegment4DCollection::const_iterator trackIt  = rangeInCh.first;
-		DTRecSegment4DCollection::const_iterator trackEnd = rangeInCh.second;
-
+	for(const DTChamberId &chamberId : segments4D->ids()) {
 		const DTRecSegment4D* tmpBest = 0;
 		int tmpdof = 0, dof = 0;
+
+		DTRecSegment4DCollection::range rangeInCh = segments4D->get(chamberId);
+		DTRecSegment4DCollection::const_iterator trackIt  = rangeInCh.first;
+		DTRecSegment4DCollection::const_iterator trackEnd = rangeInCh.second;
 
 		for(; trackIt!=trackEnd; ++trackIt) {
 			if(trackIt->hasPhi()) {
@@ -243,32 +239,30 @@ void L1ITMBPrimitiveResolutionComparePlots::analyze(const edm::Event& e, const e
 		if(tmpBest) best4DSegments.push_back(tmpBest);
 	}
 
-	vector<const DTRecSegment4D*>::const_iterator bestTrackIt  = best4DSegments.begin();
-	vector<const DTRecSegment4D*>::const_iterator bestTrackEnd = best4DSegments.end();
-	for(; bestTrackIt!=bestTrackEnd; ++bestTrackIt) {
+	for(const DTRecSegment4D* bestTrack : best4DSegments) {
 		t_deltas deltas_new, deltas_old;
-		if(analyze_tag(newVars, bestTrackIt, deltas_new) && analyze_tag(oldVars, bestTrackIt, deltas_old)) {
-			map<string, TH2F*> &scatterMap = scatterHistos[(*bestTrackIt)->chamberId().rawId()];
+		if(analyze_tag(newVars, bestTrack, deltas_new) && analyze_tag(oldVars, bestTrack, deltas_old)) {
+			map<string, TH2F*> &scatterMap = scatterHistos[bestTrack->chamberId().rawId()];
 			scatterMap.find("DCC_PhiResidual_scatter")->second->Fill(deltas_old.deltaPos, deltas_new.deltaPos);
 			scatterMap.find("DCC_PhibResidual_scatter")->second->Fill(deltas_old.deltaDir, deltas_new.deltaDir);
 
-			map<string, TH2F*> &scatterMapQ = scatterHistosQs[deltas_new.quality][(*bestTrackIt)->chamberId().rawId()];
+			map<string, TH2F*> &scatterMapQ = scatterHistosQs[deltas_new.quality][bestTrack->chamberId().rawId()];
 			scatterMapQ.find("DCC_PhiResidual_scatter")->second->Fill(deltas_old.deltaPos, deltas_new.deltaPos);
 			scatterMapQ.find("DCC_PhibResidual_scatter")->second->Fill(deltas_old.deltaDir, deltas_new.deltaDir);
 		}
 	}
 }
 
-bool L1ITMBPrimitiveResolutionComparePlots::analyze_tag(t_vars &vars, vector<const DTRecSegment4D*>::const_iterator &bestTrackIt, t_deltas &deltas) {
-	if((*bestTrackIt)->hasPhi()) {
-		DTChamberId chId = (*bestTrackIt)->chamberId();
-		int nHitsPhi = (*bestTrackIt)->phiSegment()->degreesOfFreedom()+2;
+bool L1ITMBPrimitiveResolutionComparePlots::analyze_tag(t_vars &vars, const DTRecSegment4D* bestTrack, t_deltas &deltas) {
+	if(bestTrack->hasPhi()) {
+		DTChamberId chId = bestTrack->chamberId();
+		int nHitsPhi = bestTrack->phiSegment()->degreesOfFreedom()+2;
 
 		int wheel    = chId.wheel();
 		int station  = chId.station();
 		int scsector = 0;
 		float trackPosPhi, trackPosEta, trackDirPhi, trackDirEta;
-		trigGeomUtils->computeSCCoordinates((*bestTrackIt),scsector,trackPosPhi,trackDirPhi,trackPosEta,trackDirEta);
+		trigGeomUtils->computeSCCoordinates(bestTrack,scsector,trackPosPhi,trackDirPhi,trackPosEta,trackDirEta);
 
 		int best_qualitycode = vars.trigQualBest[wheel+3][station][scsector];
 		const L1MuDTChambPhDigi* best_trig = vars.trigBest[wheel+3][station][scsector];
@@ -303,9 +297,7 @@ bool L1ITMBPrimitiveResolutionComparePlots::analyze_tag(t_vars &vars, vector<con
 /*
  * Finds the best (i.e. highest quality) DCC trigger segments.
  */
-void L1ITMBPrimitiveResolutionComparePlots::searchDccBest(t_vars &vars, std::vector<L1MuDTChambPhDigi>* trigs) {
-	string histoType, histoTag;
-
+void L1ITMBPrimitiveResolutionComparePlots::searchDccBest(t_vars &vars, std::vector<L1MuDTChambPhDigi> &trigs) {
 	// define best quality trigger segment
 	// start from 1 and zero is kept empty
 	for (int st=0;st<=4;++st) {
@@ -316,17 +308,15 @@ void L1ITMBPrimitiveResolutionComparePlots::searchDccBest(t_vars &vars, std::vec
 		}
 	}
 
-	vector<L1MuDTChambPhDigi>::const_iterator trigIt  = trigs->begin();
-	vector<L1MuDTChambPhDigi>::const_iterator trigEnd = trigs->end();
-	for(; trigIt!=trigEnd; ++trigIt) {
-		int whId  = trigIt->whNum() + 3;
-		int secId = trigIt->scNum() + 1; // DTTF -> DT sector range transform
-		int stId  = trigIt->stNum();
-		int qualitycode = trigIt->code();
+	for(L1MuDTChambPhDigi& trig : trigs) {
+		int whId  = trig.whNum() + 3;
+		int secId = trig.scNum() + 1; // DTTF -> DT sector range transform
+		int stId  = trig.stNum();
+		int qualitycode = trig.code();
 
 		if(qualitycode > vars.trigQualBest[whId][stId][secId] && qualitycode < 7) {
 			vars.trigQualBest[whId][stId][secId] = qualitycode;
-			vars.trigBest[whId][stId][secId] = &(*trigIt);
+			vars.trigBest[whId][stId][secId] = &trig;
 		}
 	}
 }
