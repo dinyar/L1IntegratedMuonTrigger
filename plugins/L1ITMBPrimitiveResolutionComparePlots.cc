@@ -14,7 +14,7 @@
  *  - the analyzer now takes two DCC input tags (inputTagDCC_old, inputTagDCC_new)
  *  - it does not generate the unnecessary "Segment" directory
  */
-#include "DQM/DTMonitorModule/interface/DTTrigGeomUtils.h"
+#include "L1Trigger/L1IntegratedMuonTrigger/interface/L1DTTrigGeomUtils.h"
 
 #include "Geometry/Records/interface/MuonGeometryRecord.h"
 #include "Geometry/DTGeometry/interface/DTGeometry.h"
@@ -63,7 +63,7 @@ class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 		edm::Service<TFileService> fs;
 
 		std::string theGeomLabel;
-		DTTrigGeomUtils* trigGeomUtils;
+		L1DTTrigGeomUtils* trigGeomUtils;
 		edm::ESHandle<DTGeometry> muonGeom;
 		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistos;
 		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistosQs[7];
@@ -124,7 +124,7 @@ void L1ITMBPrimitiveResolutionComparePlots::beginRun(const edm::Run& run, const 
 	newVars.identifier = "new";
 
 	context.get<MuonGeometryRecord>().get(theGeomLabel,muonGeom);
-	trigGeomUtils = new DTTrigGeomUtils(muonGeom);
+	trigGeomUtils = new L1DTTrigGeomUtils(muonGeom);
 
 	for(const DTChamber * chamber : muonGeom->chambers()) {
 		DTChamberId chId = chamber->id();
