@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from L1Trigger.DTTrackFinder.dttfDigis_cfi import dttfDigis
+from L1Trigger.DTTrackFinder.dttfDigis_cfi import dttfDigis as tmpDttfDigis
 
 DTBunchCrossingCleanerCfg = cms.PSet(
     bxWindowSize = cms.int32(1), #look one BX ahead and behind     
@@ -10,8 +10,8 @@ L1ITMuTriggerPrimitives = cms.EDProducer(
     'L1ITMuTriggerPrimitiveProducer',
     DT   = cms.PSet( collectorType = cms.string('DTCollector'),
                      src = cms.InputTag('simDtTriggerPrimitiveDigis'),
-                     BX_min = cms.int32(dttfDigis.BX_min.value()),
-                     BX_max = cms.int32(dttfDigis.BX_max.value()),
+                     BX_min = cms.int32(tmpDttfDigis.BX_min.value()),
+                     BX_max = cms.int32(tmpDttfDigis.BX_max.value()),
                      runBunchCrossingCleaner = cms.bool(False),
                      bxCleanerCfg = DTBunchCrossingCleanerCfg ),
     
