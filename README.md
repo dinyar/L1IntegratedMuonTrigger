@@ -13,5 +13,5 @@ mkdir -p $CMSSW_BASE/src/L1Trigger
 
 cd $CMSSW_BASE/src/L1Trigger/
 
-git clone https://github.com/lgray/L1IntegratedMuonTrigger.git
+git clone https://github.com/battibass/L1IntegratedMuonTrigger.git
 

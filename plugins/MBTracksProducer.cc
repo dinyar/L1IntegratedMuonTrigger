@@ -131,7 +131,7 @@ void MBTracksProducer::produce( edm::Event& ev,
             // float phi_global_new = 180. / acos(-1.) * scales->getPhiScale()->getValue(dttrk->phi_packed());
 
             /// JP: GMT-DTTF matching
-            for ( ; RRItr != RREnd; ++RRItr ) {
+            for ( RRItr = gmt_records.begin(); RRItr != RREnd; ++RRItr ) {
               
               // loop over GMT input collection
               std::vector<L1MuRegionalCand> dttfCands = RRItr->getDTBXCands();
