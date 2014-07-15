@@ -51,11 +51,11 @@ void efficiency::write2( TH2F * plot, std::ofstream & outfile, int inCh, int out
   // std::cout << binWidth << '\t' << binStart << '\t' << xBins << '\t' <<yBins << std::endl;
   double * xSum = new double[xBins];
 
-  for ( size_t x = 1; x < xBins; ++x ) {
+  for ( size_t x = 1; x <= xBins; ++x ) {
 
     xSum[x] = 0;
-    for ( size_t z = x; z < xBins; ++z ) {
-      for ( size_t y = 1; y < yBins; ++y ) {
+    for ( size_t z = x; z <= xBins; ++z ) {
+      for ( size_t y = 1; y <= yBins; ++y ) {
 	xSum[x] += plot->GetBinContent( x, y );
       }
     }
@@ -63,9 +63,9 @@ void efficiency::write2( TH2F * plot, std::ofstream & outfile, int inCh, int out
     double eff = 0;
     double effPrev = 0;
     size_t y = 1;
-    for ( ; y < yBins; ++y ) {
+    for ( ; y <= yBins; ++y ) {
       /// fill the y bin content, starting from threshold
-      for ( size_t z = x; z < xBins; ++z ) {
+      for ( size_t z = x; z <= xBins; ++z ) {
 	double binContent = plot->GetBinContent( x, y );
 	if ( ! binContent ) continue;
 	eff += binContent / xSum[x];
@@ -105,16 +105,16 @@ void efficiency::write( TH2F * plot, std::ofstream & outfile, int inCh, int outC
 //   double binStart = plot->GetXaxis()->GetXmin();
   // std::cout << binWidth << '\t' << binStart << '\t' << xBins << '\t' <<yBins << std::endl;
 
-  for ( size_t x = 1; x < xBins; ++x ) {
+  for ( size_t x = 1; x <= xBins; ++x ) {
     double xSum = 0;
-    for ( size_t y = 1; y < yBins; ++y ) {
+    for ( size_t y = 1; y <= yBins; ++y ) {
       xSum += plot->GetBinContent( x, y );
     }
 
     double eff = 0;
     double effPrev = 0;
     size_t y = 1;
-    for ( ; y < yBins; ++y ) {
+    for ( ; y <= yBins; ++y ) {
       double binContent = plot->GetBinContent( x, y );
       if ( ! binContent ) continue;
       eff += binContent / xSum;
