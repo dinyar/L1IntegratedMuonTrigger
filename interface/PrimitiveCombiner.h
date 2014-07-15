@@ -47,17 +47,17 @@ namespace L1ITMu {
     void combine();
 
     /// output result variables
-    int bx() const { return _bx;};
-    int radialAngle() const { return _radialAngle;};
-    int bendingAngle() const { return _bendingAngle;};
-    int bendingResol() const { return _bendingResol;};
+    inline int bx() const { return _bx;};
+    inline int radialAngle() const { return _radialAngle;};
+    inline int bendingAngle() const { return _bendingAngle;};
+    inline int bendingResol() const { return _bendingResol;};
 
     bool isValid() const {
       int ret = _dtHI ? 1 : 0;
       ret += _dtHO ? 1 : 0;
       ret += _rpcIn ? 1 : 0;
       ret += _rpcOut ? 1 : 0;
-      return ret > 1 ;
+      return ret > 0 ;
     };
 
     /// FIXME : Calculates new phiBending, check how to use 
@@ -70,9 +70,12 @@ namespace L1ITMu {
 
     /// FIXME : Calculates new phiBending resolution
     inline float phiBCombinedResol( const float & resol_xDt,
-				    const float & resol_xRpc )
+				    const float & resol_xRpc,
+				    const float & zDt,
+				    const float & zRpc
+				    )
       {
-	return sqrt( resol_xRpc*resol_xRpc + resol_xDt*resol_xDt );
+	return sqrt( resol_xRpc*resol_xRpc + resol_xDt*resol_xDt )/abs(zDt-zRpc);
       };
     /// FIXME END
 
@@ -91,10 +94,18 @@ namespace L1ITMu {
     results combineDt( const L1ITMu::TriggerPrimitive * dt,
 		       const L1ITMu::TriggerPrimitive * rpc );
 
+    results dummyCombineDt( const L1ITMu::TriggerPrimitive * dt);
+
     /// Calculates new phiBending, check how to use weights
     results combineDtRpc( const L1ITMu::TriggerPrimitive * dt,
 			  const L1ITMu::TriggerPrimitive * rpc );
 
+  /// Calculates new phiBending, check how to use weights
+   results combineRpcRpc( const L1ITMu::TriggerPrimitive * rpc1,
+                          const L1ITMu::TriggerPrimitive * rpc2 );
+ 
+ 
+     int radialAngleFromGlobalPhi( const L1ITMu::TriggerPrimitive * rpc );
   private :
     resolutions _resol;
     edm::ESHandle<DTGeometry> _muonGeom;

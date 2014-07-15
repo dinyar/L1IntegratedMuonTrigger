@@ -4,5 +4,6 @@
 using namespace L1ITMu;
 
 SubsystemCollector::SubsystemCollector(const edm::ParameterSet& ps):
-  _src(ps.getParameter<edm::InputTag>("src")) {
+  _src(ps.getParameter<edm::InputTag>("src")) ,
+  _src2(ps.getParameter<edm::InputTag>("src2")) {
 }

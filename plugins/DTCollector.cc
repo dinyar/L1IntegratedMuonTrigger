@@ -29,7 +29,7 @@ void DTCollector::extractPrimitives(const edm::Event& ev,
   edm::Handle<L1MuDTChambPhContainer> phiDigis;
   edm::Handle<L1MuDTChambThContainer> thetaDigis;
   ev.getByLabel(_src,phiDigis);
-  ev.getByLabel(_src,thetaDigis);  
+  ev.getByLabel(_src2,thetaDigis);  
   for( int wheel = -2; wheel <= 2 ; ++wheel ) {    
     for( int station = 1; station <= 4; ++station ) {
       for( int sector = 0; sector <= 11; ++sector ) {

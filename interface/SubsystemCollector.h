@@ -29,6 +29,7 @@ namespace L1ITMu {
 				   std::vector<TriggerPrimitive>&) const = 0;
   protected:
     edm::InputTag _src;
+    edm::InputTag _src2;
   };
 }
 

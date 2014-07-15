@@ -42,8 +42,8 @@
   <class name="L1ITMu::InternalTrackRef"/>
   <class name="L1ITMu::InternalTrackPtr"/>
   
-  <class name="L1ITMu::MBLTCollection" ClassVersion="10">
-   <version ClassVersion="10" checksum="752113217"/>
+  <class name="L1ITMu::MBLTCollection" ClassVersion="11">
+   <version ClassVersion="11" checksum="958576604"/>
   </class>
   <class name="edm::Wrapper<L1ITMu::MBLTCollection>"/>
   <class name="L1ITMu::MBLTContainerPair"/>

@@ -87,6 +87,33 @@ namespace L1ITMu {
     // look for common rpc hists among 2 dt primitives
     bxMatch haveCommonRpc( size_t dt1, size_t dt2 ) const;
 
+     /// rpc inner layer hits associated to a given dt station
+     TriggerPrimitiveList getRpcInUnassociatedStubs() const;
+ 
+     /// rpc outer layer hits associated to a given dt station
+     TriggerPrimitiveList getRpcOutUnassociatedStubs() const;
+ 
+     /// RPC unassociated clusters
+     std::vector< std::pair< TriggerPrimitiveList, TriggerPrimitiveList > >
+       getUnassociatedRpcClusters( double minRpcPhi ) const;
+  
+   private :
+     /// RPC unassociated utility functions
+     void
+       getUnassociatedRpcClusters( const std::vector< size_t > & rpcUnass,
+                                 const TriggerPrimitiveList & rpcList,
+                                 double minRpcPhi,
+                                 std::vector< std::vector <size_t> > & clusters ) const;
+     //
+     bool areCloseClusters( std::vector< size_t > & cluster1,
+                          std::vector< size_t > & cluster2,
+                          const TriggerPrimitiveList & rpcList1,
+                          const TriggerPrimitiveList & rpcList2,
+                          double minRpcPhi ) const;
+     //
+     size_t reduceRpcClusters( std::vector< std::vector <size_t> > & tmpClusters,
+                             const TriggerPrimitiveList & rpcList,
+                             double minRpcPhi ) const;
   private :
 
     /// dt segments
@@ -103,7 +130,9 @@ namespace L1ITMu {
 
     // association map among dt and rpc primitives
     std::vector< primitiveAssociation > _dtMapAss;
-
+    // association map among dt and rpc primitives
+    primitiveAssociation _rpcMapUnass;
+ 
   };
 }
 
