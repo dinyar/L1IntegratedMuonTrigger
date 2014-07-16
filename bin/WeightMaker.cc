@@ -226,7 +226,7 @@ void WeightMaker::run( )
 	    for ( size_t q = 0; q <=2; ++q ) {
 	      for( size_t t = 0; t<= 2; t++) {
 		
-		GetValues(Type[t],PhiBInRMS,PhiBOutRMS,DeltaPhiRMS,PhiBInSigma,PhiBOutSigma,DeltaPhiSigma,inCh[ch1],outCh[ch2],ref[p],ref[q],wheels[w], "0"); //GP for now use just sector 0 for every sectors, 
+		GetValues(Type[t],PhiBInRMS,PhiBOutRMS,DeltaPhiRMS,PhiBInSigma,PhiBOutSigma,DeltaPhiSigma,inCh[ch1],outCh[ch2],ref[p],ref[q],wheels[w], "0"); //GP so far use sector 0 for every sectors, 
 		
 		std::cout<<ref[p]<<" "<<ref[q]<<" "<<" "<<DeltaPhiRMS<<" "<<PhiBInRMS<<" "<<PhiBOutRMS<<std::endl;
 		

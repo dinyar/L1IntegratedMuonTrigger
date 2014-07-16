@@ -417,14 +417,12 @@ void ChPairPlotterComb::draw() const
     {
 
       TH1 * hHisto = hPlotsIt->second;
-
-      if ( hPlotsIt->first.find("ptResol") == std::string::npos ) continue;
  
       std::string histoName = hPlotsIt->first;
       
       std::string cName = "c" + histoName + "_2step_" + name();
       
-      system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+      system(std::string("mkdir -p plots/Resolution/Combinations" + dttfId().name()).c_str());
       
       TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
       
@@ -433,7 +431,7 @@ void ChPairPlotterComb::draw() const
       
       hHisto->Draw("");
 
-      // c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+      c->SaveAs(("plots/Resolution/Combinations" + dttfId().name() + "/" + cName+".pdf").c_str());
     }
 
 }

@@ -141,14 +141,14 @@ bool FindBestRes:: MakePlotsRes(std::string type,
   Float_t GainRMS;
   Float_t GainSigma;
 
-  int sc = 0;
   
   int inCh[2] = { 1, 2 };
   int outCh[2] = { 1, 2 };
 
   
   
-  for ( int sector = 0; sector < 1; ++sector ) {
+  for ( int sector = 0; sector < 12; ++sector ) {
+   
     for ( size_t w = 0; w < 6; ++w ) {
       for ( size_t ch1 = 0; ch1 < 1; ++ch1 ) {
 	for ( size_t ch2 = 1; ch2 < 2; ++ch2 ) {
@@ -169,14 +169,15 @@ bool FindBestRes:: MakePlotsRes(std::string type,
 	      axXSigma->SetBinLabel(3*i+j-3,(ref[i-1]+ref[j-1]).c_str());
 	    }
 	  }
-	  
-	  TString Namefile = Form("/Wh%sSc%i.txt",wheels[w].c_str(),sc);
+ 
+	  TString Namefile = Form("/Wh%sSc%i.txt",wheels[w].c_str(),sector);
+	  std::cout<<" name file "<<Namefile.Data()<<std::endl;
 	  Namefile=outdir_+Namefile;
 	  
 	  ofstream outputFile(Namefile.Data());
 	  
-   outputFile<<" Cat1 Cat2  RMSGain method  SigmaGain method"<<std::endl;  	           
-
+	  outputFile<<" Cat1 Cat2  RMSGain method  SigmaGain method"<<std::endl;  	           
+	  
  	  for ( size_t p = 0; p <=2; ++p ) {
 	    for ( size_t q = 0; q <=2; ++q ) {
 	      
@@ -231,8 +232,6 @@ bool FindBestRes:: MakePlotsRes(std::string type,
 	      hResultSigma->Draw(); 
 	     
 	      cRes->SaveAs(("plots/CombResults/ResultWh"+wheels[w]+".png").c_str());
-	      
-	      std:: cout<<std::endl<<std::endl<<std::endl<<"bin "<<3*p+q+1<<" "<<(ref[p]+ref[p]).c_str()<<" RMS "<<gainGoodRMS<<" "<<GoodTypeSigma<<std::endl;      
 	     
 	      outputFile<<(ref[p]).c_str()<<" "<<(ref[q]).c_str()<<" "<<gainGoodRMS<<"  "<<GoodTypeRMS<<" "<<gainGoodSigma<<" "<<GoodTypeSigma<<std::endl;      
 	      

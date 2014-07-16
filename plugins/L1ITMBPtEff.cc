@@ -241,7 +241,6 @@ void ChPairPlotterEff::fillEfficiency(float dttfPt, float phiBInPt, float phiBOu
     break; 
   }
 
-
   //GP choose combination with the higher gain in RMS or sigma of a gaussian fit
    BestType=BestTypeSigma;
   // BestType=BestTypeRMS;
@@ -377,14 +376,12 @@ void ChPairPlotterEff::draw() const
     {
 
       TH1 * hHisto = hPlotsIt->second;
-
-      if ( hPlotsIt->first.find("ptResol") == std::string::npos ) continue;
  
       std::string histoName = hPlotsIt->first;
       
       std::string cName = "c" + histoName + "_2step_" + name();
       
-      system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+      system(std::string("mkdir -p plots/Efficiency/" + dttfId().name()).c_str());
       
       TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
       
@@ -393,7 +390,7 @@ void ChPairPlotterEff::draw() const
       
       hHisto->Draw("");
 
-      // c->SaveAs(("plots/Efficiency/" + dttfId().name() + "/" + cName+".pdf").c_str());
+      c->SaveAs(("plots/Efficiency/" + dttfId().name() + "/" + cName+".pdf").c_str());
     }
 
 

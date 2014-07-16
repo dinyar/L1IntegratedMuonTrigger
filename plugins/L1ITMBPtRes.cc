@@ -365,7 +365,7 @@ void ChPairPlotterRes::draw() const
       
       std::string cName = "c" + histoName + name();
       
-      system(std::string("mkdir -p plots/" + dttfId().name()).c_str());
+      system(std::string("mkdir -p plots/Resolution/" + dttfId().name()).c_str());
       
       TCanvas * c = new TCanvas(cName.c_str(),cName.c_str(),500,500);
       
@@ -374,7 +374,7 @@ void ChPairPlotterRes::draw() const
       
       hHisto->Draw("");
 
-      // c->SaveAs(("plots/" + dttfId().name() + "/" + cName+".pdf").c_str());
+      c->SaveAs(("plots/Resolution/" + dttfId().name() + "/" + cName+".pdf").c_str());
   
     }
 

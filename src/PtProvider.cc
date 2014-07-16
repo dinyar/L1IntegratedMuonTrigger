@@ -67,7 +67,7 @@
     break;
   }
 
- float  PtLutFirst=9;
+ float  PtLutFirst=8;
 
 while (getline(datafileIn,line)){
 		  
@@ -78,21 +78,18 @@ while (getline(datafileIn,line)){
 		  readline>>A>>A>>D1>>D2>>PtLut>>Phi2>>A;
     
 		  if(D1 != QualInString && D2 != QualOutString ) continue;
-		  if(PtLut<9) continue;    
+		  if(PtLut<8) continue;    //GP skip first LUT values
     
 		  if(PhiValue>=Phi2&&PhiValue<Phi1){
 		    PhiFound=1;
-		    // std::cout<<" Found   pt = "<<ptLut<<std::endl<<std::endl;
 		    break;
 		  }
 		  PtLutFirst = PtLut;
 		  Phi1=Phi2; 
  }
 
-// if(PhiFound)return PtLut; //FIXME higher pt value of the chosen phi interval
- if(PhiFound)return PtLutFirst; //FIXME lower pt value of the chosen phi interval
- // else return -1.;
- else return 115.; 
+ if(PhiFound)return PtLutFirst; 
+ else return 120.; 
 }
 
 
@@ -157,7 +154,6 @@ void PtProvider::SetWeight(float & whBIn, float &whBOut, float & whDPhi, int mb1
     if(D1 != QualInString ) continue;   
     if(Type != WeightType) continue; 
     
-    // std::cout<<"D1 "<<D1.c_str()<<" D2 " <<D2.c_str()<<" QualIn "<<QualInString.c_str()<<" QualOut "<<QualOutString.c_str()<<std::endl;
     break; 
   }
  

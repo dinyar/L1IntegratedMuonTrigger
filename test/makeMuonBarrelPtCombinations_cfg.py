@@ -21,7 +21,6 @@ process.L1ITMuPtPlotter = cms.EDAnalyzer(
     GenParticlesCollection = cms.InputTag('genParticles')
     )
 
-
 infile = 'file:L1ITMBLT.root'
 #infile = '/store/caf/user/battilan/L1Trigger/BarrelTF/L1ITBarrelMuon/v1/L1ITMBLT.root'
 
