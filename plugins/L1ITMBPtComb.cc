@@ -185,14 +185,14 @@ void ChPairPlotterComb::fillResolution(float dttfPt, float phiBInPt, float phiBO
 
   Float_t MinPt2;
   
-  if(mb1Obj==1 &&  mb1Obj==1){
+  if(mb1Obj==1 &&  mb2Obj==1){
     if(phiBOutPt<DeltaphiPt && phiBOutPt<phiBInPt && DeltaphiPt<phiBInPt ) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
     else if (phiBInPt<DeltaphiPt && phiBInPt<phiBOutPt && DeltaphiPt<phiBInPt) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
     else  MinPt2 = (phiBOutPt+phiBInPt)/2.;
   }
   
-  else if(mb1Obj==1 &&  mb1Obj!=1) MinPt2 = (phiBInPt+DeltaphiPt)/2.;
-  else if(mb1Obj!=1 &&  mb1Obj==1) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+  else if(mb1Obj==1 &&  mb2Obj!=1) MinPt2 = (phiBInPt+DeltaphiPt)/2.;
+  else if(mb1Obj!=1 &&  mb2Obj==1) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
   else MinPt2 = DeltaphiPt;
   
   Float_t PtM = (phiBOutPt+phiBInPt+DeltaphiPt)/3.;
