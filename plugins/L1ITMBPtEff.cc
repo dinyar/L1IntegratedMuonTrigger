@@ -191,6 +191,19 @@ void ChPairPlotterEff::fillEfficiency(float dttfPt, float phiBInPt, float phiBOu
     if(phiBOutPt<MinPt) MinPt=phiBOutPt;
   }
 
+
+ Float_t MinPt2;
+  
+  if(mb1Obj==1 &&  mb2Obj==1){
+    if(phiBOutPt<DeltaphiPt && phiBOutPt<phiBInPt && DeltaphiPt<phiBInPt ) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+    else if (phiBInPt<DeltaphiPt && phiBInPt<phiBOutPt && DeltaphiPt<phiBInPt) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+    else  MinPt2 = (phiBOutPt+phiBInPt)/2.;
+  }
+  
+  else if(mb1Obj==1 &&  mb2Obj!=1) MinPt2 = (phiBInPt+DeltaphiPt)/2.;
+  else if(mb1Obj!=1 &&  mb2Obj==1) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+  else MinPt2 = DeltaphiPt;
+
   std::string QualInString, QualOutString;
   
   switch(mb1Obj){
@@ -259,6 +272,8 @@ void ChPairPlotterEff::fillEfficiency(float dttfPt, float phiBInPt, float phiBOu
   
       _ePlots["MinPtEff"+ dttfPtTag]->Fill(MinPt>=dttfPtCut,pt);
 
+      _ePlots["MinPt2Eff"+ dttfPtTag]->Fill(MinPt2>=dttfPtCut,pt);
+
       _ePlots["DeltaPhiPtEff"+ dttfPtTag]->Fill(DeltaphiPt>=dttfPtCut,pt);
 
       _ePlots["GMTPtEff"+ dttfPtTag]->Fill(dttfPt>=dttfPtCut,pt);
@@ -321,28 +336,31 @@ void ChPairPlotterEff::book(TFileService * fs)
       
       _ePlots["GMTPtEff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hGMTPtEff"+hName+ dttfPtTag).c_str(), 
 								   ("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
-								   50, 0., 100.);
-      
+								  60,-1.,119.);
       
       _ePlots["BestPtEff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hBestPtEff"+hName+ dttfPtTag).c_str(), 
 								    ("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
-								    50, 0., 100.);
+								   60,-1.,119.);
       
       _ePlots["MinPtEff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hMinPtEff"+hName+ dttfPtTag).c_str(), 
 								   ("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
-								   50, 0., 100.);
+								  60,-1.,119.);
+      
+      _ePlots["MinPt2Eff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hMinPt2Eff"+hName+ dttfPtTag).c_str(), 
+								   ("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
+								   60,-1.,119.);
       
       _ePlots["DeltaPhiPtEff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hDeltaPhiPtEff"+hName+ dttfPtTag).c_str(), 
 									("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
-									50, 0., 100.);
+									60,-1.,119.);
 
       _ePlots["PhiBendInPtEff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hPhiBInPtEff"+hName+ dttfPtTag).c_str(), 
 									("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
-									50, 0., 100.);
+									60,-1.,119.);
       
       _ePlots["PhiBendOutPtEff"+ dttfPtTag] = folderEff.make<TEfficiency>(("hPhiBOutPtEff"+hName+ dttfPtTag).c_str(), 
 									("events Pt reco > pt Gen for"+hName+ dttfPtTag+";pt gen ").c_str(),  
-									50, 0., 100.);
+									60,-1.,119.);
 
  } 
 

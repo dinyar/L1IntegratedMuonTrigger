@@ -141,6 +141,20 @@ void ChPairPlotterRate::fillRate(float dttfPt, float phiBInPt, float phiBOutPt, 
     if(phiBOutPt<MinPt) MinPt=phiBOutPt;
   }
 
+
+  Float_t MinPt2;
+  
+  if(mb1Obj==1 &&  mb2Obj==1){
+    if(phiBOutPt<DeltaphiPt && phiBOutPt<phiBInPt && DeltaphiPt<phiBInPt ) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+    else if (phiBInPt<DeltaphiPt && phiBInPt<phiBOutPt && DeltaphiPt<phiBInPt) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+    else  MinPt2 = (phiBOutPt+phiBInPt)/2.;
+  }
+  
+  else if(mb1Obj==1 &&  mb2Obj!=1) MinPt2 = (phiBInPt+DeltaphiPt)/2.;
+  else if(mb1Obj!=1 &&  mb2Obj==1) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+  else MinPt2 = DeltaphiPt;
+
+
   std::string QualInString, QualOutString;
   
   switch(mb1Obj){
@@ -196,7 +210,7 @@ void ChPairPlotterRate::fillRate(float dttfPt, float phiBInPt, float phiBOutPt, 
   // BestType=BestTypeSigma;    //GP choose combination with the higher gain in RMS or sigma of a gaussian fit
   BestType=BestTypeSigma;
 
-  for(int i = -0.5; i<=119.5; i+=2){
+  for(int i = 0.; i<=120; i+=2){
   
     if(DeltaphiPt>=i)  _hPlots["DeltaPhiPtRate"]->Fill(i);
     
@@ -208,7 +222,12 @@ void ChPairPlotterRate::fillRate(float dttfPt, float phiBInPt, float phiBOutPt, 
   
     if(MinPt>=i) _hPlots["MinPtRate"]->Fill(i);
 
-    if(BestType=="DeltaPhiPtResol" ){ 
+    if(MinPt2>=i) _hPlots["MinPt2Rate"]->Fill(i);
+
+
+
+   
+    if(BestType=="DeltaPhiPtResol" ){  //GP Best weighted average algorithm
       if( DeltaphiPt>=i){
 	_hPlots["BestPtRate"]->Fill(i);}     
     }
@@ -260,33 +279,35 @@ void ChPairPlotterRate::book(TFileService * fs)
 
  _hPlots["DTTFPtDistr"] = folderRate.make<TH1F>("hDTTFPtDistr", 
 						"events Pt reco > pt Gen for;pt gen ",  
-						 60, 0., 120.);
+						 60,-1.,119.);
  
  _hPlots["GMTPtRate"] = folderRate.make<TH1F>("hGMTPtRate", 
 					      "events Pt reco > pt Gen for;pt gen ",  
-					       60, 0., 120.);
+					       60,-1.,119.);
  
  _hPlots["DeltaPhiPtRate"] = folderRate.make<TH1F>("hDeltaPhiPtRate", 
 						   "events Pt reco > pt Gen for;pt gen ",  
-						    60, 0., 120.);
+						    60,-1.,119.);
 
  _hPlots["BestPtRate"] = folderRate.make<TH1F>("hBestPtRate", 
 					       "events Pt reco > pt Gen for;pt gen ",  
-					        60, 0., 120.);
+					        60,-1.,119.);
  
  _hPlots["MinPtRate"] = folderRate.make<TH1F>("hMinPtRate", 
 					      "events Pt reco > pt Gen for;pt gen ",  
-					       60, 0., 120.);
+					       60,-1.,119.);
  
-
+ _hPlots["MinPt2Rate"] = folderRate.make<TH1F>("hMinPt2Rate", 
+					      "events Pt reco > pt Gen for;pt gen ",  
+					       60,-1.,119.);
  
  _hPlots["PhiBendInPtRate"] = folderRate.make<TH1F>("hPhiBInPtRate", 
 						    "events Pt reco > pt Gen for;pt gen ",  
-						     60, 0., 120.);
+						     60,-1.,119.);
  
  _hPlots["PhiBendOutPtRate"] = folderRate.make<TH1F>("hPhiBOutPtRate", 
 						     "events Pt reco > pt Gen for;pt gen ",  
-						      60, 0., 120.);
+						      60,-1.,119.);
 }
 
 
@@ -411,27 +432,7 @@ L1ITMBPtRate::~L1ITMBPtRate()
 
 void L1ITMBPtRate::endJob()
 {
-
-
-  
-  std::map<int,std::map<int,ChPairPlotterRate*> >::iterator dttfIt = histos.begin();
-  std::map<int,std::map<int,ChPairPlotterRate*> >::iterator dttfEnd = histos.end();
-  
-  for(; dttfIt!=dttfEnd; ++dttfIt) {
-    
-    std::map<int,ChPairPlotterRate*>::iterator chambPairIt = dttfIt->second.begin();
-    std::map<int,ChPairPlotterRate*>::iterator chambPairEnd = dttfIt->second.end();
-    
-    for(; chambPairIt!=chambPairEnd; ++chambPairIt) {
-      
-      ChPairPlotterRate *plotter = chambPairIt->second;
-
-      plotter->draw();
-      delete plotter;
-      
-    }
-  }
-  
+  histo->draw();
 }
 
 void L1ITMBPtRate::analyze( const edm::Event& iEvent, const edm::EventSetup& iSetup )
