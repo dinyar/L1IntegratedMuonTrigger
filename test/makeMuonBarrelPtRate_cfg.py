@@ -12,7 +12,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 process.TFileService = cms.Service(
     "TFileService",
 
-   fileName=cms.string('L1ITMuonBarrelPtRate.root') 
+   fileName=cms.string('L1ITMuonBarrelPtRate_New.root') 
     )
 
 process.L1ITMuPtPlotter = cms.EDAnalyzer(
@@ -161,13 +161,11 @@ infile137 = '/store/user/battilan/L1Trigger/NewBarrelTrigger/v1/ZeroBias/L1ITMBL
 infile138 = '/store/user/battilan/L1Trigger/NewBarrelTrigger/v1/ZeroBias/L1ITMBLT_97_1_1vU.root'
 infile139 = '/store/user/battilan/L1Trigger/NewBarrelTrigger/v1/ZeroBias/L1ITMBLT_98_1_1th.root'
 
-infile200 = 'file:L1ITMBLT_9_1_n7n.root'
 process.source = cms.Source(
     'PoolSource',
     
-# fileNames = cms.untracked.vstring(infile1,infile2,infile3,infile4,infile5,infile6,infile7,infile8,infile9,infile10,infile11,infile12,infile13,infile14,infile15,infile16,infile17,infile18,infile19,infile20,infile21,infile22,infile23,infile24,infile25,infile26,infile27,infile28,infile29,infile30,infile31,infile32,infile33,infile34,infile35,infile36,infile37,infile38,infile39,infile40, infile41,infile42,infile43,infile44,infile45,infile46,infile47,infile48,infile49,infile50,infile51,infile52,infile53,infile54,infile55,infile56,infile57,infile58,infile59,infile60,infile61,infile62,infile63,infile64,infile65,infile66,infile67,infile68,infile69,infile70,infile71,infile72,infile73,infile74,infile75,infile76,infile77,infile78,infile79,infile80,infile81,infile82,infile83,infile84,infile85,infile86,infile87,infile88,infile89,infile90,infile91,infile92,infile93,infile94,infile95,infile96,infile97,infile98,infile99,infile100,infile101,infile102,infile103,infile104,infile105,infile106,infile107,infile108,infile109,infile10,infile111,infile112,infile113,infile114,infile115,infile116,infile117,infile118,infile119,infile120,infile121,infile122,infile123,infile124,infile125,infile126,infile127,infile128,infile129,infile130,infile131,infile132,infile133,infile134,infile135,infile136,infile137,infile138,infile139)
+fileNames = cms.untracked.vstring(infile1,infile2,infile3,infile4)#,infile5,infile6,infile7,infile8,infile9,infile10,infile11,infile12,infile13,infile14,infile15,infile16,infile17,infile18,infile19,infile20,infile21,infile22,infile23,infile24,infile25,infile26,infile27,infile28,infile29,infile30,infile31,infile32,infile33,infile34,infile35,infile36,infile37,infile38,infile39,infile40, infile41,infile42,infile43,infile44,infile45,infile46,infile47,infile48,infile49,infile50,infile51,infile52,infile53,infile54,infile55,infile56,infile57,infile58,infile59,infile60,infile61,infile62,infile63,infile64,infile65,infile66,infile67,infile68,infile69,infile70,infile71,infile72,infile73,infile74,infile75,infile76,infile77,infile78,infile79,infile80,infile81,infile82,infile83,infile84,infile85,infile86,infile87,infile88,infile89,infile90,infile91,infile92,infile93,infile94,infile95,infile96,infile97,infile98,infile99,infile100,infile101,infile102,infile103,infile104,infile105,infile106,infile107,infile108,infile109,infile110,infile111,infile112,infile113,infile114,infile115,infile116,infile117,infile118,infile119,infile120,infile121,infile122,infile123,infile124,infile125,infile126,infile127,infile128,infile129,infile130,infile131,infile132,infile133,infile134,infile135,infile136,infile137,infile138,infile139)
    
-fileNames = cms.untracked.vstring(infile1,infile2) 
 
 )    
 process.L1ITMUSequence = cms.Sequence(process.L1ITMuPtPlotter)
