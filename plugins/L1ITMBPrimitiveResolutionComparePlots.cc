@@ -96,7 +96,6 @@ L1ITMBPrimitiveResolutionComparePlots::L1ITMBPrimitiveResolutionComparePlots(con
 	oldVars.dccInputTag = ps.getUntrackedParameter<InputTag>("inputTagDCC_old");
 	newVars.dccInputTag = ps.getUntrackedParameter<InputTag>("inputTagDCC_new");
 	segInputTag = ps.getUntrackedParameter<InputTag>("inputTagSEG");
-
 	overUnderIn = ps.getUntrackedParameter<bool>("rebinOutFlowsInGraph");
 	theGeomLabel = ps.getUntrackedParameter<string>("geomLabel");
 
