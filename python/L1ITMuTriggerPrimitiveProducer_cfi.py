@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from L1Trigger.DTTrackFinder.dttfDigis_cfi import dttfDigis
+from L1Trigger.DTTrackFinder.dttfDigis_cfi import dttfDigis as tmpDttfDigis
 
 DTBunchCrossingCleanerCfg = cms.PSet(
     bxWindowSize = cms.int32(1), #look one BX ahead and behind     

@@ -218,33 +218,33 @@ void ChambPairPlotter::book(TFileService * fs)
       _pPlots["dPhivsPt" + reg] = folder.make<TProfile>(("pdPhivsPt" + reg + hName).c_str(), 
 							("obj #Delta#phi vs pt for " + hName +
 							 ";GEN  mu p_{T};#Delta#phi").c_str(), 
-							60, -0.5, 119.5, 0, .05);
+							60, 0.,120, 0, .05);
 
       _hPlots["dPhivsPt" + reg] = folder.make<TH2F>(("hdPhivsPt" + reg + hName).c_str(), 
 						    ("obj #Delta#phi vs pt for "+ hName +
 						     ";GEN  mu p_{T};#Delta#phi").c_str(),
-						    60, -0.5, 119.5, 100, -0, .05);
+						    60, 0.,120, 100, -0, .05);
 
       _pPlots["phiBendInvsPt" + reg] = folder.make<TProfile>(("pdPhiBendInvsPt" + reg + hName).c_str(), 
 							     ("obj #Delta#phi_{b}In vs pt for " + hName +
 							      ";GEN  mu p_{T};#Delta#phi_{b}In").c_str(), 
-							     60, -0.5, 119.5, 0, 100);
+							     60, 0.,120, 0, 100);
       
       _hPlots["phiBendInvsPt" + reg] = folder.make<TH2F>(("hdPhiBendInvsPt" + reg + hName).c_str(), 
 							 ("obj #Delta#phi_{b}In vs pt for " + hName +
 							  ";GEN  mu p_{T};#Delta#phi_{b}In").c_str(),
-							 60, -0.5, 119.5, 100, 0, 100);
+							 60, 0.,120, 100, 0, 100);
 
 
       _pPlots["phiBendOutvsPt" + reg] = folder.make<TProfile>(("pdPhiBendOutvsPt" + reg + hName).c_str(), 
 							      ("obj #Delta#phi_{b}Out vs pt for " + hName +
 							       ";GEN  mu p_{T};#Delta#phi_{b}Out").c_str(), 
-							      60, -0.5, 119.5, 0, 100);
+							      60, 0.,120, 0, 100);
       
       _hPlots["phiBendOutvsPt" + reg] = folder.make<TH2F>(("hdPhiBendOutvsPt" + reg + hName).c_str(), 
 							  ("obj #Delta#phi_{b}Out vs pt for " + hName +
 							   ";GEN  mu p_{T};#Delta#phi_{b}Out").c_str(),
-							  60, -0.5, 119.5, 100, 0, 100);
+							  60, 0.,120, 100, 0, 100);
 
     }
 
@@ -263,7 +263,7 @@ void ChambPairPlotter::book(TFileService * fs)
       _ePlots["effvsPt" + dttfPtTag] = folderEff.make<TEfficiency>(("eEffvsPt" + hName + dttfPtTag).c_str(), 
 								   ("obj efficiency vs pt for " + hName + dttfPtTag + 
 								    ";GEN  mu p_{T};p_{T} assign. eff.").c_str(), 
-								   60, -0.5, 119.5);
+								   60, 0.,120);
 
       _hPlots["ptResol" + dttfPtTag] = folderEff.make<TH1F>(("hPtResol" + hName + dttfPtTag).c_str(), 
 							    ("obj (dttf_[pt] - pt) / pt for " + hName + dttfPtTag + 

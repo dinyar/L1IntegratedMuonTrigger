@@ -51,11 +51,11 @@ void efficiency::write2( TH2F * plot, std::ofstream & outfile, int inCh, int out
   // std::cout << binWidth << '\t' << binStart << '\t' << xBins << '\t' <<yBins << std::endl;
   double * xSum = new double[xBins];
 
-  for ( size_t x = 1; x < xBins; ++x ) {
+  for ( size_t x = 1; x <= xBins; ++x ) {
 
     xSum[x] = 0;
-    for ( size_t z = x; z < xBins; ++z ) {
-      for ( size_t y = 1; y < yBins; ++y ) {
+    for ( size_t z = x; z <= xBins; ++z ) {
+      for ( size_t y = 1; y <= yBins; ++y ) {
 	xSum[x] += plot->GetBinContent( x, y );
       }
     }
@@ -63,9 +63,9 @@ void efficiency::write2( TH2F * plot, std::ofstream & outfile, int inCh, int out
     double eff = 0;
     double effPrev = 0;
     size_t y = 1;
-    for ( ; y < yBins; ++y ) {
+    for ( ; y <= yBins; ++y ) {
       /// fill the y bin content, starting from threshold
-      for ( size_t z = x; z < xBins; ++z ) {
+      for ( size_t z = x; z <= xBins; ++z ) {
 	double binContent = plot->GetBinContent( x, y );
 	if ( ! binContent ) continue;
 	eff += binContent / xSum[x];
@@ -77,7 +77,7 @@ void efficiency::write2( TH2F * plot, std::ofstream & outfile, int inCh, int out
 	  --y;
 	}
 	break;
-      }
+      } 
       effPrev = eff;
     }
     // std::cout << binWidth << '\t' << binStart << '\t' << xBins << '\t' << binStart + binWidth*x  << '\t' << xSum << std::endl;
@@ -96,7 +96,7 @@ void efficiency::write( TH2F * plot, std::ofstream & outfile, int inCh, int outC
 			const TString & ref1, const TString & ref2 )
 {
 
-  TAxis * xAxis = plot->GetXaxis();
+  // TAxis * xAxis = plot->GetXaxis();
   TAxis * yAxis = plot->GetYaxis();
 
   size_t xBins = plot->GetNbinsX();
@@ -105,16 +105,16 @@ void efficiency::write( TH2F * plot, std::ofstream & outfile, int inCh, int outC
 //   double binStart = plot->GetXaxis()->GetXmin();
   // std::cout << binWidth << '\t' << binStart << '\t' << xBins << '\t' <<yBins << std::endl;
 
-  for ( size_t x = 1; x < xBins; ++x ) {
+  for ( size_t x = 1; x <= xBins; ++x ) {
     double xSum = 0;
-    for ( size_t y = 1; y < yBins; ++y ) {
+    for ( size_t y = 1; y <= yBins; ++y ) {
       xSum += plot->GetBinContent( x, y );
     }
 
     double eff = 0;
     double effPrev = 0;
     size_t y = 1;
-    for ( ; y < yBins; ++y ) {
+    for ( ; y <= yBins; ++y ) {
       double binContent = plot->GetBinContent( x, y );
       if ( ! binContent ) continue;
       eff += binContent / xSum;
@@ -132,8 +132,8 @@ void efficiency::write( TH2F * plot, std::ofstream & outfile, int inCh, int outC
     testfile_ << plot->GetName() << '\t' << plot->GetBinCenter( x ) << '\t' << eff << std::endl; 
 
     outfile << inCh << '\t' << outCh << '\t' << ref1 << '\t' << ref2 << '\t'
-	    << xAxis->GetBinCenter( x ) << '\t' << yAxis->GetBinCenter( y ) << '\t' << eff << std::endl;
-
+      // << xAxis->GetBinCenter( x ) << '\t' << yAxis->GetBinCenter( y ) << '\t' << eff << std::endl; // use bin center instead of bin lowedge
+	    <<plot->GetBinLowEdge(x) << '\t' << yAxis->GetBinCenter( y ) << '\t' << eff << std::endl; 
   }
 
 
@@ -163,9 +163,11 @@ void efficiency::run( bool byTh )
 	    for ( size_t ch1 = 0; ch1 < 2; ++ch1 ) {
 	      for ( size_t ch2 = 0; ch2 < 2; ++ch2 ) {
 
-		TString name = Form( "L1ITMuPtPlotter/Wh%dSc%d/hd%svsPtWh%dSc%dinCh%doutCh%d%s%s",
-				     wheels[w], sector, params[p].Data(), wheels[w], sector, inCh[ch1], outCh[ch2], ref[rf1].Data(), ref[rf2].Data() );
+	
 
+		TString name = Form( "L1ITMuPtPlotter/Wh%dSc0/hd%svsPtWh%dSc0inCh%doutCh%d%s%s",
+				     wheels[w], params[p].Data(), wheels[w], inCh[ch1], outCh[ch2], ref[rf1].Data(), ref[rf2].Data() );  //so far use sector 0 for every sectors
+		
 		//if(rf1==1) std::cout<<" name "<<name.Data()<<std::endl;
 		TH2F * plot = (TH2F *)(file_->Get( name ));
 

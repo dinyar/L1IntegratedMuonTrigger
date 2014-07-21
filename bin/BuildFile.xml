@@ -14,3 +14,15 @@
   <use   name="boost_program_options"/>
   <use   name="boost"/>
 </bin>
+
+<bin   file="WeightMaker.cc" name="WeightMaker">
+<Flags CXXFLAGS="-g -lHistPainter"/>
+  <use   name="boost_program_options"/>
+  <use   name="boost"/>
+</bin>
+
+<bin   file="FindBestRes.cc" name="FindBestRes">
+<Flags CXXFLAGS="-g -lHistPainter"/>
+  <use   name="boost_program_options"/>
+  <use   name="boost"/>
+</bin>
