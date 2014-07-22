@@ -146,7 +146,7 @@ void ChPairPlotterRate::fillRate(float dttfPt, float phiBInPt, float phiBOutPt, 
   
   if(mb1Obj==1 &&  mb2Obj==1){
     if(phiBOutPt<DeltaphiPt && phiBOutPt<phiBInPt && DeltaphiPt<phiBInPt ) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
-    else if (phiBInPt<DeltaphiPt && phiBInPt<phiBOutPt && DeltaphiPt<phiBInPt) MinPt2 = (phiBOutPt+DeltaphiPt)/2.;
+    else if (phiBInPt<DeltaphiPt && phiBInPt<phiBOutPt && DeltaphiPt<phiBOutPt) MinPt2 = (phiBInPt+DeltaphiPt)/2.;
     else  MinPt2 = (phiBOutPt+phiBInPt)/2.;
   }
   
@@ -206,28 +206,31 @@ void ChPairPlotterRate::fillRate(float dttfPt, float phiBInPt, float phiBOutPt, 
 
  
 
-
-  // BestType=BestTypeSigma;    //GP choose combination with the higher gain in RMS or sigma of a gaussian fit
-  BestType=BestTypeSigma;
-
   for(int i = 0.; i<=120; i+=2){
   
     if(DeltaphiPt>=i)  _hPlots["DeltaPhiPtRate"]->Fill(i);
     
+    
     if(dttfPt>=i) _hPlots["GMTPtRate"]->Fill(i);
     
-    if(phiBInPt>=i) _hPlots["PhiBendInPtRate"]->Fill(i);
-    
-    if(phiBOutPt>=i) _hPlots["PhiBendOutPtRate"]->Fill(i);
-  
+    if(mb1Obj==1) if(phiBInPt>=i) _hPlots["PhiBendPtRate"]->Fill(i);
+    else if (mb1Obj!=1 && mb2Obj==1)if(phiBOutPt>=i) _hPlots["PhiBendPtRate"]->Fill(i);
+    else{ 
+      if(DeltaphiPt>=i)  _hPlots["PhiBendPtRate"]->Fill(i);
+    }
+
     if(MinPt>=i) _hPlots["MinPtRate"]->Fill(i);
 
     if(MinPt2>=i) _hPlots["MinPt2Rate"]->Fill(i);
 
 
 
-   
-    if(BestType=="DeltaPhiPtResol" ){  //GP Best weighted average algorithm
+ //GP Best weighted average algorithm
+
+  // BestType=BestTypeSigma;    //GP choose combination with the higher gain in RMS or sigma of a gaussian fit
+  BestType=BestTypeSigma;   
+
+    if(BestType=="DeltaPhiPtResol" ){ 
       if( DeltaphiPt>=i){
 	_hPlots["BestPtRate"]->Fill(i);}     
     }
@@ -301,14 +304,14 @@ void ChPairPlotterRate::book(TFileService * fs)
 					      "events Pt reco > pt Gen for;pt gen ",  
 					       60,-1.,119.);
  
- _hPlots["PhiBendInPtRate"] = folderRate.make<TH1F>("hPhiBInPtRate", 
+ _hPlots["PhiBendPtRate"] = folderRate.make<TH1F>("hPhiBPtRate", 
 						    "events Pt reco > pt Gen for;pt gen ",  
 						     60,-1.,119.);
  
- _hPlots["PhiBendOutPtRate"] = folderRate.make<TH1F>("hPhiBOutPtRate", 
-						     "events Pt reco > pt Gen for;pt gen ",  
-						      60,-1.,119.);
-}
+//  _hPlots["PhiBendOutPtRate"] = folderRate.make<TH1F>("hPhiBOutPtRate", 
+// 						     "events Pt reco > pt Gen for;pt gen ",  
+// 						      60,-1.,119.);
+// }
 
 
 void ChPairPlotterRate::draw() const
@@ -474,6 +477,7 @@ void L1ITMBPtRate::analyze( const edm::Event& iEvent, const edm::EventSetup& iSe
 
   
     // if (/*wheel!=-1 || */ sector!=0) continue; // CB hack for test just using a given sector
+    if (abs(wheel)==3) continue; // CB hack for test just using a given sector
     
     const L1ITMu::MBLTVectorRef & muonBarrelPrimitives = mbTrack.getStubs();
 
