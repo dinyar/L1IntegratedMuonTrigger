@@ -203,27 +203,28 @@ void ChPairPlotterRate::fillRate(float dttfPt, float phiBInPt, float phiBOutPt, 
     if(DT1 == QualInString && DT2 == QualOutString ) break; 
   }
 
-
- 
-
   for(int i = 0.; i<=120; i+=2){
-  
+    
     if(DeltaphiPt>=i)  _hPlots["DeltaPhiPtRate"]->Fill(i);
     
     
     if(dttfPt>=i) _hPlots["GMTPtRate"]->Fill(i);
     
-    if(mb1Obj==1) if(phiBInPt>=i) _hPlots["PhiBendPtRate"]->Fill(i);
-    else if (mb1Obj!=1 && mb2Obj==1)if(phiBOutPt>=i) _hPlots["PhiBendPtRate"]->Fill(i);
+    if(mb1Obj==1) {
+      if(phiBInPt>=i) _hPlots["PhiBendPtRate"]->Fill(i);
+    }
+    else if (mb1Obj!=1 && mb2Obj==1){
+      if(phiBOutPt>=i) _hPlots["PhiBendPtRate"]->Fill(i);
+    }
     else{ 
       if(DeltaphiPt>=i)  _hPlots["PhiBendPtRate"]->Fill(i);
     }
-
+    
     if(MinPt>=i) _hPlots["MinPtRate"]->Fill(i);
-
+    
     if(MinPt2>=i) _hPlots["MinPt2Rate"]->Fill(i);
-
-
+    
+    
 
  //GP Best weighted average algorithm
 
@@ -307,11 +308,7 @@ void ChPairPlotterRate::book(TFileService * fs)
  _hPlots["PhiBendPtRate"] = folderRate.make<TH1F>("hPhiBPtRate", 
 						    "events Pt reco > pt Gen for;pt gen ",  
 						     60,-1.,119.);
- 
-//  _hPlots["PhiBendOutPtRate"] = folderRate.make<TH1F>("hPhiBOutPtRate", 
-// 						     "events Pt reco > pt Gen for;pt gen ",  
-// 						      60,-1.,119.);
-// }
+ }
 
 
 void ChPairPlotterRate::draw() const
