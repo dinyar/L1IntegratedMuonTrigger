@@ -245,7 +245,7 @@ L1ITMu::PrimitiveCombiner::radialAngleFromGlobalPhi( const L1ITMu::TriggerPrimit
   int radialAngle2 = 0;
   int sector = rpc->detId<RPCDetId>().sector();
   float phiGlobal = rpc->getCMSGlobalPhi();
-  int wheel = rpc->detId<RPCDetId>().ring();
+  // int wheel = rpc->detId<RPCDetId>().ring();
   // from phiGlobal to radialAngle of the primitive in sector sec in [1..12]
   if ( sector == 1) radialAngle = int( phiGlobal*4096 );
   else {

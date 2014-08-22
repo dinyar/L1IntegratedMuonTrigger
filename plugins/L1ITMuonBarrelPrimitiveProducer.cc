@@ -109,17 +109,17 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       int dtquality = dt->getDTData().qualityCode;
       /// define new set of qualities
       /// skip for the moment uncorrelated
-      int qualityCode = -2;
+      // int qualityCode = -2;
       switch ( dtquality ) {
       case -1 : continue;/// -1 are theta
-      case 0 : qualityCode = -2; break;
-      case 1 : qualityCode = -2; break;
+      case 0 : /* qualityCode = -2;*/ break;
+      case 1 : /* qualityCode = -2;*/ break;
       case 2 : uncorrelated.push_back( iDt ); continue;
       case 3 : uncorrelated.push_back( iDt ); continue;
       case 4 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
       case 5 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
       case 6 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
-      default : qualityCode = dtquality; break;
+      default : /* qualityCode = dtquality; */ break;
       }
 
       //L1MuDTChambPhDigi chamb( dt->getBX(), wheel, sector-1, station, dt->getDTData().radialAngle,

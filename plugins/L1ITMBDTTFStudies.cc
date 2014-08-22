@@ -213,7 +213,7 @@ void L1ITMBDTTFStudies::analyze(const edm::Event& iEvent, const edm::EventSetup&
       L1ITMu::MBTrackCollection::const_iterator trEnd = mbTracks->end();
       float bestDR = 999.;
       float bestDRBx0 = 999.;
-      bool hadnegbx=false;
+      //bool hadnegbx=false;
       for ( ; trIt != trEnd; ++trIt ) {
 	const L1ITMu::MBTrack & mbTrack = *trIt;
 	const std::vector<L1MuRegionalCand> gmtRegCand = mbTrack.getAssociatedGMTin();
@@ -225,7 +225,7 @@ void L1ITMBDTTFStudies::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  float gmtQual = gmtRegCand.at(0).quality();
 	  int gbx = gmtRegCand.at(0).bx();
 	  _bxGmtDt->Fill(gbx);
-	  if (gbx==-1 || gbx==-2) hadnegbx=true;
+	  //if (gbx==-1 || gbx==-2) hadnegbx=true;
 	  _phiTrack->Fill(newGmtPhi); _etaTrack->Fill(gmtEta);_ptTrack->Fill(gmtPt);_qualTrack->Fill(gmtQual);
        	  float dR = reco::deltaR(gmtEta,newGmtPhi,genEta,genPhi);
 	  float dPhi = reco::deltaPhi(newGmtPhi,genPhi);
