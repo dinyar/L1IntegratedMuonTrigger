@@ -11,7 +11,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 
 process.TFileService = cms.Service(
         "TFileService",
-           fileName=cms.string('phase1L1ITMuonBarrelDTTFStudiesBx0.root')
+           fileName=cms.string('phase1L1ITMuonBarrelDTTFStudies.root')
             )
 
 process.L1ITMuDTTFPlotter = cms.EDAnalyzer(

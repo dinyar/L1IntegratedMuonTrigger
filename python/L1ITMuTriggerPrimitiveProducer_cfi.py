@@ -11,8 +11,8 @@ L1ITMuTriggerPrimitives = cms.EDProducer(
     DT   = cms.PSet( collectorType = cms.string('DTCollector'),
                      src = cms.InputTag('simDtTriggerPrimitiveDigis'),
                      src2 = cms.InputTag('simDtTriggerPrimitiveDigis'),
-                     BX_min = cms.int32(dttfDigis.BX_min.value()),
-                     BX_max = cms.int32(dttfDigis.BX_max.value()),
+                     BX_min = cms.int32(tmpDttfDigis.BX_min.value()),
+                     BX_max = cms.int32(tmpDttfDigis.BX_max.value()),
                      runBunchCrossingCleaner = cms.bool(False),
                      bxCleanerCfg = DTBunchCrossingCleanerCfg ),
     
