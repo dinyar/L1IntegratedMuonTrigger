@@ -334,7 +334,7 @@ L1ITMu::MBLTCollection::reduceRpcClusters( std::vector< std::vector <size_t> > &
   }
 
   if ( reduced ) {
-    std::cout << "### Reduce..." << std::endl;
+    // std::cout << "### Reduce..." << std::endl; CB commented out, is it really needed?
     std::vector< std::vector <size_t> > tmpClusters;
     for ( size_t cidx = 0; cidx < clusterSize; ++cidx ) {
       if ( pickUpClusterMap.at(cidx) ) {
