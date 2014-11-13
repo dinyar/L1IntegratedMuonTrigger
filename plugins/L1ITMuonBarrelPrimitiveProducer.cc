@@ -144,10 +144,11 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	const L1ITMu::TriggerPrimitive & rpcOut = *rpcOutMatch.front();
 	/// only the first is real...
 	// LG try also to reassign BX to single H using RPC BX, e.g. do not ask for DT and RPC to have the same BX
-	if (( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() ) || (_qualityRemappingMode>1 && rpcIn.getBX()==rpcOut.getBX() && abs(dt.getBX()-rpcIn.getBX())<=1)) {
+	if ( ( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() )
+	    || (_qualityRemappingMode>1 && rpcIn.getBX()==rpcOut.getBX() && abs(dt.getBX()-rpcIn.getBX())<=1) ) {
 	  bx = rpcIn.getBX();
 	}
-      }else if (rpcInMatchSize){
+      } else if (rpcInMatchSize){
 	const L1ITMu::TriggerPrimitive & rpcIn = *rpcInMatch.front();
 	if ( dt.getBX() == rpcIn.getBX() || (_qualityRemappingMode>1 && abs(dt.getBX()-rpcIn.getBX())<=1)) {
 	  bx = rpcIn.getBX();
@@ -315,13 +316,13 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 			       bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );
       phiChambVector.push_back( chamb );
-      if (abs(bendingAngle)>511||1==1){
+      //if (abs(bendingAngle)>511||1==1){
 	//	std::cout<<"Got bending angle: "<<bendingAngle<<std::endl;
 	//std::cout<<"Original DT primitive had bending angle: "<<dt.getDTData().bendingAngle<<std::endl;
 	//std::cout<<"Original radial angle: "<<radialAngle<<std::endl;
 	//std::cout<<"Quality: "<<qualityCode<<std::endl;
 	//std::cout<<"Station: "<<station<<std::endl;
-      }
+      //}
 
     } /// end of the Uncorrelated loop
 //     ////////////////////////////////////////////////////
@@ -356,12 +357,20 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       if ( inSize ) {
 	//std::cout<<"Producer working on IN&&!OUT"<<std::endl;
         size_t inPos = 0;
-        double avPhiIn = 0;
+        // double avPhiIn = 0;
+        double avPhiSin = 0;
+        double avPhiCos = 0;
         for ( size_t i = 0; i < inSize; ++i ) {
           double locPhi = inRpc.at(i)->getCMSGlobalPhi();
-          avPhiIn += ( locPhi > 0 ? locPhi : 2*M_PI + locPhi );
+          // avPhiIn += ( locPhi > 0 ? locPhi : 2*M_PI + locPhi );
+	  avPhiSin += sin( locPhi );
+	  avPhiCos += cos( locPhi ); 
         }
-        avPhiIn /= inSize;
+        // avPhiIn /= inSize;
+	avPhiSin /= inSize;
+	avPhiCos /= inSize;
+	double avPhiIn = atan2( avPhiSin, avPhiCos );
+
         double minDist = fabs( inRpc.at(0)->getCMSGlobalPhi() - avPhiIn );
         for ( size_t i = 1; i < inSize; ++i ) {
           double dist = fabs( inRpc.at(i)->getCMSGlobalPhi() - avPhiIn );
@@ -371,7 +380,9 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
           }
         }
 
-        const L1ITMu::TriggerPrimitive & rpc = (*inRpc.at(inPos));
+	// const L1ITMu::TriggerPrimitive & rpc = (*inRpc.at(inPos));
+	L1ITMu::TriggerPrimitive rpc = (*inRpc.at(inPos));
+	rpc.setCMSGlobalPhi( avPhiIn );
         station = rpc.detId<RPCDetId>().station();
         sector  = rpc.detId<RPCDetId>().sector();
         wheel = rpc.detId<RPCDetId>().ring();
@@ -382,13 +393,20 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       if ( outSize ) {
 	//std::cout<<"Producer working on OUT&&!IN"<<std::endl;
         size_t outPos = 0;
-        double avPhiOut = 0;
+        //double avPhiOut = 0;
+        double avPhiSin = 0;
+        double avPhiCos = 0;
         for ( size_t i = 0; i < outSize; ++i ) {
           double locPhi = outRpc.at(i)->getCMSGlobalPhi();
-          avPhiOut += ( locPhi > 0 ? locPhi : 2*M_PI + locPhi );
+          // avPhiOut += ( locPhi > 0 ? locPhi : 2*M_PI + locPhi );
+	  avPhiSin += sin( locPhi );
+	  avPhiCos += cos( locPhi );
         }
 
-        avPhiOut /= outSize;
+        //avPhiOut /= outSize;
+	avPhiSin /= outSize;
+	avPhiCos /= outSize;
+	double avPhiOut = atan2( avPhiSin, avPhiCos );
         double minDist = fabs( outRpc.at(0)->getCMSGlobalPhi() - avPhiOut );
         for ( size_t i = 1; i < outSize; ++i ) {
           double dist = fabs( outRpc.at(i)->getCMSGlobalPhi() - avPhiOut );
@@ -397,7 +415,9 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
             minDist = dist;
           }
         }
-        const L1ITMu::TriggerPrimitive & rpc = (*outRpc.at(outPos));
+        // const L1ITMu::TriggerPrimitive & rpc = (*outRpc.at(outPos));
+	L1ITMu::TriggerPrimitive rpc = (*outRpc.at(outPos));
+	rpc.setCMSGlobalPhi( avPhiOut );
         station = rpc.detId<RPCDetId>().station();
         sector  = rpc.detId<RPCDetId>().sector();
         wheel = rpc.detId<RPCDetId>().ring();
