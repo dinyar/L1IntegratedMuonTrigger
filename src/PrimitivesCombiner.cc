@@ -181,15 +181,32 @@ L1ITMu::PrimitiveCombiner::combineDt( const L1ITMu::TriggerPrimitive * dt1,
   results localResult;
   localResult.radialAngle = 0.5 * ( dt1->getDTData().radialAngle + dt2->getDTData().radialAngle );
   
-  if ((dt1->getDTData().wheel>0) ||
-      ((dt1->getDTData().wheel==0) && !(dt1->getDTData().sector==0 || dt1->getDTData().sector==3 || dt1->getDTData().sector==4 || 
-				      dt1->getDTData().sector==7 || dt1->getDTData().sector==8 || dt1->getDTData().sector==11))) 
-    // positive chambers
-    localResult.bendingAngle = (atan(phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
-  else
+  /// PhiB calculation :
+  /// atan( (x2-x1)/(z2-z1) is the bending angle
+  /// needs to be corrected w.r.t.the direction phi (4096 scale)
+  /// and ported to 512 scale
+  if ( ( dt1->getDTData().wheel > 0 ) ||
+       ( ( dt1->getDTData().wheel == 0 ) &&
+	 !( dt1->getDTData().sector == 0 || dt1->getDTData().sector == 3
+	    || dt1->getDTData().sector == 4 || dt1->getDTData().sector == 7
+	    || dt1->getDTData().sector == 8 || dt1->getDTData().sector == 11 ) )
+       ) {
+    /// positive chambers
+    localResult.bendingAngle = ( atan ( phiBCombined( point1.x(), point1.z(),
+						      point2.x(), point2.z() )
+					)
+				 - ( localResult.radialAngle/4096.0 )
+				 ) * 512;
+  } else {
     // negative chambers
-    localResult.bendingAngle = (atan(-phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
-  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xDt, point1.z(), point2.z() );
+    localResult.bendingAngle = ( atan ( -phiBCombined( point1.x(), point1.z(),
+						       point2.x(), point2.z() )
+					)
+				 - ( localResult.radialAngle/4096.0)
+				 ) * 512;
+  }
+  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xDt,
+						point1.z(), point2.z() );
   
   //std::cout<<" == === COMBINING DT-DT === == "<<std::endl;
   //std::cout << "dt-dt radial : " << dt1->getDTData().radialAngle << " * " << dt2->getDTData().radialAngle << " = " << localResult.radialAngle << '\n';
@@ -219,15 +236,28 @@ L1ITMu::PrimitiveCombiner::combineDtRpc( const L1ITMu::TriggerPrimitive * dt,
   const DTChamber* chamb2 = _muonGeom->chamber( DTChamberId( wheel, station, sector ) );
   LocalPoint point2 = chamb2->toLocal( rpc->getCMSGlobalPoint() );
   
-  if ((dt->getDTData().wheel>0) ||
-      ((dt->getDTData().wheel==0) && !(dt->getDTData().sector==0 || dt->getDTData().sector==3 || dt->getDTData().sector==4 || 
-				      dt->getDTData().sector==7 || dt->getDTData().sector==8 || dt->getDTData().sector==11))) 
+  if ( ( dt->getDTData().wheel > 0 ) ||
+      ( ( dt->getDTData().wheel == 0 ) &&
+	!( dt->getDTData().sector == 0 || dt->getDTData().sector==3
+	   || dt->getDTData().sector==4 || dt->getDTData().sector==7
+	   || dt->getDTData().sector==8 || dt->getDTData().sector==11 ) )
+       ) {
     // positive wheels
-    localResult.bendingAngle = (atan(phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
-  else
+    localResult.bendingAngle = ( atan( phiBCombined( point1.x(), point1.z(),
+						     point2.x(), point2.z() )
+				       )
+				 - ( localResult.radialAngle/4096.0 )
+				 ) * 512;
+  } else {
     // negative wheels
-    localResult.bendingAngle = (atan(-phiBCombined( point1.x(), point1.z(), point2.x(), point2.z() )-(localResult.radialAngle/4096.0))) * 512;
-  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xRpc, point1.z(), point2.z() );
+    localResult.bendingAngle = ( atan( -phiBCombined( point1.x(), point1.z(),
+						      point2.x(), point2.z() )
+				       )
+				 - ( localResult.radialAngle/4096.0 )
+				 ) * 512;
+  }
+  localResult.bendingResol = phiBCombinedResol( _resol.xDt, _resol.xRpc,
+						point1.z(), point2.z() );
   
   return localResult;
   
