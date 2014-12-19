@@ -125,11 +125,11 @@ WeightExt=WeightFolder;
     Float_t MinPt2=pts.PtDPhi;
     
     if(pts.Qual1_==1 &&  pts.Qual2_==1){
-      if(fabs(pts.PtDPhi-pts.PtBIn)<80 && (pts.PtDPhi-pts.PtBOut)>20){
+      if(fabs(pts.PtDPhi-pts.PtBIn)<120 && (pts.PtDPhi-pts.PtBOut)>15){
 	if(pts.PtBIn<MinPt2) MinPt2=pts.PtBIn;
       }
       
-      else if(abs(pts.PtDPhi-pts.PtBOut)<80 &&(pts.PtDPhi-pts.PtBIn)>20 ){
+      else if(abs(pts.PtDPhi-pts.PtBOut)<120 &&(pts.PtDPhi-pts.PtBIn)>15 ){
 	if(pts.PtBOut<MinPt2) MinPt2=pts.PtBOut;
       }
     }
