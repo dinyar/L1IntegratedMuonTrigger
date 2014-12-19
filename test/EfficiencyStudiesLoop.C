@@ -20,6 +20,12 @@
 #include <fstream>
 #include "TF1.h"
 
+//------------------------------------------------------------------------------------------------------------------------------------//
+//Plot a 2d histogram of plateau efficiency values for different combination of parameters of minpt2 algorithm
+//Author: Gian Luca Pinna
+//-------------------------------------------------------------------------------------------------------------------------------------//
+
+
 typedef struct {Float_t PtTrue,PtBIn,PtBOut,PtDPhi,PtGMT,Wheel_,Qual1_,Qual2_;} PTs_;
 
 void EfficiencyStudiesLoop(string FileIn, Float_t dttfPtCut =25., Int_t Wheel = 0 ){

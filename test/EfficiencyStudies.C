@@ -18,6 +18,12 @@
 #include <sstream>
 #include <fstream>
 
+//----------------------------------------------------------------------------------//
+//Plot turn on curve efficiency vs gen pt for different pt assignment algorithms
+//Author: Gian Luca Pinna
+//----------------------------------------------------------------------------------//
+
+
 std::string WeightExt = "Weights"; 
 
 void SetWeight(float&, float&, float&, int, int, std::string, std::string, std::string);
@@ -88,14 +94,13 @@ WeightExt=WeightFolder;
      else if((pts.Qual1_==1) & (pts.Qual2_!=1)) WeightedPt =  whWMInTailBIn*pts.PtBIn+whWMInTailDPhi*pts.PtDPhi;
      else if((pts.Qual1_==1) & (pts.Qual2_!=1)) WeightedPt =  whWMOutTailBOut*pts.PtBOut+whWMOutTailDPhi*pts.PtDPhi;
      
-     //Choice 2 //Best
+     //Choice 2 
      //if((pts.Qual1_==1)) WeightedPt =  whWMInTailBIn*pts.PtBIn+whWMInTailDPhi*pts.PtDPhi;
      
      //Choice 3
      //if((pts.Qual1_==1)) WeightedPt =  whWMInTailBIn*pts.PtBIn+whWMInTailDPhi*pts.PtDPhi;
      //else if((pts.Qual1_!=1) & (pts.Qual2_==1)) WeightedPt =  whWMOutTailBOut*pts.PtBOut+whWMOutTailDPhi*pts.PtDPhi; 
     
-
      
      Float_t NewPt = pts.PtDPhi;
      if(pts.Qual1_==1) NewPt =  pts.PtBIn;
@@ -156,7 +161,7 @@ WeightExt=WeightFolder;
   }
 
   //Exemple for RMS weight method 
-  //  Float_t WeightedPt =  whWMRMSBIn*pts.PtBIn+whWMRMSBOut*pts.PtBOut+whWMRMSDPhi*pts.PtDPhi;
+  //Float_t WeightedPt =  whWMRMSBIn*pts.PtBIn+whWMRMSBOut*pts.PtBOut+whWMRMSDPhi*pts.PtDPhi;
 
 
   effWeightPt->Fill(WeightedPt>=dttfPtCut,pts.PtTrue);
@@ -217,7 +222,7 @@ WeightExt=WeightFolder;
   label->AddEntry(effPtMin2," min pt 2 ","p");
   label->AddEntry(effPtMin3," min pt 3 ","p");
   label->AddEntry(effNewPt," new Pt","p");
-  // label->AddEntry(effBIn," BIn ","p");
+  //label->AddEntry(effBIn," BIn ","p");
   //label->AddEntry(effBOut," BOut pt 2 ","p");
   
   effDPhi->Draw("AP");

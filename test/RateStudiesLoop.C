@@ -19,8 +19,11 @@
 #include <sstream>
 #include <fstream>
 
+//------------------------------------------------------------------------------------------------------------------------------------//
+//Plot a 2d histogram of ratio of minPt2 rate and delta phi rate at pt =20 for different combination of parameters of minpt2 algorithm 
+//Author: Gian Luca Pinna
+//-------------------------------------------------------------------------------------------------------------------------------------//
 
-std::string WeightExt = "Weights"; 
 
 typedef struct {Float_t PtBIn,PtBOut,PtDPhi,GMTPt_,Wheel_,Qual1_,Qual2_;} PTs_;
 
@@ -86,7 +89,6 @@ Int_t nentries = (Int_t)t1->GetEntries();
     }
 
   }
-  //  TCanvas *c1 = new TCanvas("C1","Rate plots",500,500);
   hValues->SetXTitle("l");
   hValues->SetYTitle("m");
   hValues->Draw("colz");

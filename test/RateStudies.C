@@ -9,7 +9,6 @@
 #include "TTree.h"
 #include "TLatex.h"
 #include "TMath.h"
-//#include "TF1.h"
 #include "TStyle.h"
 #include "TEfficiency.h"
 #include "TLine.h"
@@ -18,6 +17,11 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+
+//---------------------------------------------------------------//
+//Plot rate vs pt cut for different pt assignment algorithms
+//Author: Gian Luca Pinna
+//---------------------------------------------------------------//
 
 
 std::string WeightExt = "Weights"; 
@@ -99,7 +103,7 @@ void RateStudies(string FileIn,string WeightFolder="Weights",Int_t Wheel = 0){
     //else if((pts.Qual1_==1) & (pts.Qual2_!=1)) WeightedPt = whWMInTailBIn*pts.PtBIn+whWMInTailDPhi*pts.PtDPhi;
     //else if((pts.Qual1_!=1) & (pts.Qual2_==1)) WeightedPt =  whWMOutTailBOut*pts.PtBOut+whWMOutTailDPhi*pts.PtDPhi; 
     
-    //Choice 2 //Best
+    //Choice 2 
     if((pts.Qual1_==1)) WeightedPt =  whWMInTailBIn*pts.PtBIn+whWMInTailDPhi*pts.PtDPhi;
 
     //Choice 3
@@ -138,7 +142,7 @@ void RateStudies(string FileIn,string WeightFolder="Weights",Int_t Wheel = 0){
 	if(pts.PtBOut<MinPt2) MinPt2=pts.PtBOut;
       }
     }
- 
+    
     else if(pts.Qual1_==1&&pts.Qual2_!=1){
       if(pts.PtBIn<MinPt2) MinPt2=pts.PtBIn;
     }
@@ -177,7 +181,6 @@ for(int j = 0.; j<=120; j+=2){
  }
   }
   
-//cout<<"entries "<<nentries<<" central events "<<nevents<<endl;
   
   hRateDPhi->SetLineColor(2);
   hRateDPhi->SetTitle("Rate vs p_{T}; pT_{Cut} ; Rate"); 
