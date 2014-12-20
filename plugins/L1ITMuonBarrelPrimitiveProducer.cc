@@ -40,6 +40,7 @@ private:
   const L1ITMu::PrimitiveCombiner::resolutions _resol;
   const int _qualityRemappingMode;
   const int _useRpcBxForDtBelowQuality;
+  const bool _is7QualityCodes;
   edm::ESHandle<DTGeometry> _muonGeom;
 };
 
@@ -64,7 +65,8 @@ L1ITMuonBarrelPrimitiveProducer::L1ITMuonBarrelPrimitiveProducer( const edm::Par
 	    iConfig.getParameter<double>("phibDtUnCorrResol")
 	    ),
     _qualityRemappingMode( iConfig.getParameter<int>("qualityRemappingMode") ),
-    _useRpcBxForDtBelowQuality( iConfig.getParameter<int>("useRpcBxForDtBelowQuality") )
+    _useRpcBxForDtBelowQuality( iConfig.getParameter<int>("useRpcBxForDtBelowQuality") ),
+    _is7QualityCodes( iConfig.getParameter<bool>("is7QualityCodes") )
  
 {
   produces<L1MuDTChambPhContainer>();
@@ -107,18 +109,32 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
     for ( size_t iDt = 0; iDt < dtListSize; ++iDt ) {
       const L1ITMu::TriggerPrimitiveRef & dt = mbltStation.getDtSegments().at(iDt);
       int dtquality = dt->getDTData().qualityCode;
+      //if ( dtquality == 2 || dtquality == 3 ) std::cout << "[o]" << dtquality << '\t' ; /// GC
+      // if ( dtquality > 3 ) std::cout << "[o]" << dtquality << '\t' ; /// GC
       /// define new set of qualities
       /// skip for the moment uncorrelated
       // int qualityCode = -2;
+      // switch ( dtquality ) {
+      // case -1 : continue;/// -1 are theta
+      // case 0 : /* qualityCode = -2;*/ break;
+      // case 1 : /* qualityCode = -2;*/ break;
+      // case 2 : uncorrelated.push_back( iDt ); continue;
+      // case 3 : uncorrelated.push_back( iDt ); continue;
+      // case 4 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
+      // case 5 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
+      // case 6 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
+      // default : /* qualityCode = dtquality; */ break;
+      // }
+
       switch ( dtquality ) {
       case -1 : continue;/// -1 are theta
       case 0 : /* qualityCode = -2;*/ break;
       case 1 : /* qualityCode = -2;*/ break;
-      case 2 : uncorrelated.push_back( iDt ); continue;
-      case 3 : uncorrelated.push_back( iDt ); continue;
-      case 4 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
-      case 5 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
-      case 6 : correlated.push_back( iDt ); continue; //qualityCode = 5; break;
+      case 2 : uncorrelated.push_back( iDt ); continue;  // HI
+      case 3 : uncorrelated.push_back( iDt ); continue;  // HO
+      case 4 : correlated.push_back( iDt ); continue;    // LL
+      case 5 : correlated.push_back( iDt ); continue;    // HL
+      case 6 : correlated.push_back( iDt ); continue;    // HH
       default : /* qualityCode = dtquality; */ break;
       }
 
@@ -129,7 +145,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
     }
 
     // START OF BX ANALYSIS FOR CORRELATED TRIGGER
-    size_t cSize = correlated.size(); 
+    size_t cSize = correlated.size();
     for ( size_t idxDt = 0; idxDt < cSize; ++idxDt ) {
       int bx=-999;
       int iDt = correlated.at(idxDt);
@@ -165,14 +181,28 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       if (bx>-999 && dt.getDTData().qualityCode<_useRpcBxForDtBelowQuality){
 	newBx=bx;
       }
+
+      int qualityCode = 6;
+      if ( ! _is7QualityCodes ) {
+	qualityCode = 13;
+	switch ( dt.getDTData().qualityCode ) {
+	case 4 : qualityCode = 14; break;    // LL // TODO: LL+rpc=13
+	case 5 : qualityCode = 15; break;    // HL
+	case 6 : qualityCode = 15; break;    // HH 
+	default : break;
+	}
+      }
+
+      //std::cout << "[n]" << dt.getDTData().qualityCode  << std::endl; /// GC
       L1MuDTChambPhDigi chamb( newBx, wheel, sector-1, station, dt.getDTData().radialAngle,
-			       dt.getDTData().bendingAngle, dt.getDTData().qualityCode,
+			       dt.getDTData().bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );
       phiChambVector.push_back( chamb );
     }
     // END OF BX ANALYSIS FOR CORRELATED TRIGGER
 
-    size_t uncSize = uncorrelated.size(); 
+    // BEGIN OF BX ANALYSIS FOR UNCORRELATED TRIGGER
+    size_t uncSize = uncorrelated.size();
     for ( size_t idxDt = 0; idxDt < uncSize; ++idxDt ) {
 
       int iDt = uncorrelated.at(idxDt);
@@ -208,7 +238,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       }
 
       /// this is just a set of output variables for building L1ITMuDTChambPhDigi
-      int qualityCode = dt.getDTData().qualityCode;
+      // int qualityCode = dt.getDTData().qualityCode;
       int bx = -2;
       int radialAngle = 0;
       int bendingAngle = 0;
@@ -224,7 +254,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	combiner.addDt( *mbltStation.getDtSegments().at(closest) );
 
 	/// redefine quality
-	qualityCode = 4;
+	/// qualityCode = 4;
 	L1ITMu::TriggerPrimitiveList rpcInMatch = mbltStation.getRpcInAssociatedStubs( iDt );
 	L1ITMu::TriggerPrimitiveList rpcOutMatch = mbltStation.getRpcOutAssociatedStubs( iDt );
 
@@ -266,7 +296,8 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	  const L1ITMu::TriggerPrimitive & rpcOut = *rpcOutMatch.front();
 	  /// only the first is real...
 	  // LG try also to reassign BX to single H using RPC BX, e.g. do not ask for DT and RPC to have the same BX
-	  if (( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() ) || (_qualityRemappingMode>1 && rpcIn.getBX()==rpcOut.getBX() && abs(dt.getBX()-rpcIn.getBX())<=1)) {
+	  if (( dt.getBX() == rpcIn.getBX() && dt.getBX() == rpcOut.getBX() )
+	      || (_qualityRemappingMode>1 && rpcIn.getBX()==rpcOut.getBX() && abs(dt.getBX()-rpcIn.getBX())<=1)) {
 	    bx = rpcIn.getBX();
 	    combiner.addRpcIn( rpcIn );
 	    combiner.addRpcOut( rpcOut );
@@ -302,16 +333,21 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 	//std::cout<<"=== I am making a combination ==="<<std::endl;
 	combiner.combine();
 	radialAngle = combiner.radialAngle();
-	bendingAngle = (combiner.bendingAngle()<-511 || combiner.bendingAngle()>511)?dt.getDTData().bendingAngle:combiner.bendingAngle();
+	bendingAngle = (combiner.bendingAngle() < -511 || combiner.bendingAngle() > 511) ? dt.getDTData().bendingAngle : combiner.bendingAngle( );
       } else {
 	// no match found, keep the primitive as it is
 	bx = dt.getBX();
 	radialAngle = dt.getDTData().radialAngle;
 	bendingAngle = dt.getDTData().bendingAngle;
 	//if (_qualityRemappingMode==0) 
-	qualityCode = ( qualityCode == 2 ) ? 0 : 1;
+	// qualityCode = ( qualityCode == 2 ) ? 0 : 1;
       }
 
+      int qualityCode = ( _is7QualityCodes ?
+			  combiner.getUncorrelatedQuality7() :
+			  combiner.getUncorrelatedQuality16() );
+
+      // std::cout << "[n]" << qualityCode << std::endl; /// GC
       L1MuDTChambPhDigi chamb( bx, wheel, sector-1, station, radialAngle,
 			       bendingAngle, qualityCode,
 			       dt.getDTData().Ts2TagCode, dt.getDTData().BxCntCode );
@@ -352,7 +388,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       int station = -1;
       int sector  = -1;
       int wheel = -5;
-      double qualityCode = 0;
+      // double qualityCode = 0;
 
       if ( inSize ) {
 	//std::cout<<"Producer working on IN&&!OUT"<<std::endl;
@@ -452,7 +488,7 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
 //         qualityCode = 1;
 //       }
 
-      if (inSize && outSize) qualityCode=1;
+      // if (inSize && outSize) qualityCode=1;
       combiner.combine();
       double radialAngle = combiner.radialAngle();
       double bendingAngle = combiner.bendingAngle();
@@ -460,10 +496,17 @@ void L1ITMuonBarrelPrimitiveProducer::produce( edm::Event& iEvent,
       double Ts2TagCode = 0;
       double BxCntCode = 0;
 
-      L1MuDTChambPhDigi chamb( bx, wheel, sector-1, station, radialAngle,
-                               bendingAngle, qualityCode,
-                               Ts2TagCode, BxCntCode );
-      phiChambVector.push_back( chamb );
+
+      int qualityCode = ( _is7QualityCodes ?
+			  combiner.getUncorrelatedQuality7() :
+			  combiner.getUncorrelatedQuality16() );
+      if ( qualityCode >= 0 ) {
+	// std::cout << "[r]" << qualityCode << std::endl ; /// GC
+	L1MuDTChambPhDigi chamb( bx, wheel, sector-1, station, radialAngle,
+				 bendingAngle, qualityCode,
+				 Ts2TagCode, BxCntCode );
+	phiChambVector.push_back( chamb );
+      }
 
       //std::cout << "IN: \n" << inRpc;
       //std::cout << "OUT: \n" << outRpc;

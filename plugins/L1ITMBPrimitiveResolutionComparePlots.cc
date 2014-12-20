@@ -41,6 +41,9 @@
 #include <string>
 #include <map>
 
+//const int nquals = 16;
+const int nquals = 7;
+
 class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 	public:
 		explicit L1ITMBPrimitiveResolutionComparePlots(const edm::ParameterSet& ps);
@@ -66,7 +69,7 @@ class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 		L1DTTrigGeomUtils* trigGeomUtils;
 		edm::ESHandle<DTGeometry> muonGeom;
 		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistos;
-		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistosQs[7];
+		std::map<uint32_t, std::map<std::string, TH2F*> > scatterHistosQs[nquals];
 
 		struct t_vars {
 			edm::InputTag dccInputTag;
@@ -74,7 +77,7 @@ class L1ITMBPrimitiveResolutionComparePlots : public edm::EDAnalyzer {
 			int trigQualBest[6][5][13];
 			const L1MuDTChambPhDigi* trigBest[6][5][13];
 			std::map<uint32_t, std::map<std::string, TH1F*>> chHistos;
-			std::map<uint32_t, std::map<std::string, TH1F*>> chHistosQs[7];
+			std::map<uint32_t, std::map<std::string, TH1F*>> chHistosQs[nquals];
 		} oldVars, newVars;
 
 		struct t_deltas {
@@ -162,7 +165,7 @@ void L1ITMBPrimitiveResolutionComparePlots::bookHistos(const string &hName, cons
 		nPhiBins,-rangePhi,rangePhi,nPhiBins,-rangePhi,rangePhi
 	);
 
-	for(int i=0; i<7; i++) {
+	for(int i=0; i<nquals; i++) {
 		ostringstream qdir_oss; qdir_oss << "quality_" << i;
 		TFileDirectory qdir = subfolder.mkdir(qdir_oss.str());
 
@@ -266,7 +269,7 @@ bool L1ITMBPrimitiveResolutionComparePlots::analyze_tag(t_vars &vars, const DTRe
 		int best_qualitycode = vars.trigQualBest[wheel+3][station][scsector];
 		const L1MuDTChambPhDigi* best_trig = vars.trigBest[wheel+3][station][scsector];
 
-		if(best_qualitycode > -1 && best_qualitycode < 7 && nHitsPhi >= 7) {
+		if(best_qualitycode > -1 && best_qualitycode < nquals && nHitsPhi >= 7) {
 			float trigPos = trigGeomUtils->trigPos(best_trig);
 			float trigDir = trigGeomUtils->trigDir(best_trig);
 			trigGeomUtils->trigToSeg(station,trigPos,trackDirPhi);
@@ -313,7 +316,7 @@ void L1ITMBPrimitiveResolutionComparePlots::searchDccBest(t_vars &vars, std::vec
 		int stId  = trig.stNum();
 		int qualitycode = trig.code();
 
-		if(qualitycode > vars.trigQualBest[whId][stId][secId] && qualitycode < 7) {
+		if(qualitycode > vars.trigQualBest[whId][stId][secId] && qualitycode < nquals) {
 			vars.trigQualBest[whId][stId][secId] = qualitycode;
 			vars.trigBest[whId][stId][secId] = &trig;
 		}

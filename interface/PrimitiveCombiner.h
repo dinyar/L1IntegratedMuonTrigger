@@ -27,10 +27,10 @@ namespace L1ITMu {
       double xRpc;
       double phibDtCorr;
       double phibDtUnCorr;
-      resolutions( const double & xDtResol, const double & xRpcResol,
-		   const double & phibDtCorrResol, const double & phibDtUnCorrResol )
-	:  xDt( xDtResol ), xRpc( xRpcResol ),
-	   phibDtCorr( phibDtCorrResol ), phibDtUnCorr( phibDtUnCorrResol ) {};
+    resolutions( const double & xDtResol, const double & xRpcResol,
+		 const double & phibDtCorrResol, const double & phibDtUnCorrResol )
+    :  xDt( xDtResol ), xRpc( xRpcResol ),
+	phibDtCorr( phibDtCorrResol ), phibDtUnCorr( phibDtUnCorrResol ) {};
     };
 
   public :
@@ -52,20 +52,21 @@ namespace L1ITMu {
     inline int bendingAngle() const { return _bendingAngle;};
     inline int bendingResol() const { return _bendingResol;};
 
+    /// valid if we have at least: 1 rpc; 1 dt + 1 any
     bool isValid() const {
       int ret = _dtHI ? 1 : 0;
       ret += _dtHO ? 1 : 0;
-      ret += _rpcIn ? 1 : 0;
-      ret += _rpcOut ? 1 : 0;
-      return ret > 0 ;
+      ret += _rpcIn ? 2 : 0;
+      ret += _rpcOut ? 2 : 0;
+      return ret > 1 ;
     };
 
     /// FIXME : Calculates new phiBending, check how to use 
     inline float phiBCombined( const float & xDt, const float & zDt,
 			       const float & xRpc, const float & zRpc )
-      {
-	return (xRpc - xDt) / (zRpc - zDt);
-      };
+    {
+      return (xRpc - xDt) / (zRpc - zDt);
+    };
     /// FIXME END
 
     /// FIXME : Calculates new phiBending resolution
@@ -74,10 +75,58 @@ namespace L1ITMu {
 				    const float & zDt,
 				    const float & zRpc
 				    )
-      {
-	return sqrt( resol_xRpc*resol_xRpc + resol_xDt*resol_xDt )/abs(zDt-zRpc);
-      };
+    {
+      return sqrt( resol_xRpc*resol_xRpc + resol_xDt*resol_xDt )/abs(zDt-zRpc);
+    };
     /// FIXME END
+
+    int getUncorrelatedQuality7() const {
+
+      int qualityCode = 0;
+      if ( _dtHI && _dtHO ) {
+	if ( _rpcIn && _rpcOut ) qualityCode = 5;
+	else qualityCode = 5;
+      } else if ( _dtHO ) {// HO quality == 3
+	if ( _rpcIn && _rpcOut ) qualityCode = 4;
+	else if ( _rpcOut ) qualityCode = 4;
+	else if ( _rpcIn ) qualityCode = 4;
+	else  qualityCode = 2;
+      } else if ( _dtHI ) {// HI, quality == 2
+	if ( _rpcIn && _rpcOut ) qualityCode = 3;
+	else if ( _rpcOut ) qualityCode = 3;
+	else if ( _rpcIn ) qualityCode = 3;
+	else  qualityCode = 1;
+      } else {
+	if ( _rpcIn && _rpcOut ) qualityCode = 0;
+	else if ( _rpcOut ) qualityCode = -1;
+	else if ( _rpcIn ) qualityCode = -1;
+      }
+      return qualityCode;
+    }
+
+    int getUncorrelatedQuality16() const {
+
+      int qualityCode = 0;
+      if ( _dtHI && _dtHO ) {
+	if ( _rpcIn && _rpcOut ) qualityCode = 12;
+	else qualityCode = 11;
+      } else if ( _dtHO ) {// HO quality == 3
+	if ( _rpcIn && _rpcOut ) qualityCode = 10;
+	else if ( _rpcOut ) qualityCode = 8;
+	else if ( _rpcIn ) qualityCode = 6;
+	else  qualityCode = 4;
+      } else if ( _dtHI ) {// HI, quality == 2
+	if ( _rpcIn && _rpcOut ) qualityCode = 9;
+	else if ( _rpcOut ) qualityCode = 7;
+	else if ( _rpcIn ) qualityCode = 5;
+	else  qualityCode = 3;
+      } else {
+	if ( _rpcIn && _rpcOut ) qualityCode = 2;
+	else if ( _rpcOut ) qualityCode = 1;
+	else if ( _rpcIn ) qualityCode = 0;
+      }
+      return qualityCode;
+    }
 
   private :
 
@@ -86,7 +135,7 @@ namespace L1ITMu {
       double radialAngle;
       double bendingAngle;
       double bendingResol;
-      results() : radialAngle(0), bendingAngle(0), bendingResol(0) {};
+    results() : radialAngle(0), bendingAngle(0), bendingResol(0) {};
     };
 
 
@@ -100,12 +149,13 @@ namespace L1ITMu {
     results combineDtRpc( const L1ITMu::TriggerPrimitive * dt,
 			  const L1ITMu::TriggerPrimitive * rpc );
 
-  /// Calculates new phiBending, check how to use weights
-   results combineRpcRpc( const L1ITMu::TriggerPrimitive * rpc1,
-                          const L1ITMu::TriggerPrimitive * rpc2 );
+    /// Calculates new phiBending, check how to use weights
+    results combineRpcRpc( const L1ITMu::TriggerPrimitive * rpc1,
+			   const L1ITMu::TriggerPrimitive * rpc2 );
  
  
-     int radialAngleFromGlobalPhi( const L1ITMu::TriggerPrimitive * rpc );
+    int radialAngleFromGlobalPhi( const L1ITMu::TriggerPrimitive * rpc );
+
   private :
     resolutions _resol;
     edm::ESHandle<DTGeometry> _muonGeom;
