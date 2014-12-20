@@ -34,12 +34,14 @@ process.L1ITMuResolutionPlotter = cms.EDAnalyzer(
 	geomLabel = cms.untracked.string('idealForDigi'),
 )
 
-infile = 'file:L1ITMBLT.root'
+infile = 'L1ITMBLT.root'
 
 process.source = cms.Source(
 	'PoolSource',
 	fileNames = cms.untracked.vstring(infile)
 )
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.L1ITMUSequence = cms.Sequence(process.L1ITMuResolutionPlotter)
 process.dtLocalRecoSequence = cms.Sequence(process.dt1DRecHits + process.dt4DSegments)
@@ -48,3 +50,4 @@ process.dtLocalRecoSequence = cms.Sequence(process.dt1DRecHits + process.dt4DSeg
 process.L1ITMUPath = cms.Path(process.dtLocalRecoSequence + process.L1ITMUSequence)
 
 process.schedule = cms.Schedule(process.L1ITMUPath)
+
