@@ -240,6 +240,27 @@ def build( hfile, base, outdir, write=False ):
         oldPhiUncHo.Add( oldPhi[wheel][3] )
         newPhiUncHo.Add( newPhi[wheel][4] )
 
+    
+    ## Draw&Save Phi Residuals for HI
+    name = "DCC_PhiResidual_Hi_Sec%d_St%d"%( sector, station )
+    draw( oldPhiHi, newPhiHi, name, outdir, write )
+    
+    ## Draw&Save Phi Residuals for HO
+    name = "DCC_PhiResidual_Ho_Sec%d_St%d"%( sector, station )
+    draw( oldPhiHo, newPhiHo, name, outdir, write )
+
+    # Draw&Save Phi Residuals for HI
+    name = "Phi uncorrelated compare (old 3, new 4) Hi_Sec%d_St%d"%( sector, station )
+    draw( oldPhiUncHi, newPhiUncHi, name, outdir, write )
+    print name, oldPhiUncHi.GetBinContent(1), newPhiUncHi.GetBinContent(1)
+    print name, oldPhiUncHi.GetBinContent(401), newPhiUncHi.GetBinContent(401)
+
+    # Draw&Save Phi Residuals for HO
+    name = "Phi uncorrelated compare (old 3, new 4) Ho_Sec%d_St%d"%( sector, station )
+    draw( oldPhiUncHo, newPhiUncHo, name, outdir, write )
+    print name, oldPhiUncHo.GetBinContent(1), newPhiUncHo.GetBinContent(1)
+    print name, oldPhiUncHo.GetBinContent(401), newPhiUncHo.GetBinContent(401)
+    
 ############
 
     oldPhibHi = oldPhib[0][2].Clone()
@@ -284,15 +305,6 @@ def build( hfile, base, outdir, write=False ):
         oldPhibUncHo.Add( oldPhib[wheel][3] )
         newPhibUncHo.Add( newPhib[wheel][4] )
     
-    
-    ## Draw&Save Phi Residuals for HI
-    name = "DCC_PhiResidual_Hi_Sec%d_St%d"%( sector, station )
-    draw( oldPhibHi, newPhibHi, name, outdir, write )
-    
-    ## Draw&Save Phi Residuals for HO
-    name = "DCC_PhiResidual_Ho_Sec%d_St%d"%( sector, station )
-    draw( oldPhibHo, newPhibHo, name, outdir, write )
-    
     # Draw&Save Phi Bending Residuals for HI
     name = "DCC_PhibResidual_Hi_Sec%d_St%d"%( sector, station )
     draw( oldPhibHi, newPhibHi, name, outdir, write )
@@ -302,24 +314,11 @@ def build( hfile, base, outdir, write=False ):
     draw( oldPhibHo, newPhibHo, name, outdir, write )
 
 
-
-    # Draw&Save Phi Residuals for HI
-    name = "Phi uncorrelated compare (old 3, new 4) Hi_Sec%d_St%d"%( sector, station )
-    draw( oldPhiUncHi, newPhiUncHi, name, outdir, write )
-    print name, oldPhiUncHi.GetBinContent(1), newPhiUncHi.GetBinContent(1)
-    print name, oldPhiUncHi.GetBinContent(401), newPhiUncHi.GetBinContent(401)
-
     # Draw&Save Phi Bending Residuals for HI
     name = "Phib uncorrelated compare (old 3, new 4) Hi_Sec%d_St%d"%( sector, station )
     draw( oldPhibUncHi, newPhibUncHi, name, outdir, write )
     print name, oldPhibUncHi.GetBinContent(1), newPhibUncHi.GetBinContent(1)
     print name, oldPhibUncHi.GetBinContent(401), newPhibUncHi.GetBinContent(401)
-
-    # Draw&Save Phi Residuals for HO
-    name = "Phi uncorrelated compare (old 3, new 4) Ho_Sec%d_St%d"%( sector, station )
-    draw( oldPhiUncHo, newPhiUncHo, name, outdir, write )
-    print name, oldPhiUncHo.GetBinContent(1), newPhiUncHo.GetBinContent(1)
-    print name, oldPhiUncHo.GetBinContent(401), newPhiUncHo.GetBinContent(401)
 
     # Draw&Save Phi Bending Residuals for HO
     name = "Phib uncorrelated compare (old 3, new 4) Ho_Sec%d_St%d"%( sector, station )
@@ -341,7 +340,7 @@ def main() :
     """
     # write = False
     write = True
-    hfile = TFile('L1ITMuonBarrelResolutionComparePlots.root', 'read')
+    hfile = TFile('/tmp/gcodispo/L1ITMuonBarrelResolutionComparePlots.root', 'read')
     outdir = "dccplots/"
     os.system( "mkdir -p " + outdir );
     gROOT.Reset()
