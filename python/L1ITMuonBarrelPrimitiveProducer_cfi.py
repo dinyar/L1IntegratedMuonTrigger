@@ -8,5 +8,6 @@ L1ITMuonBarrelPrimitiveProducer = cms.EDProducer(
     phibDtCorrResol = cms.double( 0.005 ), # rad
     phibDtUnCorrResol = cms.double( 0.04 ), # rad 
     qualityRemappingMode = cms.int32( 2 ),
+    is7QualityCodes = cms.bool( True ),
     useRpcBxForDtBelowQuality = cms.int32(8)
     )

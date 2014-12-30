@@ -62,6 +62,7 @@ process.phase1MBTracksProducer = process.MBTracksProducer.clone(
     )
 
 process.L1ITMuonBarrelPrimitiveProducer.qualityRemappingMode = cms.int32(2)
+process.L1ITMuonBarrelPrimitiveProducer.is7QualityCodes = False
 
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.MessageLogger.cerr.threshold = 'WARNING'
@@ -76,14 +77,14 @@ process.L1ITMUSequence = cms.Sequence( process.L1ITMuTriggerPrimitives +  # L1IT
                                        process.MBLTProducer            +  # chamber level primitive matching
                                        process.MBTracksProducer        +  # track-to-primitive matching
                                        process.L1ITMuonBarrelPrimitiveProducer + # new combined primitive prod.
-                                       process.phase1L1ITMuTriggerPrimitives +   # make new TP from MBPrimitive
-                                       process.phase1MBLTProducer +              # make new LT
-                                       process.phase1DttfDigis +                 # make new DTTF
-                                       process.phase1GmtDigis +                  # make new GMT
+                                       process.phase1L1ITMuTriggerPrimitives   + # make new TP from MBPrimitive
+                                       process.phase1MBLTProducer              + # make new LT
+                                       process.phase1DttfDigis                 + # make new DTTF
+                                       process.phase1GmtDigis                  + # make new GMT
                                        process.phase1MBTracksProducer            # make new matching
                                        )
-#process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10000))
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.L1ITMUPath = cms.Path(process.dtLocalRecoSequence + process.L1ITMUSequence)
 

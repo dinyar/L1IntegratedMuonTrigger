@@ -17,7 +17,7 @@
 L1ITMu::PrimitiveCombiner::PrimitiveCombiner( const L1ITMu::PrimitiveCombiner::resolutions & res,
 					      edm::ESHandle<DTGeometry> & muonGeom )
   : _resol(res), _muonGeom(muonGeom),
-    _bx(0), _radialAngle(0), _bendingAngle(0), _bendingResol(0),
+    _bx(-3), _radialAngle(4096), _bendingAngle(-520), _bendingResol(520),
     _dtHI(0), _dtHO(0), _rpcIn(0), _rpcOut(0)
 {}
 
@@ -87,8 +87,8 @@ void L1ITMu::PrimitiveCombiner::combine()
     _radialAngle = localResults.back().radialAngle;
   }
   // inner DT
-  if ( ! ( _dtHI && _dtHO ) && _dtHI ) {
-    if (!_dtHO) localResults.push_back(dummyCombineDt(_dtHI));
+  else if ( _dtHI ) {
+    // if (!_dtHO) localResults.push_back(dummyCombineDt(_dtHI));
     if ( _rpcIn ) {
       localResults.push_back( combineDtRpc( _dtHI, _rpcIn ) );
       _radialAngle = _radialAngle ? _radialAngle :_dtHI->getDTData().radialAngle;
@@ -99,8 +99,8 @@ void L1ITMu::PrimitiveCombiner::combine()
     }
   }
   //outer DT
-  if ( !( _dtHI && _dtHO ) && _dtHO ) {
-    if (!_dtHI) localResults.push_back(dummyCombineDt(_dtHO));
+  else if ( _dtHO ) {
+     // if (!_dtHI) localResults.push_back(dummyCombineDt(_dtHO));
     if ( _rpcIn ) {
       localResults.push_back( combineDtRpc( _dtHO, _rpcIn ) );
       _radialAngle = _radialAngle ? _radialAngle :_dtHO->getDTData().radialAngle;
@@ -111,7 +111,7 @@ void L1ITMu::PrimitiveCombiner::combine()
     }
   }
   // no DT
-   if ( !_dtHI && !_dtHO ) {
+  else if ( !_dtHI && !_dtHO ) {
     if ( _rpcIn && _rpcOut ) {
       results local = combineRpcRpc( _rpcIn, _rpcOut );
       localResults.push_back( local );
