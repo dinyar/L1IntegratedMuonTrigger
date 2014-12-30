@@ -16,7 +16,7 @@
 {
 
   bool PhiFound = 0;
-  LutName="../test/my_luts/"+LutName;
+  LutName="../Luts/lut_data/"+LutName;
   
   std::ifstream datafileIn(LutName.c_str(),std::ifstream::in);
   

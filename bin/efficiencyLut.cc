@@ -32,7 +32,7 @@ efficiency::efficiency(const TString & infile, const TString & outfile, const TS
   : testfile_( outfile.Data() ), target_( target ), outdir_( outdir )
 {
   file_ = TFile::Open( infile );
-  TString dir = "mkdir -p " + outdir_;
+  TString dir = "mkdir -p ../Luts/" + outdir_;
   system( dir.Data() );
 }
 
