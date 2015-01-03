@@ -155,7 +155,7 @@ void efficiency::run( bool byTh )
     for ( size_t w = 0; w < 6; ++w ) {
       for ( size_t p = 0; p < 3; ++p ) {
 
-	TString fname = Form( "%s/%sWh%dSc%d", outdir_.Data(), params[p].Data(), wheels[w], sector );
+	TString fname = Form( "../Luts/%s/%sWh%dSc%d", outdir_.Data(), params[p].Data(), wheels[w], sector );
 	std::ofstream outfile( fname.Data() );
       
 	for ( size_t rf1 = 0; rf1 < 4; ++rf1 ) {
