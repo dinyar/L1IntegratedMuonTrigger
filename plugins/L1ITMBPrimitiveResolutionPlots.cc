@@ -175,11 +175,11 @@ void L1ITMBPrimitiveResolutionPlots::bookHistos(DTChamberId chId) {
 
 void L1ITMBPrimitiveResolutionPlots::beginRun(const edm::Run& run, const edm::EventSetup& context) {
 	
-  LogTrace("L1ITMBPrimitiveResolutionPlots") << "[L1ITMBPrimitiveResolutionPlots]: BeginRun" << endl;   
+  LogTrace("L1ITMBPrimitiveResolutionPlots" ) << "[L1ITMBPrimitiveResolutionPlots]: BeginRun" << endl;   
 	
   context.get<MuonGeometryRecord>().get(theGeomLabel,muonGeom);
   trigGeomUtils = new DTTrigGeomUtils(muonGeom);
-  const std::vector<DTChamber*> & chambers = muonGeom->chambers();
+  const std::vector<const DTChamber*> & chambers = muonGeom->chambers();
   
   for ( const auto & chambIt : chambers ) {
     bookHistos( chambIt->id() );
