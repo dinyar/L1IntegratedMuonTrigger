@@ -179,7 +179,7 @@ void L1ITMBPrimitiveResolutionPlots::beginRun(const edm::Run& run, const edm::Ev
 	
   context.get<MuonGeometryRecord>().get(theGeomLabel,muonGeom);
   trigGeomUtils = new DTTrigGeomUtils(muonGeom);
-  const std::vector<const DTChamber*> & chambers = muonGeom->chambers();
+  const std::vector<DTChamber*> & chambers = muonGeom->chambers();
   
   for ( const auto & chambIt : chambers ) {
     bookHistos( chambIt->id() );

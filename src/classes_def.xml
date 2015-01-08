@@ -58,7 +58,7 @@
   <class name="edm::Wrapper<L1ITMu::MBLTContainer>"/>
   <class name="L1ITMu::MBLTCollection::primitiveAssociation"/>
   <class name="edm::Wrapper<L1ITMu::MBLTCollection::primitiveAssociation>"  ClassVersion="10">
-   <version ClassVersion="10" checksum="1233678307"/>
+   <version ClassVersion="10" checksum="2108283157"/>
   </class>
   <class name="std::vector<L1ITMu::MBLTCollection::primitiveAssociation>"/>
   <class name="edm::Wrapper<std::vector<L1ITMu::MBLTCollection::primitiveAssociation> >"/>
