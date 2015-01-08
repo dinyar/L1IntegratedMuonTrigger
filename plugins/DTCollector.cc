@@ -35,13 +35,13 @@ void DTCollector::extractPrimitives(const edm::Event& ev,
       for( int sector = 0; sector <= 11; ++sector ) {
 	chamb_list.clear();
 	for( int bx = bx_min; bx <= bx_max; ++bx) {	  
-	  std::unique_ptr<L1MuDTChambPhDigi> phi_segm_1(
+	  std::unique_ptr<const L1MuDTChambPhDigi> phi_segm_1(
 	    phiDigis->chPhiSegm1(wheel,station,sector,bx)
 	    );
-	  std::unique_ptr<L1MuDTChambPhDigi> phi_segm_2(
+	  std::unique_ptr<const L1MuDTChambPhDigi> phi_segm_2(
 	    phiDigis->chPhiSegm2(wheel,station,sector,bx)
 	    );
-	  std::unique_ptr<L1MuDTChambThDigi> theta_segm(
+	  std::unique_ptr<const L1MuDTChambThDigi> theta_segm(
 	    thetaDigis->chThetaSegm(wheel,station,sector,bx)
 	    );
 	  

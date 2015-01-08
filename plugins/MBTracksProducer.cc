@@ -108,7 +108,7 @@ void MBTracksProducer::produce( edm::Event& ev,
     for( int sector = 0; sector <= 11; ++sector ) {
       for( int bx = _min_bx; bx <= _max_bx; ++bx ) {
         for( int itrk = 1; itrk <=2; ++itrk ) {
-          std::unique_ptr<L1MuDTTrackCand> dttrk;
+          std::unique_ptr<const L1MuDTTrackCand> dttrk;
           if( itrk == 1 )
             dttrk.reset(dtTracks->dtTrackCand1(sp_wheel,sector,bx));
           else
