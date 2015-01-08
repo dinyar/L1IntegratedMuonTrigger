@@ -197,7 +197,7 @@ void RateStudies(string FileIn,string WeightFolder="Weights",Int_t Wheel = 0){
   
   TLegend *label = new TLegend(.65,.12,.85,.26);
   
-  label->AddEntry(hRateDTTF," #DTTF ","l");
+  label->AddEntry(hRateDTTF," DTTF ","l");
   label->AddEntry(hRateDPhi," #Delta #phi ","l");
   label->AddEntry(hRatePtMin," min pt","l");
   label->AddEntry(hRatePtMin2," min pt 2 ","l");
