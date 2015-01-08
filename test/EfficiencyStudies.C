@@ -30,7 +30,7 @@ void SetWeight(float&, float&, float&, int, int, std::string, std::string, std::
 
 typedef struct {Float_t PtTrue,PtBIn,PtBOut,PtDPhi,PtGMT,Wheel_,Qual1_,Qual2_;} PTs_;
 
-void EfficiencyStudies(string FileIn, Float_t dttfPtCut =25.,string WeightFolder="Weights", Int_t Wheel = 0 ){
+void EfficiencyStudies(string FileIn, Float_t PtCut =25.,string WeightFolder="Weights", Int_t Wheel = 0 ){
 
 WeightExt=WeightFolder;
 
@@ -40,6 +40,7 @@ WeightExt=WeightFolder;
   PTs_ pts;
   t1->SetBranchAddress("Pts",&pts.PtTrue);
 
+  TEfficiency *effDTTF= new TEfficiency("dttf"," ", 60,-1.,119.);
   TEfficiency *effBIn= new TEfficiency("effBIn"," ", 60,-1.,119.);
   TEfficiency *effBOut= new TEfficiency("effBOut"," ", 60,-1.,119.);
   TEfficiency *effDPhi= new TEfficiency("effBDPhi"," ", 60,-1.,119.);
@@ -101,6 +102,7 @@ WeightExt=WeightFolder;
      //if((pts.Qual1_==1)) WeightedPt =  whWMInTailBIn*pts.PtBIn+whWMInTailDPhi*pts.PtDPhi;
      //else if((pts.Qual1_!=1) & (pts.Qual2_==1)) WeightedPt =  whWMOutTailBOut*pts.PtBOut+whWMOutTailDPhi*pts.PtDPhi; 
     
+
      
      Float_t NewPt = pts.PtDPhi;
      if(pts.Qual1_==1) NewPt =  pts.PtBIn;
@@ -163,23 +165,27 @@ WeightExt=WeightFolder;
   //Exemple for RMS weight method 
   //Float_t WeightedPt =  whWMRMSBIn*pts.PtBIn+whWMRMSBOut*pts.PtBOut+whWMRMSDPhi*pts.PtDPhi;
 
-
-  effWeightPt->Fill(WeightedPt>=dttfPtCut,pts.PtTrue);
-  effBIn->Fill(pts.PtBIn>=dttfPtCut,pts.PtTrue);
-  effBOut->Fill(pts.PtBOut>=dttfPtCut,pts.PtTrue);
-  effDPhi->Fill(pts.PtDPhi>=dttfPtCut,pts.PtTrue);
-  effPtMin->Fill(MinPt>=dttfPtCut,pts.PtTrue);
-  effPtMin2->Fill(MinPt2>=dttfPtCut,pts.PtTrue);
-  effPtMin3->Fill(MinPt3>=dttfPtCut,pts.PtTrue);
-  effNewPt->Fill(NewPt>=dttfPtCut,pts.PtTrue);
+  effDTTF->Fill(pts.PtGMT>=PtCut,pts.PtTrue);
+  effWeightPt->Fill(WeightedPt>=PtCut,pts.PtTrue);
+  effBIn->Fill(pts.PtBIn>=PtCut,pts.PtTrue);
+  effBOut->Fill(pts.PtBOut>=PtCut,pts.PtTrue);
+  effDPhi->Fill(pts.PtDPhi>=PtCut,pts.PtTrue);
+  effPtMin->Fill(MinPt>=PtCut,pts.PtTrue);
+  effPtMin2->Fill(MinPt2>=PtCut,pts.PtTrue);
+  effPtMin3->Fill(MinPt3>=PtCut,pts.PtTrue);
+  effNewPt->Fill(NewPt>=PtCut,pts.PtTrue);
   }
 
   cout<<"entries "<<nentries<<" central events "<<nevents<<endl;
   
-  TLine *lineCut = new TLine(dttfPtCut,0,dttfPtCut,1.05);
+  TLine *lineCut = new TLine(PtCut,0,PtCut,1.05);
   lineCut->SetLineColor(4);
   lineCut->SetLineStyle(4);
   lineCut->SetLineWidth(4);  
+
+  effDTTF->SetMarkerStyle(23);
+  effDTTF->SetMarkerColor(51);
+  effDTTF->SetMarkerSize(.8);
 
   effDPhi->SetMarkerStyle(21);
   effDPhi->SetMarkerColor(2);
@@ -214,8 +220,10 @@ WeightExt=WeightFolder;
   effNewPt->SetMarkerSize(.8); 
 
 
+
   TLegend *label = new TLegend(.65,.12,.85,.26);
-  label->AddEntry(lineCut,"p_{T} threshold","l"); 
+  label->AddEntry(lineCut,"p_{T} threshold","l");
+  label->AddEntry(effDTTF," Dttf ","p"); 
   label->AddEntry(effDPhi," #Delta #phi ","p");
   label->AddEntry(effPtMin," min pt","p");
   label->AddEntry(effWeightPt," Tail method","p");
@@ -226,6 +234,7 @@ WeightExt=WeightFolder;
   //label->AddEntry(effBOut," BOut pt 2 ","p");
   
   effDPhi->Draw("AP");
+  effDTTF->Draw("sameP");
   effWeightPt->Draw("sameP");
   effPtMin->Draw("sameP");
   effPtMin2->Draw("sameP");

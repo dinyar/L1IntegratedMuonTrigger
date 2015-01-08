@@ -42,6 +42,7 @@ void RateStudies(string FileIn,string WeightFolder="Weights",Int_t Wheel = 0){
 
   //TH1F *hRateBIn= new TH1F("hRateBIn"," ", 60,-1.,119.);
   //TH1F *hRateBOut= new TH1F("hRateBOut"," ", 60,-1.,119.);
+  TH1F *hRateDTTF= new TH1F("hRateDTTF"," ", 60,-1.,119.);
   TH1F *hRateDPhi= new TH1F("hRateBDPhi"," ", 60,-1.,119.);
   TH1F *hRatePtMin= new TH1F("hRatePtMin"," ", 60,-1.,119.);
   TH1F *hRatePtMin2= new TH1F("hRatePtMin2"," ", 60,-1.,119.);
@@ -170,12 +171,13 @@ void RateStudies(string FileIn,string WeightFolder="Weights",Int_t Wheel = 0){
     if(pts.PtBOut<MinPt3) MinPt3=pts.PtBOut;
   }
 
-for(int j = 0.; j<=120; j+=2){
+  for(int j = 0.; j<=120; j+=2){
     
+    if(pts.GMTPt>=j)   hRateDTTF->Fill(j); 
     if(pts.PtDPhi>=j)  hRateDPhi->Fill(j);
     if(WeightedPt>=j)  hRatePtWeighted->Fill(j);
-    if(NewPt>=j)  hRateNewPt->Fill(j);
-    if(MinPt>=j)  hRatePtMin->Fill(j);
+    if(NewPt>=j)   hRateNewPt->Fill(j);
+    if(MinPt>=j)   hRatePtMin->Fill(j);
     if(MinPt2>=j)  hRatePtMin2->Fill(j);
     if(MinPt3>=j)  hRatePtMin3->Fill(j);  
  }
@@ -185,6 +187,7 @@ for(int j = 0.; j<=120; j+=2){
   hRateDPhi->SetLineColor(2);
   hRateDPhi->SetTitle("Rate vs p_{T}; pT_{Cut} ; Rate"); 
   hRatePtWeighted->SetLineColor(93);
+  hRateDTTF->SetLineColor(51);
   // hRateBIn->SetLineColor(2);
   // hRateBOut->SetLineColor(4);
   hRateNewPt->SetLineColor(64);
@@ -194,6 +197,7 @@ for(int j = 0.; j<=120; j+=2){
   
   TLegend *label = new TLegend(.65,.12,.85,.26);
   
+  label->AddEntry(hRateDTTF," DTTF ","l");
   label->AddEntry(hRateDPhi," #Delta #phi ","l");
   label->AddEntry(hRatePtMin," min pt","l");
   label->AddEntry(hRatePtMin2," min pt 2 ","l");
@@ -207,6 +211,7 @@ for(int j = 0.; j<=120; j+=2){
   c1->SetLogy();
   
   hRateDPhi->Draw("same");
+  hRateDTTF->Draw("same");
   hRatePtMin->Draw("same");
   hRatePtWeighted->Draw("same");
   hRatePtMin2->Draw("same");
