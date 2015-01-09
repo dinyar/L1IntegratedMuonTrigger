@@ -52,7 +52,7 @@
 
 class L1ITMBPrimitiveResolutionPlots: public edm::EDAnalyzer{
   
- public:
+public:
   
   /// Constructor
   L1ITMBPrimitiveResolutionPlots(const edm::ParameterSet& ps );
@@ -60,7 +60,7 @@ class L1ITMBPrimitiveResolutionPlots: public edm::EDAnalyzer{
   /// Destructor
   virtual ~L1ITMBPrimitiveResolutionPlots();
   
- protected:
+protected:
   
   // BeginJob
   void beginJob();
@@ -69,7 +69,7 @@ class L1ITMBPrimitiveResolutionPlots: public edm::EDAnalyzer{
   void beginRun(const edm::Run& , const edm::EventSetup&);
 
   /// Find best (highest qual) DCC trigger segments
-  void searchDccBest(std::vector<L1MuDTChambPhDigi>* trigs);
+  void searchDccBest(const std::vector<L1MuDTChambPhDigi>& trigs);
   
   /// Analyze
   void analyze(const edm::Event& e, const edm::EventSetup& c);
@@ -80,12 +80,12 @@ class L1ITMBPrimitiveResolutionPlots: public edm::EDAnalyzer{
   /// EndJob
   void endJob(void);  
 
- private:  
+private:  
 
   /// Book histos
   void bookHistos(DTChamberId chId);
 
- private :
+private :
 
   int nEvents;
   int nLumis;
@@ -175,17 +175,15 @@ void L1ITMBPrimitiveResolutionPlots::bookHistos(DTChamberId chId) {
 
 void L1ITMBPrimitiveResolutionPlots::beginRun(const edm::Run& run, const edm::EventSetup& context) {
 	
-  LogTrace("L1ITMBPrimitiveResolutionPlots") << "[L1ITMBPrimitiveResolutionPlots]: BeginRun" << endl;   
+  LogTrace("L1ITMBPrimitiveResolutionPlots" ) << "[L1ITMBPrimitiveResolutionPlots]: BeginRun" << endl;   
 	
   context.get<MuonGeometryRecord>().get(theGeomLabel,muonGeom);
   trigGeomUtils = new DTTrigGeomUtils(muonGeom);
-	
-  std::vector<DTChamber*>::const_iterator chambIt  = muonGeom->chambers().begin();
-  std::vector<DTChamber*>::const_iterator chambEnd = muonGeom->chambers().end();
+  const std::vector<const DTChamber*> & chambers = muonGeom->chambers();
   
-  for (; chambIt!=chambEnd; ++chambIt)
-    bookHistos((*chambIt)->id());
-
+  for ( const auto & chambIt : chambers ) {
+    bookHistos( chambIt->id() );
+  }
 }
 
 
@@ -210,17 +208,17 @@ void L1ITMBPrimitiveResolutionPlots::analyze(const edm::Event& e, const edm::Eve
     
   edm::Handle<L1MuDTChambPhContainer> trigHandle;
   e.getByLabel(dccInputTag,trigHandle);
-  vector<L1MuDTChambPhDigi>* trigs = trigHandle->getContainer();
+  const vector<L1MuDTChambPhDigi> & trigs = *(trigHandle->getContainer());
   searchDccBest(trigs);
 
   Handle<DTRecSegment4DCollection> segments4D;
-  e.getByLabel(segInputTag,segments4D);  		
+  e.getByLabel(segInputTag,segments4D);		
   DTRecSegment4DCollection::id_iterator chamberId;
 
   // Preliminary loop finds best 4D Segment and high quality ones
   vector<const DTRecSegment4D*> best4DSegments;
-  
-  for (chamberId = segments4D->id_begin(); chamberId != segments4D->id_end(); ++chamberId){
+  for ( chamberId = segments4D->id_begin(); chamberId != segments4D->id_end();
+	++chamberId ) {
 		
     DTRecSegment4DCollection::range  rangeInCh = segments4D->get(*chamberId);
     DTRecSegment4DCollection::const_iterator trackIt  = rangeInCh.first;
@@ -245,22 +243,19 @@ void L1ITMBPrimitiveResolutionPlots::analyze(const edm::Event& e, const edm::Eve
     if (tmpBest) best4DSegments.push_back(tmpBest);
   
   }
-
-  vector<const DTRecSegment4D*>::const_iterator bestTrackIt  = best4DSegments.begin();
-  vector<const DTRecSegment4D*>::const_iterator bestTrackEnd = best4DSegments.end();
   
-  for (; bestTrackIt!=bestTrackEnd; ++bestTrackIt) {
+  for ( const auto & bestTrackIt : best4DSegments ) {
     
-    if((*bestTrackIt)->hasPhi()) {
+    if ( bestTrackIt->hasPhi() ) {
       
-      DTChamberId chId = (*bestTrackIt)->chamberId();
-      int nHitsPhi = (*bestTrackIt)->phiSegment()->degreesOfFreedom()+2;
+      DTChamberId chId = bestTrackIt->chamberId();
+      int nHitsPhi = bestTrackIt->phiSegment()->degreesOfFreedom()+2;
       
       int wheel    = chId.wheel();
       int station  = chId.station();
       int scsector = 0;
       float trackPosPhi, trackPosEta, trackDirPhi, trackDirEta;
-      trigGeomUtils->computeSCCoordinates((*bestTrackIt),scsector,trackPosPhi,trackDirPhi,trackPosEta,trackDirEta);
+      trigGeomUtils->computeSCCoordinates(bestTrackIt,scsector,trackPosPhi,trackDirPhi,trackPosEta,trackDirEta);
       
       map<string, TH1F*> &chMap = chHistos[chId.rawId()];
 
@@ -286,7 +281,7 @@ void L1ITMBPrimitiveResolutionPlots::analyze(const edm::Event& e, const edm::Eve
   
 }
 
-void L1ITMBPrimitiveResolutionPlots::searchDccBest( std::vector<L1MuDTChambPhDigi>* trigs ){
+void L1ITMBPrimitiveResolutionPlots::searchDccBest( const std::vector<L1MuDTChambPhDigi> & trigs ){
   
   string histoType ;
   string histoTag ;
@@ -298,18 +293,16 @@ void L1ITMBPrimitiveResolutionPlots::searchDccBest( std::vector<L1MuDTChambPhDig
       for (int sec=0;sec<=12;++sec)
 	trigQualBest[wh][st][sec] = -1;    
 	
-  vector<L1MuDTChambPhDigi>::const_iterator trigIt  = trigs->begin();
-  vector<L1MuDTChambPhDigi>::const_iterator trigEnd = trigs->end();
-  for(; trigIt!=trigEnd; ++trigIt) {
+  for ( const auto & trigIt : trigs ) {
     
-    int wh   = trigIt->whNum();
-    int sec  = trigIt->scNum() + 1; // DTTF -> DT sector range transform
-    int st   = trigIt->stNum();
-    int qual = trigIt->code();
+    int wh   = trigIt.whNum();
+    int sec  = trigIt.scNum() + 1; // DTTF -> DT sector range transform
+    int st   = trigIt.stNum();
+    int qual = trigIt.code();
 
     if(qual>trigQualBest[wh+3][st][sec] && qual<7) {
       trigQualBest[wh+3][st][sec]=qual; 
-      trigBest[wh+3][st][sec] = &(*trigIt);
+      trigBest[wh+3][st][sec] = &(trigIt);
     }
     
   }

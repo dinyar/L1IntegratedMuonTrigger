@@ -53,7 +53,7 @@
 
 class L1ITMBPrimitiveTimingEffPlots_T0: public edm::EDAnalyzer{
   
- public:
+public:
   
   /// Constructor
   L1ITMBPrimitiveTimingEffPlots_T0(const edm::ParameterSet& ps );
@@ -61,7 +61,7 @@ class L1ITMBPrimitiveTimingEffPlots_T0: public edm::EDAnalyzer{
   /// Destructor
   virtual ~L1ITMBPrimitiveTimingEffPlots_T0();
   
- protected:
+protected:
   
   // BeginJob
   void beginJob();
@@ -70,7 +70,7 @@ class L1ITMBPrimitiveTimingEffPlots_T0: public edm::EDAnalyzer{
   void beginRun(const edm::Run& , const edm::EventSetup&);
 
   /// Find best (highest qual) DCC trigger segments
-  void searchDccBest(std::vector<L1MuDTChambPhDigi>* trigs);
+  void searchDccBest(const std::vector<L1MuDTChambPhDigi> & trigs);
   
   /// Analyze
   void analyze(const edm::Event& e, const edm::EventSetup& c);
@@ -81,12 +81,12 @@ class L1ITMBPrimitiveTimingEffPlots_T0: public edm::EDAnalyzer{
   /// EndJob
   void endJob(void);  
 
- private:  
+private:  
 
   /// Book histos
   void bookHistos(DTChamberId chId);
 
- private :
+private :
 
   int nEvents;
   int nLumis;
@@ -183,72 +183,72 @@ void L1ITMBPrimitiveTimingEffPlots_T0::bookHistos(DTChamberId chId) {
   
   string hName = "Timing_DTprim_BX_ALLQ";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for ALL qualities",nBXBins,-rangeBX,rangeBX);
-/*
-  hName = "Timing_DTprim_BX_Q03";
-  chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q<4",nBXBins,-rangeBX,rangeBX);
+  /*
+    hName = "Timing_DTprim_BX_Q03";
+    chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q<4",nBXBins,-rangeBX,rangeBX);
    
-  hName = "Timing_DTprim_BX_Q46";
-  chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q>=4",nBXBins,-rangeBX,rangeBX);
-*/
+    hName = "Timing_DTprim_BX_Q46";
+    chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q>=4",nBXBins,-rangeBX,rangeBX);
+  */
   hName = "Timing_DTprim_BX_Q0";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=0",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Timing_DTprim_BX_Q1";
+  hName = "Timing_DTprim_BX_Q1";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=1",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Timing_DTprim_BX_Q2";
+  hName = "Timing_DTprim_BX_Q2";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=2",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Timing_DTprim_BX_Q3";
+  hName = "Timing_DTprim_BX_Q3";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=3",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Timing_DTprim_BX_Q4";
+  hName = "Timing_DTprim_BX_Q4";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=4",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Timing_DTprim_BX_Q5";
+  hName = "Timing_DTprim_BX_Q5";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=5",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Timing_DTprim_BX_Q6";
+  hName = "Timing_DTprim_BX_Q6";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"BX distribution of DT trigger primitives for Q=6",nBXBins,-rangeBX,rangeBX);
 
   
   hName = "Clasific_OOT";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"Number of entries for different clasification",5,0,4);
 
-   hName = "Timing_DTprim_BX_outoftime";
+  hName = "Timing_DTprim_BX_outoftime";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"Number of entries of out of time DT trigger primitives ALL qualities",nBXBins,-rangeBX,rangeBX);
 
-    hName = "Number_TPrimitives";
+  hName = "Number_TPrimitives";
   chambMap[hName] = folder.make<TH1F>((hName+chTag).c_str(),"Number of trigger primitives per event",nTPBins,0,rangeTP);
 
-   hName = "TP_Efficiency_posPhi";
+  hName = "TP_Efficiency_posPhi";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_posPhi",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_posEta";
+  hName = "TP_Efficiency_posEta";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_posEta",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_posPhi_BX0";
+  hName = "TP_Efficiency_posPhi_BX0";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_posPhi_BX0",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_posEta_BX0";
+  hName = "TP_Efficiency_posEta_BX0";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_posEta_BX0",nEffBins,-rangeEff,rangeEff);
   
-     hName = "TP_Efficiency_dirPhi";
+  hName = "TP_Efficiency_dirPhi";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_dirPhi",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_dirEta";
+  hName = "TP_Efficiency_dirEta";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_dirEta",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_dirPhi_BX0";
+  hName = "TP_Efficiency_dirPhi_BX0";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_dirPhi_BX0",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_dirEta_BX0";
+  hName = "TP_Efficiency_dirEta_BX0";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_dirEta_BX0",nEffBins,-rangeEff,rangeEff);
 
-   hName = "TP_Efficiency_T0";
+  hName = "TP_Efficiency_T0";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_T0",nEffBinsT0,-rangeEffT0,rangeEffT0);
 
-   hName = "TP_Efficiency_T0_BX0";
+  hName = "TP_Efficiency_T0_BX0";
   effchambMap[hName] = folder.make<TEfficiency>((hName+chTag).c_str(),"TP_Efficiency_T0_BX0",nEffBinsT0,-rangeEffT0,rangeEffT0);
   
 }
@@ -262,15 +262,15 @@ void L1ITMBPrimitiveTimingEffPlots_T0::beginRun(const edm::Run& run, const edm::
   context.get<MuonGeometryRecord>().get(theGeomLabel,muonGeom);
   trigGeomUtils = new DTTrigGeomUtils(muonGeom);
 	
-  std::vector<DTChamber*>::const_iterator chambIt  = muonGeom->chambers().begin();
-  std::vector<DTChamber*>::const_iterator chambEnd = muonGeom->chambers().end();
+  std::vector<const DTChamber*>::const_iterator chambIt  = muonGeom->chambers().begin();
+  std::vector<const DTChamber*>::const_iterator chambEnd = muonGeom->chambers().end();
   
   for (; chambIt!=chambEnd; ++chambIt)
     bookHistos((*chambIt)->id());
 
-   TFileDirectory crisfolder  = fs->mkdir("Overall");
-   std::map<std::string, TH1F*> &crischambMap = sHistos;
-   crischambMap["ALL_Timing_DTprim_BX_ALLQ"]=crisfolder.make<TH1F>("ALL_Timing_DTprim_BX_ALLQ","Summary BX",nBXBins,-rangeBX,rangeBX);
+  TFileDirectory crisfolder  = fs->mkdir("Overall");
+  std::map<std::string, TH1F*> &crischambMap = sHistos;
+  crischambMap["ALL_Timing_DTprim_BX_ALLQ"]=crisfolder.make<TH1F>("ALL_Timing_DTprim_BX_ALLQ","Summary BX",nBXBins,-rangeBX,rangeBX);
 }
 
 
@@ -295,7 +295,7 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
     
   edm::Handle<L1MuDTChambPhContainer> trigHandle;
   e.getByLabel(dccInputTag,trigHandle);
-  vector<L1MuDTChambPhDigi>* trigs = trigHandle->getContainer();
+  const vector<L1MuDTChambPhDigi> & trigs = *(trigHandle->getContainer());
   searchDccBest(trigs);
 
   Handle<DTRecSegment4DCollection> segments4D;
@@ -313,7 +313,9 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
     const DTRecSegment4D* tmpBest = 0;
     int tmpdof = 0;
     int dof = 0;
-    
+
+    // DTRecSegment4DCollection::range & rangeInCh = segments4D->get(*chamberId);
+    // for ( const auto & trackIt : rangeInCh ) {
     for (; trackIt!=trackEnd; ++trackIt){
       if(trackIt->hasPhi()) {				
 	dof = trackIt->phiSegment()->degreesOfFreedom();
@@ -340,7 +342,7 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
       
       bool ist0valid=(*bestTrackIt)->phiSegment()->ist0Valid();
       if (ist0valid==true) {
-         t0seg = (*bestTrackIt)->phiSegment()->t0();
+	t0seg = (*bestTrackIt)->phiSegment()->t0();
       };
       
       int wheel    = chId.wheel();
@@ -355,8 +357,8 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
       map<string, TEfficiency*> &effchMap = EffchHistos[chId.rawId()];
 
       map<string, TH1F*> &crischMap = sHistos;
- //     map<string, TH1F*> &crischMap2 = sHistos2;
-  //    map<string, TH1F*> &crischMap3 = sHistos3;
+      //     map<string, TH1F*> &crischMap2 = sHistos2;
+      //    map<string, TH1F*> &crischMap3 = sHistos3;
       bool TP_good=false;
       bool TP_good_BX0=false;
       
@@ -367,26 +369,26 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
 	BXbest=trigBest[wheel+3][station][scsector]->bxNum();
 	chMap.find("Timing_DTprim_BX_ALLQ")->second->Fill(BXbest);
 	crischMap.find("ALL_Timing_DTprim_BX_ALLQ")->second->Fill(BXbest);
-	} //trigQualBest if
+      } //trigQualBest if
 
       BXbest=-1;
       if (trigQualBest[wheel+3][station][scsector] > -1 &&  //EFFICIENCY tests
 	  trigQualBest[wheel+3][station][scsector] < 7 ) {
-	   // && nHitsPhi>=7 ) {
+	// && nHitsPhi>=7 ) {
 	BXbest=trigBest[wheel+3][station][scsector]->bxNum();
 	TP_good=true;
 	if (BXbest==0) TP_good_BX0=true;
 	  
-	  } //trigQualBest if
+      } //trigQualBest if
 	  
-	effchMap.find("TP_Efficiency_posPhi")->second->Fill(TP_good,trackPosPhi);
-	effchMap.find("TP_Efficiency_posEta")->second->Fill(TP_good,trackPosEta);
-	effchMap.find("TP_Efficiency_posPhi_BX0")->second->Fill(TP_good_BX0,trackPosPhi);
-	effchMap.find("TP_Efficiency_posEta_BX0")->second->Fill(TP_good_BX0,trackPosEta);
-	effchMap.find("TP_Efficiency_dirPhi")->second->Fill(TP_good,trackDirPhi);
-	effchMap.find("TP_Efficiency_dirEta")->second->Fill(TP_good,trackDirEta);
-	effchMap.find("TP_Efficiency_dirPhi_BX0")->second->Fill(TP_good_BX0,trackDirPhi);
-	effchMap.find("TP_Efficiency_dirEta_BX0")->second->Fill(TP_good_BX0,trackDirEta);
+      effchMap.find("TP_Efficiency_posPhi")->second->Fill(TP_good,trackPosPhi);
+      effchMap.find("TP_Efficiency_posEta")->second->Fill(TP_good,trackPosEta);
+      effchMap.find("TP_Efficiency_posPhi_BX0")->second->Fill(TP_good_BX0,trackPosPhi);
+      effchMap.find("TP_Efficiency_posEta_BX0")->second->Fill(TP_good_BX0,trackPosEta);
+      effchMap.find("TP_Efficiency_dirPhi")->second->Fill(TP_good,trackDirPhi);
+      effchMap.find("TP_Efficiency_dirEta")->second->Fill(TP_good,trackDirEta);
+      effchMap.find("TP_Efficiency_dirPhi_BX0")->second->Fill(TP_good_BX0,trackDirPhi);
+      effchMap.find("TP_Efficiency_dirEta_BX0")->second->Fill(TP_good_BX0,trackDirEta);
 
       if (ist0valid==true) {
         effchMap.find("TP_Efficiency_T0")->second->Fill(TP_good,t0seg);
@@ -394,92 +396,90 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
 
       };
 
-/*
-      BXbest=-1;
-      if (trigQualBest[wheel+3][station][scsector] > -1 &&   //fills up the BX histogram for qualities 0 to 3
-	  trigQualBest[wheel+3][station][scsector] < 4  &&
-	  nHitsPhi>=7 ) {
+      /*
+	BXbest=-1;
+	if (trigQualBest[wheel+3][station][scsector] > -1 &&   //fills up the BX histogram for qualities 0 to 3
+	trigQualBest[wheel+3][station][scsector] < 4  &&
+	nHitsPhi>=7 ) {
 	BXbest=trigBest[wheel+3][station][scsector]->bxNum();
 	chMap.find("Timing_DTprim_BX_Q03")->second->Fill(BXbest);
 	crischMap2.find("ALL_Timing_DTprim_BX_Q03")->second->Fill(BXbest);
-      } //trigQualBest if
+	} //trigQualBest if
 
-      BXbest=-1;
-      if (trigQualBest[wheel+3][station][scsector] > 3 &&   //fills up the BX histogram for qualities 4 to 6
-	  trigQualBest[wheel+3][station][scsector] < 7  &&
-	  nHitsPhi>=7 ) {
+	BXbest=-1;
+	if (trigQualBest[wheel+3][station][scsector] > 3 &&   //fills up the BX histogram for qualities 4 to 6
+	trigQualBest[wheel+3][station][scsector] < 7  &&
+	nHitsPhi>=7 ) {
 	BXbest=trigBest[wheel+3][station][scsector]->bxNum();
 	chMap.find("Timing_DTprim_BX_Q46")->second->Fill(BXbest);
 	crischMap3.find("ALL_Timing_DTprim_BX_Q46")->second->Fill(BXbest);
-      } //trigQualBest if
-*/
-//individual qualities      
+	} //trigQualBest if
+      */
+      //individual qualities      
       BXbest=-1;
       if (nHitsPhi>=7 ) {
-          if (trigQualBest[wheel+3][station][scsector] == 0) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q0")->second->Fill(BXbest);
-          }
-          if (trigQualBest[wheel+3][station][scsector] == 1) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q1")->second->Fill(BXbest);
-          }
-          if (trigQualBest[wheel+3][station][scsector] == 2) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q2")->second->Fill(BXbest);
-          }
-          if (trigQualBest[wheel+3][station][scsector] == 3) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q3")->second->Fill(BXbest);
-          }
-          if (trigQualBest[wheel+3][station][scsector] == 4) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q4")->second->Fill(BXbest);
-          }
-          if (trigQualBest[wheel+3][station][scsector] == 5) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q5")->second->Fill(BXbest);
-          }
-          if (trigQualBest[wheel+3][station][scsector] == 6) {
-          	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
-          	  chMap.find("Timing_DTprim_BX_Q6")->second->Fill(BXbest);
-          }
+	if (trigQualBest[wheel+3][station][scsector] == 0) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q0")->second->Fill(BXbest);
+	}
+	if (trigQualBest[wheel+3][station][scsector] == 1) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q1")->second->Fill(BXbest);
+	}
+	if (trigQualBest[wheel+3][station][scsector] == 2) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q2")->second->Fill(BXbest);
+	}
+	if (trigQualBest[wheel+3][station][scsector] == 3) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q3")->second->Fill(BXbest);
+	}
+	if (trigQualBest[wheel+3][station][scsector] == 4) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q4")->second->Fill(BXbest);
+	}
+	if (trigQualBest[wheel+3][station][scsector] == 5) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q5")->second->Fill(BXbest);
+	}
+	if (trigQualBest[wheel+3][station][scsector] == 6) {
+	  BXbest=trigBest[wheel+3][station][scsector]->bxNum();
+	  chMap.find("Timing_DTprim_BX_Q6")->second->Fill(BXbest);
+	}
       } //trigQualBest if individual qualities
  
-  vector<L1MuDTChambPhDigi>::const_iterator trigIt  = trigs->begin();
-  vector<L1MuDTChambPhDigi>::const_iterator trigEnd = trigs->end();
-  int NumTP=0;
-  int BX_i=-1;
-  for(; trigIt!=trigEnd; ++trigIt) {
-    int wh   = trigIt->whNum();
-    int sec  = trigIt->scNum() + 1; // DTTF -> DT sector range transform
-    int st   = trigIt->stNum();
+      int NumTP=0;
+      int BX_i=-1;
+      for ( const auto & trigIt :trigs  ) {
+	int wh   = trigIt.whNum();
+	int sec  = trigIt.scNum() + 1; // DTTF -> DT sector range transform
+	int st   = trigIt.stNum();
      
-  //  int qual = trigIt->code();
-  if ((wh==wheel) && (sec==scsector) && (st==station) && (nHitsPhi>7)){
-  	   BX_i=trigIt->bxNum();
-     	   NumTP=NumTP+1;
-	   chMap.find("Timing_DTprim_BX_outoftime")->second->Fill(BX_i);
-   }//if matching same station
-  }//for trigs
+	//  int qual = trigIt->code();
+	if ((wh==wheel) && (sec==scsector) && (st==station) && (nHitsPhi>7)){
+	  BX_i=trigIt.bxNum();
+	  NumTP=NumTP+1;
+	  chMap.find("Timing_DTprim_BX_outoftime")->second->Fill(BX_i);
+	}//if matching same station
+      }//for trigs
  
-    chMap.find("Number_TPrimitives")->second->Fill(NumTP);
+      chMap.find("Number_TPrimitives")->second->Fill(NumTP);
  
-    //Clasification OOT TP
-    if (NumTP==1) {
-    	    //select if it has the BXin =0
-    	    if (BX_i==0){    chMap.find("Clasific_OOT")->second->Fill(0);
-	    }else{    chMap.find("Clasific_OOT")->second->Fill(1);
-	    }
-    }else {//nuntp=1
-    	    //search for the best quality 
-    	if (BXbest!=-1){
-    	    //select if it has the BXin =0
-    	    if (BXbest==0){  chMap.find("Clasific_OOT")->second->Fill(2);
-	    }else{chMap.find("Clasific_OOT")->second->Fill(3);
-	    }
+      //Clasification OOT TP
+      if (NumTP==1) {
+	//select if it has the BXin =0
+	if (BX_i==0){    chMap.find("Clasific_OOT")->second->Fill(0);
+	}else{    chMap.find("Clasific_OOT")->second->Fill(1);
 	}
-    }//nuntp=1
+      }else {//nuntp=1
+	//search for the best quality 
+    	if (BXbest!=-1){
+	  //select if it has the BXin =0
+	  if (BXbest==0){  chMap.find("Clasific_OOT")->second->Fill(2);
+	  }else{chMap.find("Clasific_OOT")->second->Fill(3);
+	  }
+	}
+      }//nuntp=1
     
     
    
@@ -488,7 +488,7 @@ void L1ITMBPrimitiveTimingEffPlots_T0::analyze(const edm::Event& e, const edm::E
   
 }//::analyze
 
-void L1ITMBPrimitiveTimingEffPlots_T0::searchDccBest( std::vector<L1MuDTChambPhDigi>* trigs ){
+void L1ITMBPrimitiveTimingEffPlots_T0::searchDccBest( const std::vector<L1MuDTChambPhDigi> & trigs ){
   
   string histoType ;
   string histoTag ;
@@ -500,18 +500,16 @@ void L1ITMBPrimitiveTimingEffPlots_T0::searchDccBest( std::vector<L1MuDTChambPhD
       for (int sec=0;sec<=12;++sec)
 	trigQualBest[wh][st][sec] = -1;    
 	
-  vector<L1MuDTChambPhDigi>::const_iterator trigIt  = trigs->begin();
-  vector<L1MuDTChambPhDigi>::const_iterator trigEnd = trigs->end();
-  for(; trigIt!=trigEnd; ++trigIt) {
+  for ( const auto & trigIt :trigs  ) {
     
-    int wh   = trigIt->whNum();
-    int sec  = trigIt->scNum() + 1; // DTTF -> DT sector range transform
-    int st   = trigIt->stNum();
-    int qual = trigIt->code();
+    int wh   = trigIt.whNum();
+    int sec  = trigIt.scNum() + 1; // DTTF -> DT sector range transform
+    int st   = trigIt.stNum();
+    int qual = trigIt.code();
 
     if(qual>trigQualBest[wh+3][st][sec] && qual<7) {
       trigQualBest[wh+3][st][sec]=qual; 
-      trigBest[wh+3][st][sec] = &(*trigIt);
+      trigBest[wh+3][st][sec] = &trigIt;
     }
     
   }
