@@ -1,0 +1,213 @@
+DEBUG 2015-01-13 11:38:32,438: 	 Executing command: 'submit'
+DEBUG 2015-01-13 11:38:32,441: 	 Found /afs/cern.ch/user/g/gcodispo/.crab3 file
+DEBUG 2015-01-13 11:38:32,592: 	 Checking credentials
+DEBUG 2015-01-13 11:38:32,593: 	 Found proxy file /tmp/x509up_u11551
+DEBUG 2015-01-13 11:38:32,593: 	 Getting proxy life time left
+DEBUG 2015-01-13 11:38:33,798: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -timeleft
+ output : 85020
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:38:34,803: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -actimeleft
+ output : 85019
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:38:34,803: 	 Proxy valid for 23:37:00 hours
+INFO 2015-01-13 11:38:34,803: 	 Will use configuration file crab3_particleGunGenSim_MuPlus.py
+DEBUG 2015-01-13 11:38:34,804: 	 Loading configuration
+DEBUG 2015-01-13 11:38:35,318: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti
+
+ error: WARNING: can't open config file: /build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/tmp/BUILDROOT/1b0a06ff720813198f5edc6648696789/build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/slc6_amd64_gcc481/external/openssl/1.0.1j/ssl/openssl.cnf
+
+ retcode : 0
+DEBUG 2015-01-13 11:38:35,318: 	 Checking credentials
+DEBUG 2015-01-13 11:38:35,318: 	 Found proxy file /tmp/x509up_u11551
+DEBUG 2015-01-13 11:38:35,318: 	 Getting proxy life time left
+DEBUG 2015-01-13 11:38:36,423: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -timeleft
+ output : 85017
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:38:37,627: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -actimeleft
+ output : 85016
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:38:37,628: 	 Proxy valid for 23:36:57 hours
+DEBUG 2015-01-13 11:38:38,732: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u11551 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+/cms/itcms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:38:38,894: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(3[136]|21|045|052|021|031).cern.ch
+DEBUG 2015-01-13 11:38:39,409: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti
+
+ error: WARNING: can't open config file: /build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/tmp/BUILDROOT/1b0a06ff720813198f5edc6648696789/build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/slc6_amd64_gcc481/external/openssl/1.0.1j/ssl/openssl.cnf
+
+ retcode : 0
+DEBUG 2015-01-13 11:38:39,409: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2015-01-13 11:38:39,409: 	 Calculating hash of /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti_cmsweb.cern.ch for credential name
+DEBUG 2015-01-13 11:38:40,213: 	 Executing : 
+ command : myproxy-info -l 19c564e25ba28fdba929d57dfcb99a4928c6b672 -s myproxy.cern.ch
+ output : username: 19c564e25ba28fdba929d57dfcb99a4928c6b672
+owner: /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(3[136]|21|045|052|021|031).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(3[136]|21|045|052|021|031).cern.ch
+  timeleft: 696:32:11  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:38:40,214: 	 Myproxy is valid: 2507531
+DEBUG 2015-01-13 11:38:40,214: 	 Command use: submit
+DEBUG 2015-01-13 11:38:40,214: 	 Options use: ['crab3_particleGunGenSim_MuPlus.py']
+DEBUG 2015-01-13 11:38:40,410: 	 CRABClient version: 3.3.12.patch1 Compatible
+DEBUG 2015-01-13 11:38:40,410: 	 Instance is prod
+DEBUG 2015-01-13 11:38:40,410: 	 Server base url is cmsweb.cern.ch
+DEBUG 2015-01-13 11:38:40,410: 	 Command url /crabserver/prod/workflow
+DEBUG 2015-01-13 11:38:40,410: 	 Started submission
+DEBUG 2015-01-13 11:38:40,411: 	 Working on /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/src/L1Trigger/L1IntegratedMuonTrigger/test/crab3/MBPrimitivesProduction/crab_particleGunGenSim_MuPlus_v1
+DEBUG 2015-01-13 11:38:40,642: 	 Found CMSSW_7_2_3_patch1 for slc6_amd64_gcc481 with base /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1
+DEBUG 2015-01-13 11:38:41,110: 	 UNIQUE NAME: tarUUID d3f857c2-79fc-40ee-a083-1fd2ec603c7d 
+DEBUG 2015-01-13 11:38:41,110: 	 self.config: from WMCore.Configuration import Configuration
+config = Configuration()
+config.section_('General')
+config.General.transferLogs = True
+config.General.workArea = 'MBPrimitivesProduction'
+config.General.requestName = 'particleGunGenSim_MuPlus_v1'
+config.General.serverUrl = 'cmsweb.cern.ch'
+config.section_('JobType')
+config.JobType.psetName = 'particleGunGenSimCrab_MuPlus.py'
+config.JobType.pluginName = 'PrivateMC'
+config.JobType.capath = '/etc/grid-security/certificates/'
+config.JobType.proxyfilename = '/tmp/x509up_u11551'
+config.JobType.filecacheurl = 'https://cmsweb.cern.ch/crabcache'
+config.section_('Data')
+config.Data.publishDBS = 'phys03'
+config.Data.publication = False
+config.Data.unitsPerJob = 10000
+config.Data.splitting = 'EventBased'
+config.Data.publishDataName = 'MBPrimitivesProduction_particleGunGenSim_MuPlus_v1'
+config.Data.primaryDataset = 'SingleMuPlus'
+config.Data.totalUnits = 100000
+config.section_('Site')
+config.Site.storageSite = 'T3_IT_Bologna'
+
+DEBUG 2015-01-13 11:38:41,110: 	 self.config.JobType.psetName: particleGunGenSimCrab_MuPlus.py
+DEBUG 2015-01-13 11:38:41,110: 	 Importing CMSSW config particleGunGenSimCrab_MuPlus.py
+DEBUG 2015-01-13 11:38:52,321: 	 The following EDM output files will be collected: ['SingleMuPlus_FlatPt_3to140_eta-1p05to1p05_phi-0p52to0p52_GEN_SIM_DIGI_L1.root']
+DEBUG 2015-01-13 11:38:52,321: 	 The following TFile output files will be collected: []
+DEBUG 2015-01-13 11:38:52,321: 	 The following user output files will be collected: []
+DEBUG 2015-01-13 11:38:52,321: 	 Writing CMSSW config to /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/src/L1Trigger/L1IntegratedMuonTrigger/test/crab3/MBPrimitivesProduction/crab_particleGunGenSim_MuPlus_v1/inputs/CMSSW_cfg.py
+DEBUG 2015-01-13 11:38:52,930: 	 Found CMSSW_7_2_3_patch1 for slc6_amd64_gcc481 with base /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1
+DEBUG 2015-01-13 11:38:52,931: 	 Making tarball in /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/src/L1Trigger/L1IntegratedMuonTrigger/test/crab3/MBPrimitivesProduction/crab_particleGunGenSim_MuPlus_v1/inputs/d3f857c2-79fc-40ee-a083-1fd2ec603c7ddefault.tgz
+DEBUG 2015-01-13 11:38:52,932: 	  checking directory /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/lib
+DEBUG 2015-01-13 11:38:52,932: 	  adding directory /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/lib to tarball
+DEBUG 2015-01-13 11:38:53,493: 	  checking directory /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/module
+DEBUG 2015-01-13 11:38:53,597: 	 tgz contents: [('lib', 0, 1420734936, 'gcodispo'), ('lib/slc6_amd64_gcc481', 0, 1420735239, 'gcodispo'), ('lib/slc6_amd64_gcc481/libL1TriggerL1IntegratedMuonTrigger.so', 2160721, 1420735227, 'gcodispo'), ('lib/slc6_amd64_gcc481/pluginL1TriggerL1IntegratedMuonTriggerPlugins.so', 1387491, 1420735235, 'gcodispo'), ('lib/slc6_amd64_gcc481/L1TriggerL1IntegratedMuonTriggerPlugins.edmplugin', 56, 1420735235, 'gcodispo'), ('lib/slc6_amd64_gcc481/pluginL1TriggerL1IntegratedMuonTriggerCapabilities.so', 19486, 1420735235, 'gcodispo'), ('lib/slc6_amd64_gcc481/L1TriggerL1IntegratedMuonTriggerCapabilities.edmplugin', 61, 1420735235, 'gcodispo'), ('lib/slc6_amd64_gcc481/.edmplugincache', 16158, 1420735239, 'gcodispo'), ('PSet.py', 101, 1421145532, 'gcodispo'), ('PSet.pkl', 941753, 1421145532, 'gcodispo'), ('debug/originalPSet.py', 6520, 1421145500, 'gcodispo'), ('debug/crabConfig.py', 975, 1421145533, 'gcodispo')]
+DEBUG 2015-01-13 11:38:53,597: 	 MD5 checksum: 7b2af091baa869f28bc146b64596d9bc
+DEBUG 2015-01-13 11:38:53,610: 	  uploading archive to cache /afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/src/L1Trigger/L1IntegratedMuonTrigger/test/crab3/MBPrimitivesProduction/crab_particleGunGenSim_MuPlus_v1/inputs/d3f857c2-79fc-40ee-a083-1fd2ec603c7ddefault.tgz 
+DEBUG 2015-01-13 11:38:53,873: 	 Result uploading input files: ('https://cmsweb.cern.ch/crabcache', '051c58fb5f11f6948710c16f019aa643f329e7c1fd14ae32a3ce45e69fbe2873.tar.gz', '7b2af091baa869f28bc146b64596d9bc') 
+INFO 2015-01-13 11:38:53,874: 	 Sending the request to the server
+DEBUG 2015-01-13 11:38:53,874: 	 Submitting {'ignorelocality': 0, 'workflow': 'crab_particleGunGenSim_MuPlus_v1', 'adduserfiles': [], 'publishname': 'MBPrimitivesProduction_particleGunGenSim_MuPlus_v1-7b2af091baa869f28bc146b64596d9bc', 'savelogsflag': 1, 'useparent': 0, 'nonprodsw': 0, 'tfileoutfiles': [], 'asyncdest': 'T3_IT_Bologna', 'oneEventMode': 0, 'algoargs': 10000, 'saveoutput': 1, 'totalunits': 100000, 'cachefilename': '051c58fb5f11f6948710c16f019aa643f329e7c1fd14ae32a3ce45e69fbe2873.tar.gz', 'jobarch': 'slc6_amd64_gcc481', 'addoutputfiles': [], 'splitalgo': 'EventBased', 'publishdbsurl': 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter', 'jobsw': 'CMSSW_7_2_3_patch1', 'dbsurl': 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader', 'publication': 0, 'edmoutfiles': ['SingleMuPlus_FlatPt_3to140_eta-1p05to1p05_phi-0p52to0p52_GEN_SIM_DIGI_L1.root'], 'cacheurl': 'https://cmsweb.cern.ch/crabcache', 'inputdata': '/SingleMuPlus', 'jobtype': 'PrivateMC'} 
+DEBUG 2015-01-13 11:38:53,874: 	 Encoded submit request: ignorelocality=0&workflow=crab_particleGunGenSim_MuPlus_v1&publishname=MBPrimitivesProduction_particleGunGenSim_MuPlus_v1-7b2af091baa869f28bc146b64596d9bc&savelogsflag=1&useparent=0&nonprodsw=0&asyncdest=T3_IT_Bologna&oneEventMode=0&algoargs=10000&saveoutput=1&totalunits=100000&cachefilename=051c58fb5f11f6948710c16f019aa643f329e7c1fd14ae32a3ce45e69fbe2873.tar.gz&jobarch=slc6_amd64_gcc481&splitalgo=EventBased&publishdbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fphys03%2FDBSWriter&jobsw=CMSSW_7_2_3_patch1&dbsurl=https%3A%2F%2Fcmsweb.cern.ch%2Fdbs%2Fprod%2Fglobal%2FDBSReader&publication=0&cacheurl=https%3A%2F%2Fcmsweb.cern.ch%2Fcrabcache&inputdata=%2FSingleMuPlus&jobtype=PrivateMC&edmoutfiles=SingleMuPlus_FlatPt_3to140_eta-1p05to1p05_phi-0p52to0p52_GEN_SIM_DIGI_L1.root
+DEBUG 2015-01-13 11:38:54,565: 	 Result: {'result': [{'RequestName': '150113_103854_crab3test-1:gcodispo_crab_particleGunGenSim_MuPlus_v1'}]}
+INFO 2015-01-13 11:38:54,567: 	 Success: Your task has been delivered to the CRAB3 server.
+INFO 2015-01-13 11:38:54,567: 	 Task name: 150113_103854_crab3test-1:gcodispo_crab_particleGunGenSim_MuPlus_v1
+INFO 2015-01-13 11:38:54,567: 	 Please use 'crab status' to check how the submission process proceed
+DEBUG 2015-01-13 11:38:54,567: 	 About to return
+DEBUG 2015-01-13 11:41:29,189: 	 Executing command: 'status'
+DEBUG 2015-01-13 11:41:29,189: 	 Found /afs/cern.ch/user/g/gcodispo/.crab3 file
+DEBUG 2015-01-13 11:41:29,196: 	 Checking credentials
+DEBUG 2015-01-13 11:41:29,197: 	 Found proxy file /tmp/x509up_u11551
+DEBUG 2015-01-13 11:41:29,197: 	 Getting proxy life time left
+DEBUG 2015-01-13 11:41:29,701: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -timeleft
+ output : 84844
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:41:30,414: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -actimeleft
+ output : 84843
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:41:30,414: 	 Proxy valid for 23:34:04 hours
+DEBUG 2015-01-13 11:41:30,542: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti
+
+ error: WARNING: can't open config file: /build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/tmp/BUILDROOT/1b0a06ff720813198f5edc6648696789/build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/slc6_amd64_gcc481/external/openssl/1.0.1j/ssl/openssl.cnf
+
+ retcode : 0
+DEBUG 2015-01-13 11:41:30,543: 	 Checking credentials
+DEBUG 2015-01-13 11:41:30,543: 	 Found proxy file /tmp/x509up_u11551
+DEBUG 2015-01-13 11:41:30,543: 	 Getting proxy life time left
+DEBUG 2015-01-13 11:41:31,046: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -timeleft
+ output : 84843
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:41:31,551: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u11551 -actimeleft
+ output : 84842
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:41:31,551: 	 Proxy valid for 23:34:03 hours
+DEBUG 2015-01-13 11:41:32,056: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u11551 voms-proxy-info -fqan
+ output : /cms/Role=NULL/Capability=NULL
+/cms/itcms/Role=NULL/Capability=NULL
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:41:32,205: 	 Registering user credentials for server /DC=ch/DC=cern/OU=computers/CN=vocms(3[136]|21|045|052|021|031).cern.ch
+DEBUG 2015-01-13 11:41:32,314: 	 Executing : 
+ command : openssl x509 -in ~/.globus/usercert.pem -subject -noout
+ output : subject= /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti
+
+ error: WARNING: can't open config file: /build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/tmp/BUILDROOT/1b0a06ff720813198f5edc6648696789/build/dmwmbld/srv/state/dmwmbld/builds/comp_gcc481/w/slc6_amd64_gcc481/external/openssl/1.0.1j/ssl/openssl.cnf
+
+ retcode : 0
+DEBUG 2015-01-13 11:41:32,314: 	 Getting myproxy life time left for myproxy.cern.ch
+DEBUG 2015-01-13 11:41:32,314: 	 Calculating hash of /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti_cmsweb.cern.ch for credential name
+DEBUG 2015-01-13 11:41:32,517: 	 Executing : 
+ command : myproxy-info -l 19c564e25ba28fdba929d57dfcb99a4928c6b672 -s myproxy.cern.ch
+ output : username: 19c564e25ba28fdba929d57dfcb99a4928c6b672
+owner: /C=IT/O=INFN/OU=Personal Certificate/L=Bologna/CN=Giuseppe Codispoti
+  renewal policy: /DC=ch/DC=cern/OU=computers/CN=vocms(3[136]|21|045|052|021|031).cern.ch
+  trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=vocms(3[136]|21|045|052|021|031).cern.ch
+  timeleft: 696:29:19  (29.0 days)
+
+ error: 
+ retcode : 0
+DEBUG 2015-01-13 11:41:32,518: 	 Myproxy is valid: 2507359
+DEBUG 2015-01-13 11:41:32,518: 	 Command use: status
+DEBUG 2015-01-13 11:41:32,518: 	 Options use: ['-d', 'MBPrimitivesProduction/crab_particleGunGenSim_MuPlus_v1/']
+DEBUG 2015-01-13 11:41:33,479: 	 CRABClient version: 3.3.12.patch1 Compatible
+DEBUG 2015-01-13 11:41:33,479: 	 Instance is prod
+DEBUG 2015-01-13 11:41:33,479: 	 Server base url is cmsweb.cern.ch
+DEBUG 2015-01-13 11:41:33,479: 	 Command url /crabserver/prod/workflow
+DEBUG 2015-01-13 11:41:33,480: 	 Looking up detailed status of task 150113_103854_crab3test-1:gcodispo_crab_particleGunGenSim_MuPlus_v1
+DEBUG 2015-01-13 11:41:36,079: 	 {'status': 'SUBMITTED', 'totalJobdefs': 0, 'jobSetID': '150113_103854_crab3test-1:gcodispo_crab_particleGunGenSim_MuPlus_v1', 'jobsPerStatus': {'idle': 5, 'running': 5}, 'taskWarningMsg': [], 'taskFailureMsg': '', 'failedJobdefs': 0, 'ASOURL': 'https://cmsweb.cern.ch/couchdb', 'jobList': [['idle', 10], ['running', 1], ['running', 3], ['running', 2], ['running', 5], ['running', 4], ['idle', 7], ['idle', 6], ['idle', 9], ['idle', 8]], 'jobs': {'10': {'State': 'idle'}, '1': {'State': 'running'}, '3': {'State': 'running'}, '2': {'State': 'running'}, '5': {'State': 'running'}, '4': {'State': 'running'}, '7': {'State': 'idle'}, '6': {'State': 'idle'}, '9': {'State': 'idle'}, '8': {'State': 'idle'}}, 'jobdefErrors': [], 'outdatasets': None, 'pool': {}, 'publication': {}}
+INFO 2015-01-13 11:41:36,079: 	 Task name:			150113_103854_crab3test-1:gcodispo_crab_particleGunGenSim_MuPlus_v1
+INFO 2015-01-13 11:41:36,079: 	 Task status:			SUBMITTED
+INFO 2015-01-13 11:41:36,079: 	 Glidemon monitoring URL:	http://glidemon.web.cern.ch/glidemon/jobs.php?taskname=150113_103854_crab3test-1%3Agcodispo_crab_particleGunGenSim_MuPlus_v1
+INFO 2015-01-13 11:41:36,079: 	 Dashboard monitoring URL:	http://dashb-cms-job.cern.ch/dashboard/templates/task-analysis/#user=gcodispo&refresh=0&table=Jobs&p=1&records=25&activemenu=2&status=&site=&tid=150113_103854_crab3test-1%3Agcodispo_crab_particleGunGenSim_MuPlus_v1
+INFO 2015-01-13 11:41:36,080: 	 Details:			idle           50.0% ( 5/10)
+INFO 2015-01-13 11:41:36,080: 	 				running        50.0% ( 5/10)
+INFO 2015-01-13 11:41:36,080: 	 
+INFO 2015-01-13 11:41:36,080: 	 No publication information available yet

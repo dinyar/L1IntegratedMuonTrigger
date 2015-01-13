@@ -83,13 +83,12 @@ process.configurationMetadata = cms.untracked.PSet(
 )
 
 # Output definition
-
+outname = configTag.replace( '.', 'p' ) + '_GEN_SIM_DIGI_L1.root'
 process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
-    #fileName = cms.untracked.string(configTag+'_GEN_SIM_DIGI_L1.root'),
-    fileName = cms.untracked.string('SingleMuPlus_FlatPt_3to140_eta-1.05to1.05_phi-0.52to0.52_GEN_SIM_DIGI_L1.root'),
+    fileName = cms.untracked.string( outname ),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('')
