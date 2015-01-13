@@ -12,7 +12,7 @@ process = cms.Process('L1')
 # The GlobalTag 
 # must be defined according to the release and the configuration you need
 # this is release/geometry depended, what is now here has been tested to make the
-# workflow work in CMSSW_6_2_12_patch1 using 2012 geomery and was not used for 
+# workflow work in CMSSW_7_2_3_patch1 using 2012 geomery and was not used for 
 # big sample production, only technical workflow was tested
 globalTag = "START72_V1"
 
@@ -36,7 +36,7 @@ maxPt = 140
 
 # The sign of the muon
 # -1 for mu- and +1 for mu+
-muonCharge = +1
+muonCharge = -1
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -88,7 +88,8 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
-    fileName = cms.untracked.string(configTag+'_GEN_SIM_DIGI_L1.root'),
+    #fileName = cms.untracked.string(configTag+'_GEN_SIM_DIGI_L1.root'),
+    fileName = cms.untracked.string('SingleMuMinus_FlatPt_3to140_eta-1.05to1.05_phi-0.52to0.52_GEN_SIM_DIGI_L1.root'),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('')
