@@ -12,7 +12,7 @@ process = cms.Process('L1')
 # The GlobalTag 
 # must be defined according to the release and the configuration you need
 # this is release/geometry depended, what is now here has been tested to make the
-# workflow work in CMSSW_6_2_12_patch1 using 2012 geomery and was not used for 
+# workflow work in CMSSW_7_2_3_patch1 using 2012 geomery and was not used for 
 # big sample production, only technical workflow was tested
 globalTag = "START72_V1"
 
@@ -83,12 +83,12 @@ process.configurationMetadata = cms.untracked.PSet(
 )
 
 # Output definition
-
+outname = configTag.replace( '.', 'p' ) + '_GEN_SIM_DIGI_L1.root'
 process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
     splitLevel = cms.untracked.int32(0),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
-    fileName = cms.untracked.string(configTag+'_GEN_SIM_DIGI_L1.root'),
+    fileName = cms.untracked.string( outname ),
     dataset = cms.untracked.PSet(
         filterName = cms.untracked.string(''),
         dataTier = cms.untracked.string('')
