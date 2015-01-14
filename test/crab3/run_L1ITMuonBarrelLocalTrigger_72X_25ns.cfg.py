@@ -11,7 +11,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 #process.load('Configuration.Geometry.GeometryIdeal_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load("Configuration.StandardSequences.DigiToRaw_cff")
+#process.load("Configuration.StandardSequences.DigiToRaw_cff")
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 process.load("Configuration.StandardSequences.Simulation_cff")
 process.load("Configuration.StandardSequences.L1Emulator_cff")
@@ -32,6 +32,7 @@ process.load('L1Trigger.L1IntegratedMuonTrigger.MBTracksProducer_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.L1ITMuonBarrelPrimitiveProducer_cfi')
 
 process.L1ITMuTriggerPrimitives.DT.src  = cms.InputTag('dttfDigis') # DT from unpacker
+process.L1ITMuTriggerPrimitives.DT.src2  = cms.InputTag('dttfDigis') # DT from unpacker
 process.L1ITMuTriggerPrimitives.CSC.src = cms.InputTag('simCscTriggerPrimitiveDigis', 'MPCSORTED') # CSC are kept in 62X GEN-RAW
 process.L1ITMuTriggerPrimitives.RPC.src = cms.InputTag('muonRPCDigis') # RPC from unpacker
 
@@ -62,6 +63,7 @@ infile = [
 #'file:/data2/battilan/L1Trigger/62X_RAW_RECO.root',
 #'/store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8-tauola_v2/GEN-SIM-RAW/AVE30BX50_tsg_PHYS14_ST_V1-v1/30000/000055D9-148B-E411-86DF-20CF3027A560.root'
 '/store/mc/Phys14DR/RSGravitonToWW_kMpl01_M_1000_Tune4C_13TeV_pythia8/GEN-SIM-RAW/BUNNIES-v3/00000/A6C21248-768A-E411-A17B-02163E00E5AD.root'
+#'/store/relval/CMSSW_7_2_2_patch1/RelValZMM_13/GEN-SIM-DIGI-RAW-HLTDEBUG/PU25ns_MCRUN2_72_V1-v1/00000/1C9D6ECB-6C73-E411-9052-002590596468.root'
 #'file:/afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/src/L1Trigger/L1IntegratedMuonTrigger/SingleMuPlus_FlatPt_3to140_eta-1.05to1.05_phi-0.52to0.52_GEN_SIM_DIGI_L1.root'
 ]
 
@@ -84,7 +86,8 @@ process.L1ITMUSequence = cms.Sequence( process.RawToDigi                +
                                        process.L1RPCTFTrackConverters   +
                                        process.MBLTProducer             +
                                        process.L1ITMuonBarrelPrimitiveProducer +
-                                       process.MBTracksProducer        )
+                                       process.MBTracksProducer
+                                       )
 
 process.L1ITMUPath = cms.Path(process.L1ITMUSequence)
 
