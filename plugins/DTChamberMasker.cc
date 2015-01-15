@@ -46,6 +46,7 @@
 #include "Geometry/DTGeometry/interface/DTChamber.h"
 #include "Geometry/DTGeometry/interface/DTLayer.h"
 
+#include "DataFormats/DTDigi/interface/DTLocalTriggerCollection.h"
 #include "DataFormats/DTDigi/interface/DTDigiCollection.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
 #include "DataFormats/MuonDetId/interface/DTLayerId.h"
@@ -79,6 +80,8 @@ private:
   edm::InputTag m_digiTag;
   edm::InputTag m_trPhTag;
   edm::InputTag m_trThTag;
+
+  bool m_doTriggerFromDDU;
   
   std::vector<std::regex> m_maskedChRegEx;
   std::vector<DTChamberId> m_enabledCh;  
@@ -100,10 +103,14 @@ private:
 DTChamberMasker::DTChamberMasker(const edm::ParameterSet& iConfig) :
   m_digiTag( iConfig.getParameter<edm::InputTag>("digiTag") ),
   m_trPhTag( iConfig.getParameter<edm::InputTag>("triggerPrimPhTag") ),
-  m_trThTag( iConfig.getParameter<edm::InputTag>("triggerPrimThTag") )
+  m_trThTag( iConfig.getParameter<edm::InputTag>("triggerPrimThTag") ),
+  m_doTriggerFromDDU( iConfig.getParameter<bool>("doTriggerFromDDU") ) 
 {
 
   produces<DTDigiCollection>();
+  if (m_doTriggerFromDDU)
+    produces<DTLocalTriggerCollection>();
+  
   produces<L1MuDTChambPhContainer>();
   produces<L1MuDTChambThContainer>();
 
@@ -132,56 +139,78 @@ DTChamberMasker::produce(edm::Event& event, const edm::EventSetup& config)
 {
 
   // CB Fix a few things:
-  // Write loops better
-  // Add protection in case an input tag is "" or "null"
-  // change enabled object maps from ID to rawId ?
+  // add code to mask DDU trigger primitives as well
+  // add possibility to put hit efficiency at a different than 100 or 0
   // deal better with SEC 13 and 14 for trigger
+  // change enabled object maps from ID to rawId ?
   // add FillDescriptors
+  // write loops better
   
   std::auto_ptr<DTDigiCollection> filteredDigis(new DTDigiCollection());
+  std::auto_ptr<DTLocalTriggerCollection> filteredTrigsDDU(new DTLocalTriggerCollection());
+
   std::auto_ptr<L1MuDTChambPhContainer> filteredPhTrigPrimsCont(new L1MuDTChambPhContainer());
   std::auto_ptr<L1MuDTChambThContainer> filteredThTrigPrimsCont(new L1MuDTChambThContainer());
 
   std::vector<L1MuDTChambPhDigi> filteredPhTrigPrims;
   std::vector<L1MuDTChambThDigi> filteredThTrigPrims;
   
-  
-  edm::Handle<DTDigiCollection> dtDigis;
-  event.getByLabel(m_digiTag, dtDigis);
-  
-  DTDigiCollection::DigiRangeIterator dtLayerIdIt  = dtDigis->begin();
-  DTDigiCollection::DigiRangeIterator dtLayerIdEnd = dtDigis->end();
 
-  for (; dtLayerIdIt != dtLayerIdEnd; ++dtLayerIdIt)
+  if (m_digiTag.label() != "")
     {
+  
+      edm::Handle<DTDigiCollection> dtDigis;
+      event.getByLabel(m_digiTag, dtDigis);
+  
+      DTDigiCollection::DigiRangeIterator dtLayerIdIt  = dtDigis->begin();
+      DTDigiCollection::DigiRangeIterator dtLayerIdEnd = dtDigis->end();
       
-      DTChamberId chId = ((*dtLayerIdIt).first).chamberId();
-      if (std::find(m_enabledCh.begin(),m_enabledCh.end(),chId) != m_enabledCh.end())
-	filteredDigis->put((*dtLayerIdIt).second,(*dtLayerIdIt).first);
+      for (; dtLayerIdIt != dtLayerIdEnd; ++dtLayerIdIt)
+	{
 	  
+	  DTChamberId chId = ((*dtLayerIdIt).first).chamberId();
+	  if (std::find(m_enabledCh.begin(),m_enabledCh.end(),chId) != m_enabledCh.end())
+	    filteredDigis->put((*dtLayerIdIt).second,(*dtLayerIdIt).first);
+	  
+	}
+      // CB write the code to apply masks to the DDU collection here
+      //      if (m_doTriggerFromDDU)
+      //	{
+      //        }
+
     }
 
-  edm::Handle<L1MuDTChambPhContainer> phTrigPrimDigis;
-  event.getByLabel(m_trPhTag, phTrigPrimDigis);
-
-  for (auto const trPhDigi : (*phTrigPrimDigis->getContainer()) )
+  if (m_trPhTag.label() != "")
     {
-
-      DTChamberId chId = DTChamberId(trPhDigi.whNum(), trPhDigi.stNum(), (trPhDigi.scNum()+1));
-      if (std::find(m_enabledCh.begin(),m_enabledCh.end(),chId) != m_enabledCh.end())
-	filteredPhTrigPrims.push_back(trPhDigi);	  
+  
+      edm::Handle<L1MuDTChambPhContainer> phTrigPrimDigis;
+      event.getByLabel(m_trPhTag, phTrigPrimDigis);
+      
+      for (auto const trPhDigi : (*phTrigPrimDigis->getContainer()) )
+	{
+	  
+	  DTChamberId chId = DTChamberId(trPhDigi.whNum(), trPhDigi.stNum(), (trPhDigi.scNum()+1));
+	  if (std::find(m_enabledCh.begin(),m_enabledCh.end(),chId) != m_enabledCh.end())
+	    filteredPhTrigPrims.push_back(trPhDigi);	  
+	  
+	}
 
     }
       
-  edm::Handle<L1MuDTChambThContainer> thTrigPrimDigis;
-  event.getByLabel(m_trThTag, thTrigPrimDigis);
-
-  for (auto const trThDigi : (*thTrigPrimDigis->getContainer()) )
+  if (m_trThTag.label() != "")
     {
+  
+      edm::Handle<L1MuDTChambThContainer> thTrigPrimDigis;
+      event.getByLabel(m_trThTag, thTrigPrimDigis);
 
-      DTChamberId chId = DTChamberId(trThDigi.whNum(), trThDigi.stNum(), (trThDigi.scNum()+1));
-      if (std::find(m_enabledCh.begin(),m_enabledCh.end(),chId) != m_enabledCh.end())
-	filteredThTrigPrims.push_back(trThDigi);	  
+      for (auto const trThDigi : (*thTrigPrimDigis->getContainer()) )
+	{
+	  
+	  DTChamberId chId = DTChamberId(trThDigi.whNum(), trThDigi.stNum(), (trThDigi.scNum()+1));
+	  if (std::find(m_enabledCh.begin(),m_enabledCh.end(),chId) != m_enabledCh.end())
+	    filteredThTrigPrims.push_back(trThDigi);	  
+	  
+	}
 
     }
 
@@ -189,6 +218,8 @@ DTChamberMasker::produce(edm::Event& event, const edm::EventSetup& config)
   filteredThTrigPrimsCont->setContainer(filteredThTrigPrims);
   
   event.put(filteredDigis);
+  if (m_doTriggerFromDDU)
+    event.put(filteredTrigsDDU);
   event.put(filteredPhTrigPrimsCont);
   event.put(filteredThTrigPrimsCont);
 
