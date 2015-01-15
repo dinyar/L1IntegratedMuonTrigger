@@ -36,7 +36,7 @@ maxPt = 140
 
 # The sign of the muon
 # -1 for mu- and +1 for mu+
-muonCharge = +1
+muonCharge = -1
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')

@@ -116,10 +116,9 @@ void WeightMaker:: GetValues(std::string Type,
   Float_t VarBOut = 1./HresDeltaBOut->GetCovariance(2,2);
   Float_t VarBIn = 1./HresBInBOut->GetCovariance(1,1);
 
-  //  Float_t TailCut = -0.5;
   Float_t TailCut = TailCut_.Atof();
 
-  /*TAxis *xaxisDPhi = HresDeltaPhi->GetXaxis();
+  TAxis *xaxisDPhi = HresDeltaPhi->GetXaxis();
   Int_t BinCutDPhi = xaxisDPhi->FindBin(TailCut);
   Float_t TailDPhi = 1./HresDeltaPhi->Integral(0,BinCutDPhi);
   TailDPhi=TailDPhi*TailDPhi;
@@ -136,29 +135,6 @@ void WeightMaker:: GetValues(std::string Type,
   Int_t BinCutPhiBOut = xaxisBOut->FindBin(TailCut);
   Float_t TailBOut = 1./HresPhiBOut->Integral(0,BinCutPhiBOut);
   TailBOut=TailBOut*TailBOut;
-  */
-
-
-  Float_t TailDPhi = 1./HresDeltaPhi->Integral(0,TailCut);
-  //  TailDPhi=TailDPhi*TailDPhi;
-  std::cout<<" integral "<<HresDeltaPhi->Integral(-10,TailCut)<<" weight "<<TailDPhi<<std::endl;
-
-
-
-
-  Float_t TailBIn = 1./HresPhiBIn->Integral(-10,TailCut);
-  //  TailBIn=TailBIn*TailBIn;
-
-
-
-
-  Float_t TailBOut = 1./HresPhiBOut->Integral(-10,TailCut);
-  // TailBOut=TailBOut*TailBOut;
-
-
-  //To delete
-
-
 
   // GP  weights for weighted average for correlated variables, not used yet
 

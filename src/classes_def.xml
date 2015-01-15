@@ -1,4 +1,4 @@
-<lcgdict>
+ <lcgdict>
  <selection>
   <class name="L1ITMu::TriggerPrimitive::RPCData"  ClassVersion="11">
    <version ClassVersion="10" checksum="3778906334"/>
@@ -58,7 +58,7 @@
   <class name="edm::Wrapper<L1ITMu::MBLTContainer>"/>
   <class name="L1ITMu::MBLTCollection::primitiveAssociation"/>
   <class name="edm::Wrapper<L1ITMu::MBLTCollection::primitiveAssociation>"  ClassVersion="10">
-   <version ClassVersion="10" checksum="2108283157"/>
+   <version ClassVersion="10" checksum="1233678307"/>
   </class>
   <class name="std::vector<L1ITMu::MBLTCollection::primitiveAssociation>"/>
   <class name="edm::Wrapper<std::vector<L1ITMu::MBLTCollection::primitiveAssociation> >"/>

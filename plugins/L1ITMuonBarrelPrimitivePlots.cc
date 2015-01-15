@@ -195,54 +195,50 @@ void L1ITMuonBarrelPrimitivePlots::analyze( const edm::Event& iEvent,
   edm::Handle<L1MuDTChambPhContainer> phiChambContainer;
   iEvent.getByLabel( _l1itDtPhiChInput, phiChambContainer );
 
-  std::vector<L1MuDTChambPhDigi>* phTrigs = phiChambContainer->getContainer();
-  std::vector<L1MuDTChambPhDigi>::const_iterator iph  = phTrigs->begin();
-  std::vector<L1MuDTChambPhDigi>::const_iterator iphEnd = phTrigs->end();
+  const std::vector<L1MuDTChambPhDigi>& phTrigs
+    = *( phiChambContainer->getContainer() );
 
-  for ( ; iph != iphEnd ; ++iph ) {
+  for ( const auto & iph : phTrigs ) {
 
-
-    if ( iph->code() == 2 || iph->code() == 3 ) {
+    if ( iph.code() == 2 || iph.code() == 3 ) {
       _uncorrelated->Fill( 1 );
-      oldBendingAngle.push_back( iph->phiB() );
-      oldRadialAngle.push_back( iph->phi() );
+      oldBendingAngle.push_back( iph.phiB() );
+      oldRadialAngle.push_back( iph.phi() );
     }
 
-    if ( iph->bxNum() ) continue;
-    _dtQuality->Fill( iph->stNum(), iph->code() );
+    if ( iph.bxNum() ) continue;
+    _dtQuality->Fill( iph.stNum(), iph.code() );
   }
 
   /// New primitives loop
   edm::Handle<L1MuDTChambPhContainer> phiChambContainerNew;
   iEvent.getByLabel( _l1itDtPhiChInputNew, phiChambContainerNew );
 
-  std::vector<L1MuDTChambPhDigi>* phTrigsNew = phiChambContainerNew->getContainer();
-  std::vector<L1MuDTChambPhDigi>::const_iterator iphNew  = phTrigsNew->begin();
-  std::vector<L1MuDTChambPhDigi>::const_iterator iphNewEnd = phTrigsNew->end();
+  const std::vector<L1MuDTChambPhDigi> & phTrigsNew =
+    *( phiChambContainerNew->getContainer() );
 
-  for ( ; iphNew != iphNewEnd ; ++iphNew ) {
+  for ( const auto & iphNew : phTrigsNew ) {
 
-
-    if ( iphNew->code() < 4  ) {
+    if ( iphNew.code() < 4  ) {
 
       // any uncorrelated is bin 2
       _uncorrelated->Fill( 2 );
 
       // uncorrelated with rpc match is bin 3 and has bending recalculation
-      if ( iphNew->code() > 1  ) {
+      if ( iphNew.code() > 1  ) {
 	_uncorrelated->Fill( 3 );
-	newBendingAngle.push_back( iphNew->phiB() );
+	newBendingAngle.push_back( iphNew.phiB() );
       }
 
       /// recombined uncorrelated is bin 4 and has phi and phiB recalculated
-    } else if ( iphNew->code() == 4 ) {
+    } else if ( iphNew.code() == 4 ) {
       _uncorrelated->Fill( 4 );
-      newRadialAngle.push_back( iphNew->phi() );
-      newBendingAngle.push_back( iphNew->phiB() );
+      newRadialAngle.push_back( iphNew.phi() );
+      newBendingAngle.push_back( iphNew.phiB() );
     }
 
-    if ( iphNew->bxNum() ) continue;
-    _dtQualityNew->Fill( iphNew->stNum(), iphNew->code() );
+    if ( iphNew.bxNum() ) continue;
+    _dtQualityNew->Fill( iphNew.stNum(), iphNew.code() );
 
   }
 
