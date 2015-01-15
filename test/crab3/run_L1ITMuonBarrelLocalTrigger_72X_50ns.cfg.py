@@ -11,7 +11,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 #process.load('Configuration.Geometry.GeometryIdeal_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load("Configuration.StandardSequences.DigiToRaw_cff")
+#process.load("Configuration.StandardSequences.DigiToRaw_cff")
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 process.load("Configuration.StandardSequences.Simulation_cff")
 process.load("Configuration.StandardSequences.L1Emulator_cff")
@@ -32,6 +32,7 @@ process.load('L1Trigger.L1IntegratedMuonTrigger.MBTracksProducer_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.L1ITMuonBarrelPrimitiveProducer_cfi')
 
 process.L1ITMuTriggerPrimitives.DT.src  = cms.InputTag('dttfDigis') # DT from unpacker
+process.L1ITMuTriggerPrimitives.DT.src2  = cms.InputTag('dttfDigis') # DT from unpacker
 process.L1ITMuTriggerPrimitives.CSC.src = cms.InputTag('simCscTriggerPrimitiveDigis', 'MPCSORTED') # CSC are kept in 62X GEN-RAW
 process.L1ITMuTriggerPrimitives.RPC.src = cms.InputTag('muonRPCDigis') # RPC from unpacker
 
