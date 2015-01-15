@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.7 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: SingleMuFlatLogPt_100MeVto2TeV_cfi.py -s GEN,SIM,DIGI,L1 --conditions START53_V7A::All --eventcontent FEVTDEBUG --no_exec
+# with command line options: SingleMuFlatLogPt_100MeVto2TeV_cfi.py -s GEN,SIM,DIGI,L1 --conditions START72_V1::All --eventcontent FEVTDEBUG --no_exec
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('L1')

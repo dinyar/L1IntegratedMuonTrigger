@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.381.2.7 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/PyReleaseValidation/python/ConfigBuilder.py,v 
-# with command line options: SingleMuFlatLogPt_100MeVto2TeV_cfi.py -s GEN,SIM,DIGI,L1 --conditions START53_V7A::All --eventcontent FEVTDEBUG --no_exec
+# with command line options: SingleMuFlatLogPt_100MeVto2TeV_cfi.py -s GEN,SIM,DIGI,L1 --conditions START72_V1::All --eventcontent FEVTDEBUG --no_exec
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('L1')
@@ -64,7 +64,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
 # Other statements
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_V7A::All', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'START72_V1::All', '')
 
 process.generator = cms.EDProducer("FlatRandomPtGunProducer",
 	PGunParameters = cms.PSet(
