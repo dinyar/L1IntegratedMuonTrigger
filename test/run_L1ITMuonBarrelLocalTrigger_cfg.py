@@ -20,7 +20,7 @@ process.load('L1Trigger.L1IntegratedMuonTrigger.MBTracksProducer_cfi')
 process.load('L1Trigger.L1IntegratedMuonTrigger.L1ITMuonBarrelPrimitiveProducer_cfi')
 
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_V7A::All', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'START72_V1::All', '')
 
 #infile = ['file:SingleMuFlatPt_minusEta_1GeVto200GeV_GEN_SIM_DIGI_L1.root']
 #infile.append('file:SingleMuFlatPt_plusEta_1GeVto200GeV_GEN_SIM_DIGI_L1.root')
@@ -32,7 +32,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 #process.MessageLogger.cerr.threshold = 'WARNING'
 process.MessageLogger.cerr.threshold = 'ERROR'
 
-infile = ['/store/caf/user/battilan/L1Trigger/BarrelTF/Generation/v1/SingleMuFlatPt_3GeVto140GeV_GEN_SIM_DIGI_L1_1_1_96z.root']
+infile = [
+'file:/afs/cern.ch/user/g/gcodispo/scratch1/CMSSW_7_2_3_patch1/src/L1Trigger/L1IntegratedMuonTrigger/SingleMuPlus_FlatPt_3to140_eta-1.05to1.05_phi-0.52to0.52_GEN_SIM_DIGI_L1.root']
 
 process.source = cms.Source(
     'PoolSource',

@@ -26,7 +26,7 @@ process.dt1DRecHits.dtDigiLabel = 'simMuonDTDigis'
 process.load('L1Trigger.GlobalMuonTrigger.gmtDigis_cfi')
 from  L1Trigger.DTTrackFinder.dttfDigis_cfi import dttfDigis as tmpDttfDigis
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'START53_V7A::All', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'START72_V1::All', '')
 
 process.phase1DttfDigis = process.tmpDttfDigis.clone(
 #    DTDigi_Source = cms.InputTag("simDtTriggerPrimitiveDigis"),
